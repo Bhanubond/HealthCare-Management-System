@@ -1,0 +1,61 @@
+@model HMS.Entities.MASDepartment
+
+@{
+    ViewData["Title"] = "Create Department";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-success text-white">
+        <h4>Create Department</h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Create" method="post">
+
+            <div class="form-group mb-3">
+                <label>Department Name</label>
+                <input asp-for="DeptName" class="form-control" />
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 form-check mb-2">
+                    <input asp-for="IsReferredView" class="form-check-input" />
+                    <label class="form-check-label">Referred View</label>
+                </div>
+
+                <div class="col-md-6 form-check mb-2">
+                    <input asp-for="IsService" class="form-check-input" />
+                    <label class="form-check-label">Service</label>
+                </div>
+
+                <div class="col-md-6 form-check mb-2">
+                    <input asp-for="IsUserRights" class="form-check-input" />
+                    <label class="form-check-label">User Rights</label>
+                </div>
+
+                <div class="col-md-6 form-check mb-2">
+                    <input asp-for="LoadUserDropdown" class="form-check-input" />
+                    <label class="form-check-label">Load User Dropdown</label>
+                </div>
+
+                <div class="col-md-6 form-check mb-2">
+                    <input asp-for="ClinicalDept" class="form-check-input" />
+                    <label class="form-check-label">Clinical Department</label>
+                </div>
+
+                <div class="col-md-6 form-check mb-2">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label class="form-check-label">Active</label>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3">Save</button>
+            <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+
+        </form>
+
+    </div>
+</div>

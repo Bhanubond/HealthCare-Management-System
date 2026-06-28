@@ -1,0 +1,43 @@
+# =========================
+# Visual Studio
+# =========================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================
+# Build folders
+# =========================
+bin/
+obj/
+Debug/
+Release/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# ASP.NET Core Secrets
+# =========================
+appsettings.Development.json
+
+# If your production appsettings contains passwords,
+# DON'T commit it. Instead use appsettings.Example.json.
+# appsettings.json
+
+# =========================
+# Rider / VS Code
+# =========================
+.idea/
+.vscode/
+
+# =========================
+# OS Files
+# =========================
+Thumbs.db
+Desktop.ini
+.DS_Store

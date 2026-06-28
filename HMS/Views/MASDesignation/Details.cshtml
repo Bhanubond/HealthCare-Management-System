@@ -1,0 +1,42 @@
+@model HMS.Entities.MASDesignation
+
+@{
+    ViewData["Title"] = "Designation Details";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0 fw-bold">Designation Details</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">Designation ID</div>
+                    <div class="col-sm-8">@Model.DesignationId</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">Designation Name</div>
+                    <div class="col-sm-8">@Model.DesignationName</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">Status</div>
+                    <div class="col-sm-8">
+                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                            @(Model.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary fw-bold">Back</a>
+        </div>
+    </div>
+</div>

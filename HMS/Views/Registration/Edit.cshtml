@@ -1,0 +1,301 @@
+﻿@model HMS.Models.RegistrationFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Patient Registration";
+}
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+    @Html.AntiForgeryToken()
+
+    <input asp-for="Patient.PatientId" type="hidden" />
+    <input asp-for="Patient.UHID" type="hidden" />
+    <input asp-for="Patient.OpNo" type="hidden" />
+    <input asp-for="Patient.PatientPicture" type="hidden" />
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            <h4>Edit OPD Patient</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-2">
+                    <label>UHID</label>
+                    <input class="form-control" value="@Model.Patient.UHID" readonly />
+                </div>
+
+                <div class="col-md-2">
+                    <label>OP Number</label>
+                    <input class="form-control" value="@Model.Patient.OpNo" readonly />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Registration Date</label>
+                    <input asp-for="Patient.RegDate" class="form-control" readonly />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Title</label>
+
+                    <select asp-for="Patient.Title" class="form-control">
+                        @foreach (var t in Model.Titles)
+                        {
+                            <option value="@t">@t</option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+                    <label>Patient Name</label>
+                    <input asp-for="Patient.PatientName" class="form-control" />
+                    <span asp-validation-for="Patient.PatientName" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+
+                <div class="col-md-4">
+                    <label>Father / Husband</label>
+                    <input asp-for="Patient.FatherOrHusband" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>DOB</label>
+                    <input asp-for="Patient.Dob" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Gender</label>
+
+                    <select asp-for="Patient.Gender" class="form-control">
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-2">
+                    <label>Phone</label>
+                    <input asp-for="Patient.Phone" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Aadhar</label>
+                    <input asp-for="Patient.AadharNo" class="form-control" />
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+
+                <div class="col-md-6">
+                    <label>Address</label>
+                    <textarea asp-for="Patient.Address" class="form-control"></textarea>
+                </div>
+
+                <div class="col-md-2">
+                    <label>Category</label>
+
+                    <select asp-for="Patient.CategoryId"
+                            asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))"
+                            class="form-control">
+                        <option value="">--Select--</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-2">
+                    <label>Payment Mode</label>
+
+                    <select asp-for="Patient.PaymodeId"
+                            asp-items="@(new SelectList(Model.PaymentModes, "PaymodeId", "PaymodeName"))"
+                            class="form-control">
+                        <option value="">--Select--</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h5>Location</h5>
+
+            <div class="row">
+
+                <div class="col-md-3">
+
+                    <label>Country</label>
+
+                    <select asp-for="Patient.CountryId"
+                            asp-items="@(new SelectList(Model.Countries, "CountryId", "CountryName"))"
+                            id="CountryId"
+                            class="form-control">
+                        <option value="">Select Country</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label>State</label>
+
+                    <select asp-for="Patient.StateId"
+                            asp-items="@(new SelectList(Model.States, "StateId", "StateName"))"
+                            id="StateId"
+                            class="form-control">
+                        <option value="">Select State</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label>Mandal</label>
+
+                    <select asp-for="Patient.MandalId"
+                            asp-items="@(new SelectList(Model.Mandals, "MandalId", "MandalName"))"
+                            id="MandalId"
+                            class="form-control">
+                        <option value="">Select Mandal</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label>City</label>
+
+                    <select asp-for="Patient.CityId"
+                            asp-items="@(new SelectList(Model.Cities, "CityId", "CityName"))"
+                            id="CityId"
+                            class="form-control">
+                        <option value="">Select City</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h5>Billing</h5>
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    <label>Total Amount</label>
+                    <input asp-for="Patient.TotalAmount"
+                           id="TotalAmount"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label>Discount %</label>
+                    <input asp-for="Patient.DiscountPer"
+                           id="DiscountPer"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label>Net Amount</label>
+                    <input asp-for="Patient.NetAmount"
+                           id="NetAmount"
+                           readonly
+                           class="form-control bg-light" />
+                </div>
+
+                <div class="col-md-3">
+                    <label>Paid Amount</label>
+                    <input asp-for="Patient.PaidAmount"
+                           class="form-control" />
+                </div>
+
+            </div>
+
+            <hr />
+
+            <div class="row">
+
+                <div class="col-md-3">
+
+                    <label>Patient Photo</label>
+
+                    <input type="file"
+                           name="PatientImage"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-3">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Patient.PatientPicture))
+                    {
+                        <img src="~/uploads/patients/@Model.Patient.PatientPicture"
+                             width="120"
+                             class="img-thumbnail mt-2" />
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer text-end">
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Back
+            </a>
+            <a asp-action="PrintOPCard"
+               asp-route-id="@Model.Patient.PatientId"
+               target="_blank"
+               class="btn btn-primary">
+                Print OP Card
+            </a>
+
+            <button class="btn btn-success">
+                Update Patient
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        function CalculateNetAmount() {
+
+            var total = parseFloat($("#TotalAmount").val()) || 0;
+
+            var discount = parseFloat($("#DiscountPer").val()) || 0;
+
+            var net = total - ((total * discount) / 100);
+
+            $("#NetAmount").val(net.toFixed(2));
+        }
+
+        $("#TotalAmount,#DiscountPer").keyup(function () {
+
+            CalculateNetAmount();
+
+        });
+
+        CalculateNetAmount();
+
+    </script>
+
+}

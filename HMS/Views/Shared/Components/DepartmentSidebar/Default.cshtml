@@ -1,0 +1,29 @@
+@model List<HMS.Models.DashboardDepartmentViewModel>
+
+<div class="department-shell h-100">
+    <div class="department-shell__title">
+        Departments
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="px-3 pb-3 text-white-50 small">
+            No active departments found.
+        </div>
+    }
+    else
+    {
+        <div class="department-shell__list">
+            @foreach (var dept in Model)
+            {
+                <a asp-controller="Dashboard"
+                   asp-action="Index"
+                   asp-route-deptId="@dept.DeptId"
+                   class="department-item @(dept.IsSelected ? "active" : "")">
+                    <span class="department-item__name">@dept.DeptName</span>
+                    <span class="department-item__meta">@dept.ScreenCount</span>
+                </a>
+            }
+        </div>
+    }
+</div>

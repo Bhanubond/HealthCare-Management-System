@@ -1,0 +1,116 @@
+﻿<script>
+    $(document).ready(function () {
+
+        var selectedState = $("#stateId").val();
+        var selectedMandal = $("#mandalId").val();
+        var selectedCity = $("#cityId").val();
+
+        // ================= COUNTRY → STATE
+        $("#countryId").change(function () {
+            loadStates();
+        });
+
+        function loadStates(callback) {
+            var countryId = $("#countryId").val();
+
+            $("#stateId").html('<option value="">-- Select State --</option>');
+            $("#mandalId").html('<option value="">-- Select Mandal --</option>');
+            $("#cityId").html('<option value="">-- Select City --</option>');
+
+            if (!countryId) return;
+
+            $.get('/Doctor/GetStatesByCountry', { countryId: countryId }, function (data) {
+
+                $.each(data, function (i, item) {
+                    $("#stateId").append(
+                        $('<option>', {
+                            value: item.stateId,
+                            text: item.stateName
+                        })
+                    );
+                });
+
+                if (selectedState) {
+                    $("#stateId").val(selectedState);
+                }
+
+                if (callback) callback();
+            });
+        }
+
+        // ================= STATE → MANDAL
+        $("#stateId").change(function () {
+            loadMandals();
+        });
+
+        function loadMandals(callback) {
+            var stateId = $("#stateId").val();
+
+            $("#mandalId").html('<option value="">-- Select Mandal --</option>');
+            $("#cityId").html('<option value="">-- Select City --</option>');
+
+            if (!stateId) return;
+
+            $.get('/Doctor/GetMandalsByState', { stateId: stateId }, function (data) {
+
+                $.each(data, function (i, item) {
+                    $("#mandalId").append(
+                        $('<option>', {
+                            value: item.mandalId,
+                            text: item.mandalName
+                        })
+                    );
+                });
+
+                if (selectedMandal) {
+                    $("#mandalId").val(selectedMandal);
+                }
+
+                if (callback) callback();
+            });
+        }
+
+        // ================= MANDAL → CITY
+        $("#mandalId").change(function () {
+            loadCities();
+        });
+
+        function loadCities() {
+            var mandalId = $("#mandalId").val();
+
+            $("#cityId").html('<option value="">-- Select City --</option>');
+
+            if (!mandalId) return;
+
+            $.get('/Doctor/GetCitiesByMandal', { mandalId: mandalId }, function (data) {
+
+                $.each(data, function (i, item) {
+                    $("#cityId").append(
+                        $('<option>', {
+                            value: item.cityId,
+                            text: item.cityName
+                        })
+                    );
+                });
+
+                if (selectedCity) {
+                    $("#cityId").val(selectedCity);
+                }
+            });
+        }
+
+        // ================= EDIT PAGE AUTO LOAD FLOW
+        if ($("#countryId").val()) {
+            loadStates(function () {
+                if ($("#stateId").val()) {
+                    loadMandals(function () {
+                        if ($("#mandalId").val()) {
+                            loadCities();
+                        }
+                    });
+                }
+            });
+        }
+
+    });
+</script>

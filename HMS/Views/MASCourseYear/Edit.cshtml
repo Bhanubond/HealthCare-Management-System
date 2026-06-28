@@ -1,0 +1,72 @@
+﻿@model HMS.Models.CourseYearDto
+
+@{
+    ViewData["Title"] = "Edit Course Year";
+}
+
+<div class="container mt-4">
+
+    <div class="card">
+
+        <div class="card-header bg-warning">
+
+            Edit Course Year
+
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit">
+
+                <input asp-for="CourseYearId" type="hidden" />
+
+                <div class="mb-3">
+
+                    <label>Course</label>
+
+                    <input asp-for="CourseName"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="YearName"></label>
+
+                    <input asp-for="YearName"
+                           class="form-control" />
+
+                </div>
+
+                <div class="form-check">
+
+                    <input asp-for="IsActive"
+                           class="form-check-input" />
+
+                    <label asp-for="IsActive"></label>
+
+                </div>
+
+                <br />
+
+                <button class="btn btn-warning">
+
+                    Update
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

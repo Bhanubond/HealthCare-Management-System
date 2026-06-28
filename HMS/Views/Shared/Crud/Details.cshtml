@@ -1,0 +1,23 @@
+@model object
+@using System.Reflection
+@{
+    var modelType = Model.GetType();
+    var properties = CrudViewHelper.GetDisplayProperties(modelType).ToList();
+    var title = ViewData["Title"]?.ToString() ?? "Details";
+}
+
+<h3 class="mb-3">@title</h3>
+
+<table class="table table-bordered">
+    <tbody>
+        @foreach (var property in properties)
+        {
+            <tr>
+                <th style="width: 25%">@CrudViewHelper.GetLabel(property)</th>
+                <td>@CrudViewHelper.GetDisplayValue(CrudViewHelper.GetPropertyValue(Model, property))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Back</a>

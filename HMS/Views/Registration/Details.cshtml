@@ -1,0 +1,57 @@
+﻿@model HMS.Entities.OPDPatientRegistration
+
+@{
+    ViewData["Title"] = "Patient Details";
+}
+
+<div class="container mt-3">
+
+    <h3>Patient Details</h3>
+
+    <div class="card p-3">
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <strong>UHID:</strong> @Model.UHID
+            </div>
+
+            <div class="col-md-6">
+                <strong>OP No:</strong> @Model.OpNo
+            </div>
+
+            <div class="col-md-6 mt-2">
+                <strong>Name:</strong> @Model.Title @Model.PatientName
+            </div>
+
+            <div class="col-md-6 mt-2">
+                <strong>Phone:</strong> @Model.Phone
+            </div>
+
+            <div class="col-md-6 mt-2">
+                <strong>Gender:</strong> @Model.Gender
+            </div>
+
+            <div class="col-md-6 mt-2">
+                <strong>Aadhar:</strong> @Model.AadharNo
+            </div>
+
+            <div class="col-md-12 mt-2">
+                <strong>Address:</strong> @Model.Address
+            </div>
+
+            <div class="col-md-6 mt-2">
+                <strong>Reg Date:</strong> @Model.RegDate.ToString("dd-MM-yyyy")
+            </div>
+
+            <div class="col-md-6 mt-2">
+                <strong>Net Amount:</strong> @Model.NetAmount
+            </div>
+
+        </div>
+
+    </div>
+
+    <a href="/Registration/Index" class="btn btn-secondary mt-3">Back</a>
+
+</div>

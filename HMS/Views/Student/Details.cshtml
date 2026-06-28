@@ -1,0 +1,106 @@
+﻿@model HMS.Models.StudentDetailsVm
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<div class="card shadow p-4">
+
+    <h3 class="mb-3">Student Details</h3>
+
+    <table class="table table-bordered">
+
+        <tr>
+            <th>Student Code</th>
+            <td>@Model.StudentCode</td>
+        </tr>
+
+        <tr>
+            <th>Name</th>
+            <td>@Model.StudentName</td>
+        </tr>
+
+        <tr>
+            <th>Gender</th>
+            <td>@Model.Gender</td>
+        </tr>
+
+        <tr>
+            <th>Date of Birth</th>
+            <td>@Model.DOB?.ToString("yyyy-MM-dd")</td>
+        </tr>
+
+        <tr>
+            <th>Phone</th>
+            <td>@Model.Phone</td>
+        </tr>
+
+        <tr>
+            <th>Email</th>
+            <td>@Model.Email</td>
+        </tr>
+
+        <tr>
+            <th>Address</th>
+            <td>@Model.Address</td>
+        </tr>
+
+        <tr>
+            <th>Course</th>
+            <td>@Model.CourseName</td>
+        </tr>
+
+        <tr>
+            <th>Course Year</th>
+            <td>@Model.YearName</td>
+        </tr>
+
+        <tr>
+            <th>Department</th>
+            <td>@Model.DeptName</td>
+        </tr>
+
+        <tr>
+            <th>Country</th>
+            <td>@Model.CountryName</td>
+        </tr>
+
+        <tr>
+            <th>State</th>
+            <td>@Model.StateName</td>
+        </tr>
+
+        <tr>
+            <th>Mandal</th>
+            <td>@Model.MandalName</td>
+        </tr>
+
+        <tr>
+            <th>City</th>
+            <td>@Model.CityName</td>
+        </tr>
+
+        <tr>
+            <th>Admission Date</th>
+            <td>@Model.AdmissionDate.ToString("yyyy-MM-dd")</td>
+        </tr>
+
+        <tr>
+            <th>Status</th>
+            <td>
+                @if (Model.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">Inactive</span>
+                }
+            </td>
+        </tr>
+
+    </table>
+
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+</div>

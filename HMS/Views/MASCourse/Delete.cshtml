@@ -1,0 +1,76 @@
+﻿@model HMS.Models.CourseDetailsDto
+
+@{
+    ViewData["Title"] = "Delete Course";
+}
+
+<div class="container mt-4">
+
+    <div class="card border-danger shadow">
+
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Delete Course</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-warning">
+                <strong>Are you sure you want to delete this course?</strong>
+            </div>
+
+            <dl class="row">
+
+                <dt class="col-sm-3">
+                    Course ID
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.CourseId
+                </dd>
+
+                <dt class="col-sm-3">
+                    Course Name
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.CourseName
+                </dd>
+
+                <dt class="col-sm-3">
+                    Status
+                </dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                </dd>
+
+            </dl>
+
+        </div>
+
+        <div class="card-footer">
+
+            <form asp-action="Delete" method="post">
+
+                <input asp-for="CourseId" type="hidden" />
+
+                <button type="submit" class="btn btn-danger">
+                    Delete
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

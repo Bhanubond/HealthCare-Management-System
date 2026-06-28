@@ -1,0 +1,69 @@
+@model HMS.Models.UserDetailsDto
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <th style="width: 25%">User Name</th>
+            <td>@Model.UserName</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>@Model.Name</td>
+        </tr>
+        <tr>
+            <th>Department</th>
+            <td>@Model.DeptName</td>
+        </tr>
+        <tr>
+            <th>Category</th>
+            <td>@Model.CategoryId</td>
+        </tr>
+        <tr>
+            <th>Active</th>
+            <td>@(Model.Active ? "Yes" : "No")</td>
+        </tr>
+        <tr>
+            <th>Enable View All Patient</th>
+            <td>@(Model.EnableViewAllPatient ? "Yes" : "No")</td>
+        </tr>
+        <tr>
+            <th>Password Reset</th>
+            <td>@(Model.PasswordReset ? "Yes" : "No")</td>
+        </tr>
+        <tr>
+            <th>Enable Live Chat</th>
+            <td>@(Model.EnableLiveChat ? "Yes" : "No")</td>
+        </tr>
+        <tr>
+            <th>Is Online</th>
+            <td>@(Model.IsOnline ? "Yes" : "No")</td>
+        </tr>
+        <tr>
+            <th>Created By</th>
+            <td>@Model.CreatedBy</td>
+        </tr>
+        <tr>
+            <th>Created Date</th>
+            <td>@Model.CreatedDate</td>
+        </tr>
+        <tr>
+            <th>Modified By</th>
+            <td>@Model.ModifiedBy</td>
+        </tr>
+        <tr>
+            <th>Modified Date</th>
+            <td>@Model.ModifiedDate</td>
+        </tr>
+        <tr>
+            <th>Last Seen At</th>
+            <td>@Model.LastSeenAt</td>
+        </tr>
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Back</a>

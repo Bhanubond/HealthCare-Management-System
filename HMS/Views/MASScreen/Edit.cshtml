@@ -1,0 +1,109 @@
+﻿@model HMS.Entities.MASScreen
+@using System.Reflection
+@{
+    var modelType = Model.GetType();
+    var keyProperty = CrudViewHelper.GetKeyProperty(modelType);
+    var hiddenProperties = (ViewData["HiddenProperties"] as IEnumerable<string> ?? Array.Empty<string>())
+        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    var editableProperties = CrudViewHelper.GetEditableProperties(modelType, hiddenProperties).ToList();
+    var hiddenEditableProperties = modelType.GetProperties()
+        .Where(p => hiddenProperties.Contains(p.Name))
+        .Where(p => p.GetIndexParameters().Length == 0)
+        .Where(p => p.SetMethod != null)
+        .ToList();
+    var formAction = ViewData["FormAction"]?.ToString() ?? "Create";
+    var submitText = ViewData["SubmitText"]?.ToString() ?? "Save";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<form asp-action="@formAction" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    @if (keyProperty != null)
+    {
+        <input type="hidden" name="@keyProperty.Name" value="@CrudViewHelper.GetInputValue(CrudViewHelper.GetPropertyValue(Model, keyProperty))" />
+    }
+
+    @foreach (var property in hiddenEditableProperties)
+    {
+        var hiddenValue = CrudViewHelper.GetPropertyValue(Model, property);
+        <input type="hidden" name="@property.Name" value="@CrudViewHelper.GetInputValue(hiddenValue)" />
+    }
+
+    <div class="row g-3">
+        @foreach (var property in editableProperties)
+        {
+            var value = CrudViewHelper.GetPropertyValue(Model, property);
+            var propertyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            var label = CrudViewHelper.GetLabel(property);
+            var inputName = property.Name;
+            var selectList = CrudViewHelper.GetSelectList(ViewData, inputName);
+
+            <div class="col-md-6">
+                <label class="form-label">@label</label>
+
+                @if (selectList != null)
+                {
+                    <select class="form-select" name="@inputName">
+                        <option value="">-- Select --</option>
+                        @foreach (var item in selectList)
+                        {
+                            var selected = item.Value == Convert.ToString(value);
+                            if (selected)
+                            {
+                                <option value="@item.Value" selected="selected">@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                }
+                else if (propertyType == typeof(bool))
+                {
+                    var checkedValue = value is bool boolValue && boolValue;
+                    <input type="hidden" name="@inputName" value="false" />
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="@inputName" value="true" @(checkedValue ? "checked=\"checked\"" : "") />
+                        <label class="form-check-label">@label</label>
+                    </div>
+                }
+                else if (propertyType == typeof(DateTime))
+                {
+                    var dateValue = value is DateTime dateTime && dateTime != default
+                        ? dateTime.ToString("yyyy-MM-dd")
+                        : string.Empty;
+                    <input type="date" class="form-control" name="@inputName" value="@dateValue" />
+                }
+                else if (property.Name.Contains("Password", StringComparison.OrdinalIgnoreCase))
+                {
+                    <input type="password" class="form-control" name="@inputName" value="@value" />
+                }
+                else if (propertyType == typeof(int) || propertyType == typeof(long) ||
+                         propertyType == typeof(short) || propertyType == typeof(decimal) ||
+                         propertyType == typeof(double) || propertyType == typeof(float))
+                {
+                    var numberValue = value == null ? string.Empty : Convert.ToString(value);
+                    <input type="number" class="form-control" name="@inputName" value="@numberValue" />
+                }
+                else
+                {
+                    <input type="text" class="form-control" name="@inputName" value="@value" />
+                }
+
+                @Html.ValidationMessage(inputName, "", new { @class = "text-danger small" })
+            </div>
+        }
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">@submitText</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+<partial name="_ValidationScriptsPartial" />
+

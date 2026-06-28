@@ -1,0 +1,34 @@
+@model HMS.Entities.Doctor
+
+@{
+    ViewData["Title"] = "Doctor Details";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0 fw-bold">Doctor Details</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Doctor Code</div><div class="col-sm-8">@Model.DoctorCode</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Doctor Name</div><div class="col-sm-8">@Model.DoctorName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Gender</div><div class="col-sm-8">@Model.Gender</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Date of Birth</div><div class="col-sm-8">@(Model.DOB.HasValue ? Model.DOB.Value.ToString("yyyy-MM-dd") : "-")</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Phone</div><div class="col-sm-8">@Model.Phone</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Email</div><div class="col-sm-8">@Model.Email</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Department</div><div class="col-sm-8">@Model.Department?.DeptName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Designation</div><div class="col-sm-8">@Model.Designation?.DesignationName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Country</div><div class="col-sm-8">@Model.Country?.CountryName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">State</div><div class="col-sm-8">@Model.State?.StateName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Mandal</div><div class="col-sm-8">@Model.Mandal?.MandalName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">City</div><div class="col-sm-8">@Model.City?.CityName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Joining Date</div><div class="col-sm-8">@Model.JoiningDate.ToString("yyyy-MM-dd")</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Status</div><div class="col-sm-8"><span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">@(Model.IsActive ? "Active" : "Inactive")</span></div></div></div>
+        </div>
+
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary fw-bold">Back</a>
+        </div>
+    </div>
+</div>

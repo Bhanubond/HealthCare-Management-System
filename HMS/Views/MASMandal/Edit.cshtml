@@ -1,0 +1,80 @@
+@model HMS.Entities.MASMandal
+
+@{
+    ViewData["Title"] = "Edit Mandal";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-warning">
+        <h4 class="mb-0 fw-bold">Edit Mandal</h4>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <input asp-for="MandalId" type="hidden" />
+            <input asp-for="IsDeleted" type="hidden" />
+            <input asp-for="IsDefault" type="hidden" />
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Country</label>
+                    <select id="countryId" class="form-select" asp-items="ViewBag.CountryId">
+                        <option value="">-- Select Country --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="StateId" class="form-label fw-bold">State</label>
+                    <select id="stateId" asp-for="StateId" class="form-select" asp-items="ViewBag.StateId">
+                        <option value="">-- Select State --</option>
+                    </select>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="MandalName" class="form-label fw-bold"></label>
+                    <input asp-for="MandalName" class="form-control" />
+                    <span asp-validation-for="MandalName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-center">
+                    <div class="form-check mt-4">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-warning fw-bold">Update</button>
+                <a asp-action="Index" class="btn btn-secondary fw-bold">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#countryId').change(function () {
+                var countryId = $(this).val();
+                $('#stateId').html('<option value="">-- Select State --</option>');
+
+                if (countryId) {
+                    $.get('/MASMandal/GetStatesByCountry', { countryId: countryId }, function (data) {
+                        $.each(data, function (i, item) {
+                            $('#stateId').append($('<option>', {
+                                value: item.stateId,
+                                text: item.stateName
+                            }));
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}

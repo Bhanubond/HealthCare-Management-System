@@ -1,0 +1,81 @@
+@model HMS.Models.UserFormViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <input asp-for="UserId" type="hidden" />
+    <input asp-for="CreatedBy" type="hidden" />
+    <input asp-for="CreatedDate" type="hidden" />
+    <input asp-for="ModifiedBy" type="hidden" />
+    <input asp-for="ModifiedDate" type="hidden" />
+    <input asp-for="LastSeenAt" type="hidden" />
+    <input asp-for="IsOnline" type="hidden" />
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="UserName" class="form-label"></label>
+            <input asp-for="UserName" class="form-control" />
+            <span asp-validation-for="UserName" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="StudentId" class="form-label"></label>
+            <select asp-for="StudentId" class="form-select" asp-items="Model.StudentOptions">
+                <option value="">-- Select Student --</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="DoctorId" class="form-label"></label>
+            <select asp-for="DoctorId" class="form-select" asp-items="Model.DoctorOptions">
+                <option value="">-- Select Doctor --</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="CategoryId" class="form-label"></label>
+            <input asp-for="CategoryId" type="number" class="form-control" />
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check mt-4">
+                <input asp-for="Active" class="form-check-input" />
+                <label asp-for="Active" class="form-check-label"></label>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check">
+                <input asp-for="EnableViewAllPatient" class="form-check-input" />
+                <label asp-for="EnableViewAllPatient" class="form-check-label"></label>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check">
+                <input asp-for="PasswordReset" class="form-check-input" />
+                <label asp-for="PasswordReset" class="form-check-label"></label>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check">
+                <input asp-for="EnableLiveChat" class="form-check-input" />
+                <label asp-for="EnableLiveChat" class="form-check-label"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

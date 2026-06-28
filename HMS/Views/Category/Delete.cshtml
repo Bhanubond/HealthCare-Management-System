@@ -1,0 +1,55 @@
+﻿@model HMS.Entities.MASCategory
+
+@{
+    ViewData["Title"] = "Delete Category";
+}
+
+<div class="card shadow-sm border-danger">
+
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0 fw-bold">Delete Category</h4>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-warning">
+            Are you sure you want to delete this record?
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-6"><strong>ID:</strong> @Model.CategoryId</div>
+            <div class="col-md-6"><strong>Name:</strong> @Model.CategoryName</div>
+
+            <div class="col-md-4">
+                <strong>Discount:</strong> @Model.DiscountPer %
+            </div>
+
+            <div class="col-md-4">
+                <strong>Investigation:</strong> @Model.InvestigationDiscountPer %
+            </div>
+
+            <div class="col-md-4">
+                <strong>Treatment:</strong> @Model.TreatmentDiscountPer %
+            </div>
+
+            <div class="col-md-4">
+                <strong>Status:</strong>
+                <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                    @(Model.IsActive ? "Active" : "Inactive")
+                </span>
+            </div>
+
+        </div>
+
+        <form asp-action="Delete" method="post" class="mt-4 d-flex gap-2">
+
+            <input type="hidden" asp-for="CategoryId" />
+
+            <button type="submit" class="btn btn-danger fw-bold">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary fw-bold">Cancel</a>
+
+        </form>
+
+    </div>
+</div>

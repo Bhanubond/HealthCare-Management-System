@@ -1,0 +1,38 @@
+@model HMS.Models.UserDetailsDto
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<div class="alert alert-danger">
+    This action cannot be undone.
+</div>
+
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <th style="width: 25%">User Name</th>
+            <td>@Model.UserName</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>@Model.Name</td>
+        </tr>
+        <tr>
+            <th>Department</th>
+            <td>@Model.DeptName</td>
+        </tr>
+        <tr>
+            <th>Active</th>
+            <td>@(Model.Active ? "Yes" : "No")</td>
+        </tr>
+    </tbody>
+</table>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="UserId" type="hidden" />
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

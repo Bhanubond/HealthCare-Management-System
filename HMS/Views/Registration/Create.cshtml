@@ -1,0 +1,279 @@
+﻿@model HMS.Models.RegistrationFormViewModel
+
+@{
+    ViewData["Title"] = "OPD Patient Registration";
+}
+
+<div class="container-fluid mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🏥 OPD Patient Registration</h3>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-primary text-white">
+                        Patient Information
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <label>Title</label>
+                                <select asp-for="Patient.Title" class="form-control">
+                                    <option value="">Select</option>
+                                    @foreach (var t in Model.Titles)
+                                    {
+                                        <option value="@t">@t</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label>Patient Name *</label>
+                                <input asp-for="Patient.PatientName" class="form-control" required />
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+                                <label>Father / Husband</label>
+                                <input asp-for="Patient.FatherOrHusband" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Date of Birth</label>
+                                <input asp-for="Patient.Dob" type="date" class="form-control" />
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+                                <label>Gender</label>
+                                <select asp-for="Patient.Gender" class="form-control">
+                                    <option value="">Select</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Phone *</label>
+                                <input asp-for="Patient.Phone" class="form-control" required />
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+                                <label>Aadhar No</label>
+                                <input asp-for="Patient.AadharNo" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Category</label>
+                                <select asp-for="Patient.CategoryId" class="form-control"
+                                        asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))">
+                                    <option value="">Select Category</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-2">
+                            <label>Patient Photo</label>
+                            <input type="file" name="PatientImage" class="form-control" id="patientImage" />
+                            <img id="previewImg" style="width:100px;height:100px;margin-top:10px;display:none;" />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        Address Details
+                    </div>
+
+                    <div class="card-body">
+
+                        <label>Address</label>
+                        <textarea asp-for="Patient.Address" class="form-control"></textarea>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+                                <label>Country</label>
+                                <select asp-for="Patient.CountryId" id="CountryId"
+                                        class="form-control"
+                                        asp-items="@(new SelectList(Model.Countries, "CountryId", "CountryName"))">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>State</label>
+                                <select asp-for="Patient.StateId" id="StateId" class="form-control"></select>
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-2">
+
+                            <div class="col-md-6">
+                                <label>Mandal</label>
+                                <select asp-for="Patient.MandalId" id="MandalId" class="form-control"></select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>City</label>
+                                <select asp-for="Patient.CityId" id="CityId" class="form-control"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-success text-white">
+                        Billing Details
+                    </div>
+
+                    <div class="card-body">
+
+                        <label>Total Amount</label>
+                        <input asp-for="Patient.TotalAmount" id="TotalAmount" class="form-control" />
+
+                        <label class="mt-2">Discount %</label>
+                        <input asp-for="Patient.DiscountPer" id="DiscountPer" class="form-control" />
+
+                        <label class="mt-2">Net Amount</label>
+                        <input asp-for="Patient.NetAmount" id="NetAmount" class="form-control" readonly />
+
+                        <label class="mt-2">Paid Amount</label>
+                        <input asp-for="Patient.PaidAmount" class="form-control" />
+
+                        <label class="mt-2">Payment Mode</label>
+                        <select asp-for="Patient.PaymodeId"
+                                class="form-control"
+                                asp-items="@(new SelectList(Model.PaymentModes, "PaymodeId", "PaymodeName"))">
+                            <option value="">Select</option>
+                        </select>
+
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            💾 Register Patient
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>
+@section Scripts {
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $("#patientImage").change(function () {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#previewImg").show();
+                $("#previewImg").attr("src", e.target.result);
+            };
+            reader.readAsDataURL(this.files[0]);
+        });
+        function calculateNet() {
+            let total = parseFloat($("#TotalAmount").val()) || 0;
+            let discount = parseFloat($("#DiscountPer").val()) || 0;
+
+            let net = total - (total * discount / 100);
+
+            $("#NetAmount").val(net.toFixed(2));
+        }
+
+        $("#TotalAmount, #DiscountPer").on("input", function () {
+            calculateNet();
+        });
+
+        $("#CountryId").change(function () {
+
+            $("#StateId").empty();
+            $("#MandalId").empty();
+            $("#CityId").empty();
+            $.getJSON('/Registration/GetStatesByCountry', { countryId: $(this).val() }, function (data) {
+
+                $("#StateId").append('<option>Select</option>');
+
+                $.each(data, function (i, item) {
+                    $("#StateId").append('<option value="' + item.stateId + '">' + item.stateName + '</option>');
+                });
+
+            });
+        });
+
+        $("#StateId").change(function () {
+
+            $("#MandalId").empty();
+            $("#CityId").empty();
+
+            $.getJSON('/Registration/GetMandalsByState', { stateId: $(this).val() }, function (data) {
+
+                $("#MandalId").append('<option>Select</option>');
+
+                $.each(data, function (i, item) {
+                    $("#MandalId").append('<option value="' + item.mandalId + '">' + item.mandalName + '</option>');
+                });
+
+            });
+        });
+
+        $("#MandalId").change(function () {
+
+            $("#CityId").empty();
+
+            $.getJSON('/Registration/GetCitiesByMandal', { mandalId: $(this).val() }, function (data) {
+
+                $("#CityId").append('<option>Select</option>');
+
+                $.each(data, function (i, item) {
+                    $("#CityId").append('<option value="' + item.cityId + '">' + item.cityName + '</option>');
+                });
+
+            });
+        });
+
+    </script>
+}

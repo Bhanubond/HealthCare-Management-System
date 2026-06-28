@@ -1,0 +1,148 @@
+﻿@model IEnumerable<HMS.Entities.MASCategory>
+
+@{
+    ViewData["Title"] = "Category Master";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
+
+<div class="card-header bg-primary text-white">
+    <h4 class="mb-0">Category List</h4>
+</div>
+
+<div class="card-body">
+
+    <a asp-action="Create" class="btn btn-success mb-3">
+        + Create Category
+    </a>
+
+    <div class="table-responsive">
+
+        <table id="categoryTable" class="table table-bordered table-hover table-striped">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Category</th>
+                    <th>Discount %</th>
+                    <th>Investigation %</th>
+                    <th>Treatment %</th>
+                    <th>Status</th>
+                    <th width="180">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@item.CategoryId</td>
+
+                        <td><strong>@item.CategoryName</strong></td>
+
+                        <td>@item.DiscountPer</td>
+
+                        <td>@item.InvestigationDiscountPer</td>
+
+                        <td>@item.TreatmentDiscountPer</td>
+
+                        <td>
+                            <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
+                                @(item.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+
+                        <td class="text-nowrap">
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-info btn-sm">
+                                Details
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-danger btn-sm">
+                                Delete
+                            </a>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#categoryTable').DataTable({
+
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "All"]
+                ],
+
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false,
+
+                dom: 'Blfrtip',
+
+                buttons: [
+                    { extend: 'copy', className: 'btn btn-primary' },
+                    { extend: 'csv', className: 'btn btn-success' },
+                    { extend: 'excel', className: 'btn btn-success' },
+                    { extend: 'pdf', className: 'btn btn-danger', orientation: 'landscape', pageSize: 'A4' },
+                    { extend: 'print', className: 'btn btn-info' },
+                    { extend: 'colvis', className: 'btn btn-secondary' }
+                ]
+
+            });
+
+        });
+
+    </script>
+
+}

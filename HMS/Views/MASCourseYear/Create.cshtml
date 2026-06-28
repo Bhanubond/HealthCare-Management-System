@@ -1,0 +1,70 @@
+﻿@model HMS.Entities.MASCourseYear
+
+@{
+    ViewData["Title"] = "Create Course Year";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h4>Create Course Year</h4>
+        </div>
+
+
+        <div class="card-body">
+
+            <form asp-action="Create">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+
+                    <label asp-for="CourseId"></label>
+
+                    <select asp-for="CourseId"
+                            asp-items="ViewBag.CourseId"
+                            class="form-select">
+
+                        <option value="">Select Course</option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="YearName"></label>
+
+                    <input asp-for="YearName" class="form-control" />
+
+                    <span asp-validation-for="YearName" class="text-danger"></span>
+
+                </div>
+
+                <div class="form-check">
+
+                    <input asp-for="IsActive" class="form-check-input" />
+
+                    <label asp-for="IsActive"></label>
+
+                </div>
+
+                <br />
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success mt-3">Save</button>
+                    <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

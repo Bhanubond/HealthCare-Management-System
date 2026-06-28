@@ -1,0 +1,25 @@
+@model HMS.Models.StudentFormViewModel
+
+<h3>Edit Student</h3>
+
+<form asp-action="Edit" method="post">
+
+    <partial name="_StudentForm" model="Model" />
+
+    <button type="submit" class="btn btn-primary">
+        Update
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <partial name="_StudentScripts" model="Model" />
+
+}

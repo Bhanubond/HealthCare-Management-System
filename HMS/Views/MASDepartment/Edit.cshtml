@@ -1,0 +1,63 @@
+@model HMS.Entities.MASDepartment
+
+@{
+    ViewData["Title"] = "Edit Department";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-warning">
+        <h4>Edit Department</h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <input type="hidden" asp-for="DeptId" />
+
+            <div class="form-group mb-3">
+                <label>Department Name</label>
+                <input asp-for="DeptName" class="form-control" />
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 form-check">
+                    <input asp-for="IsReferredView" />
+                    <label>Referred View</label>
+                </div>
+
+                <div class="col-md-6 form-check">
+                    <input asp-for="IsService" />
+                    <label>Service</label>
+                </div>
+
+                <div class="col-md-6 form-check">
+                    <input asp-for="IsUserRights" />
+                    <label>User Rights</label>
+                </div>
+
+                <div class="col-md-6 form-check">
+                    <input asp-for="LoadUserDropdown" />
+                    <label>Load User Dropdown</label>
+                </div>
+
+                <div class="col-md-6 form-check">
+                    <input asp-for="ClinicalDept" />
+                    <label>Clinical Dept</label>
+                </div>
+
+                <div class="col-md-6 form-check">
+                    <input asp-for="IsActive" />
+                    <label>Active</label>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Update</button>
+            <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+
+        </form>
+
+    </div>
+</div>

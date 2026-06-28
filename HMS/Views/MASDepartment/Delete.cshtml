@@ -1,0 +1,23 @@
+@model HMS.Entities.MASDepartment
+
+<div class="card border-danger shadow">
+
+    <div class="card-header bg-danger text-white">
+        <h4>Delete Department</h4>
+    </div>
+
+    <div class="card-body">
+
+        <h5>Are you sure you want to delete this record?</h5>
+
+        <p><strong>@Model.DeptName</strong></p>
+
+        <form asp-action="DeleteConfirmed" method="post">
+            <input type="hidden" asp-for="DeptId" />
+
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+
+    </div>
+</div>

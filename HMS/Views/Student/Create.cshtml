@@ -1,0 +1,26 @@
+@model HMS.Models.StudentFormViewModel
+
+
+    <div class="card-header bg-success text-white">
+        <h4>Create Student</h4>
+    </div>
+
+
+<form asp-action="Create" method="post">
+
+    <partial name="_StudentForm" model="Model" />
+
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-success mt-3">Save</button>
+        <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+    </div>
+
+</form>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <partial name="_StudentScripts" model="Model" />
+
+}

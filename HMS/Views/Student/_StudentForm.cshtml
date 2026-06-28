@@ -1,0 +1,337 @@
+﻿@model HMS.Models.StudentFormViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<input asp-for="Student.StudentId" type="hidden" />
+
+<div class="row">
+
+    <!-- Student Code -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.StudentCode" class="form-label"></label>
+        <input asp-for="Student.StudentCode" class="form-control" />
+        <span asp-validation-for="Student.StudentCode" class="text-danger"></span>
+    </div>
+
+    <!-- Student Name -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.StudentName" class="form-label"></label>
+        <input asp-for="Student.StudentName" class="form-control" />
+        <span asp-validation-for="Student.StudentName" class="text-danger"></span>
+    </div>
+
+    <!-- Gender -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.Gender" class="form-label"></label>
+        <select asp-for="Student.Gender" class="form-control">
+            <option value="">-- Select Gender --</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+        <span asp-validation-for="Student.Gender" class="text-danger"></span>
+    </div>
+
+    <!-- DOB -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.DOB" class="form-label"></label>
+        <input asp-for="Student.DOB" type="date" class="form-control" />
+        <span asp-validation-for="Student.DOB" class="text-danger"></span>
+    </div>
+
+    <!-- Phone -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.Phone" class="form-label"></label>
+        <input asp-for="Student.Phone" class="form-control" />
+        <span asp-validation-for="Student.Phone" class="text-danger"></span>
+    </div>
+
+    <!-- Email -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.Email" class="form-label"></label>
+        <input asp-for="Student.Email" type="email" class="form-control" />
+        <span asp-validation-for="Student.Email" class="text-danger"></span>
+    </div>
+
+    <!-- Address -->
+    <div class="col-md-12 mb-3">
+        <label asp-for="Student.Address" class="form-label"></label>
+        <textarea asp-for="Student.Address" class="form-control" rows="2"></textarea>
+        <span asp-validation-for="Student.Address" class="text-danger"></span>
+    </div>
+
+    <!-- Course -->
+    <div class="col-md-4 mb-3">
+        <label class="form-label">Course</label>
+        <select id="courseId"
+                asp-for="Student.CourseId"
+                class="form-control"
+                asp-items="@(new SelectList(Model.Courses, "CourseId", "CourseName"))">
+            <option value="">-- Select Course --</option>
+        </select>
+    </div>
+
+    <!-- Course Year -->
+    <div class="col-md-4 mb-3">
+        <label class="form-label">Course Year</label>
+        <select id="courseYearId"
+                asp-for="Student.CourseYearId"
+                class="form-control"
+                data-selected="@Model.Student.CourseYearId">
+            <option value="">-- Select Course Year --</option>
+        </select>
+    </div>
+
+    <!-- Department -->
+    <div class="col-md-4 mb-3">
+        <label class="form-label">Department</label>
+        <select asp-for="Student.DepartmentId"
+                class="form-control"
+                asp-items="@(new SelectList(Model.Departments, "DeptId", "DeptName"))">
+            <option value="">-- Select Department --</option>
+        </select>
+    </div>
+
+    <!-- Country -->
+    <div class="col-md-3 mb-3">
+        <label class="form-label">Country</label>
+        <select id="countryId"
+                asp-for="Student.CountryId"
+                class="form-control"
+                asp-items="@(new SelectList(Model.Countries, "CountryId", "CountryName"))">
+            <option value="">-- Select Country --</option>
+        </select>
+    </div>
+
+    <!-- State -->
+    <div class="col-md-3 mb-3">
+        <label class="form-label">State</label>
+        <select id="stateId"
+                asp-for="Student.StateId"
+                class="form-control"
+                data-selected="@Model.Student.StateId">
+            <option value="">-- Select State --</option>
+        </select>
+    </div>
+
+    <!-- Mandal -->
+    <div class="col-md-3 mb-3">
+        <label class="form-label">Mandal</label>
+        <select id="mandalId"
+                asp-for="Student.MandalId"
+                class="form-control"
+                data-selected="@Model.Student.MandalId">
+            <option value="">-- Select Mandal --</option>
+        </select>
+    </div>
+
+    <!-- City -->
+    <div class="col-md-3 mb-3">
+        <label class="form-label">City</label>
+        <select id="cityId"
+                asp-for="Student.CityId"
+                class="form-control"
+                data-selected="@Model.Student.CityId">
+            <option value="">-- Select City --</option>
+        </select>
+    </div>
+
+    <!-- Admission Date -->
+    <div class="col-md-4 mb-3">
+        <label asp-for="Student.AdmissionDate" class="form-label"></label>
+        <input asp-for="Student.AdmissionDate" type="date" class="form-control" />
+        <span asp-validation-for="Student.AdmissionDate" class="text-danger"></span>
+    </div>
+
+    <!-- Active -->
+    <div class="col-md-4 mb-3">
+        <label class="form-label d-block">Status</label>
+        <div class="form-check mt-2">
+            <input asp-for="Student.IsActive" class="form-check-input" />
+            <label asp-for="Student.IsActive" class="form-check-label"></label>
+        </div>
+    </div>
+
+</div>
+
+@* @section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        $(function () {
+
+            //--------------------------
+            // COURSE -> COURSE YEAR
+            //--------------------------
+
+            function loadCourseYears(selectedId) {
+
+                var courseId = $("#courseId").val();
+
+                $("#courseYearId").html('<option value="">-- Select Course Year --</option>');
+
+                if (!courseId)
+                    return;
+
+                $.get('/Student/GetCourseYears',
+                    { courseId: courseId },
+                    function (data) {
+
+                        $.each(data, function (i, item) {
+
+                            $("#courseYearId").append(
+                                $('<option>', {
+                                    value: item.courseYearId,
+                                    text: item.yearName
+                                })
+                            );
+
+                        });
+
+                        if (selectedId)
+                            $("#courseYearId").val(selectedId);
+                    });
+            }
+
+            $("#courseId").change(function () {
+                loadCourseYears(null);
+            });
+
+            loadCourseYears($("#courseYearId").data("selected"));
+
+            //--------------------------
+            // COUNTRY -> STATE
+            //--------------------------
+
+            function loadStates(selectedState) {
+
+                var countryId = $("#countryId").val();
+
+                $("#stateId").html('<option value="">-- Select State --</option>');
+                $("#mandalId").html('<option value="">-- Select Mandal --</option>');
+                $("#cityId").html('<option value="">-- Select City --</option>');
+
+                if (!countryId)
+                    return;
+
+                $.get('/Student/GetStatesByCountry',
+                    { countryId: countryId },
+                    function (data) {
+
+                        $.each(data, function (i, item) {
+
+                            $("#stateId").append(
+                                $('<option>', {
+                                    value: item.stateId,
+                                    text: item.stateName
+                                })
+                            );
+
+                        });
+
+                        if (selectedState) {
+                            $("#stateId").val(selectedState);
+                            loadMandals($("#mandalId").data("selected"));
+                        }
+
+                    });
+            }
+
+            //--------------------------
+            // STATE -> MANDAL
+            //--------------------------
+
+            function loadMandals(selectedMandal) {
+
+                var stateId = $("#stateId").val();
+
+                $("#mandalId").html('<option value="">-- Select Mandal --</option>');
+                $("#cityId").html('<option value="">-- Select City --</option>');
+
+                if (!stateId)
+                    return;
+
+                $.get('/Student/GetMandalsByState',
+                    { stateId: stateId },
+                    function (data) {
+
+                        $.each(data, function (i, item) {
+
+                            $("#mandalId").append(
+                                $('<option>', {
+                                    value: item.mandalId,
+                                    text: item.mandalName
+                                })
+                            );
+
+                        });
+
+                        if (selectedMandal) {
+                            $("#mandalId").val(selectedMandal);
+                            loadCities($("#cityId").data("selected"));
+                        }
+
+                    });
+            }
+
+            //--------------------------
+            // MANDAL -> CITY
+            //--------------------------
+
+            function loadCities(selectedCity) {
+
+                var mandalId = $("#mandalId").val();
+
+                $("#cityId").html('<option value="">-- Select City --</option>');
+
+                if (!mandalId)
+                    return;
+
+                $.get('/Student/GetCitiesByMandal',
+                    { mandalId: mandalId },
+                    function (data) {
+
+                        $.each(data, function (i, item) {
+
+                            $("#cityId").append(
+                                $('<option>', {
+                                    value: item.cityId,
+                                    text: item.cityName
+                                })
+                            );
+
+                        });
+
+                        if (selectedCity)
+                            $("#cityId").val(selectedCity);
+
+                    });
+            }
+
+            //--------------------------
+            // Events
+            //--------------------------
+
+            $("#countryId").change(function () {
+                loadStates(null);
+            });
+
+            $("#stateId").change(function () {
+                loadMandals(null);
+            });
+
+            $("#mandalId").change(function () {
+                loadCities(null);
+            });
+
+            //--------------------------
+            // Edit Page Load
+            //--------------------------
+
+            loadStates($("#stateId").data("selected"));
+
+        });
+
+    </script>
+} *@

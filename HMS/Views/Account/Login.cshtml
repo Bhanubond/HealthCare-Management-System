@@ -1,0 +1,128 @@
+﻿@model HMS.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        height: 100vh;
+    }
+
+    .login-wrapper {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        border: 0;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    .login-header {
+        background: #4e54c8;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .login-body {
+        padding: 30px;
+        background: #fff;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 12px;
+    }
+
+    .btn-login {
+        background: #4e54c8;
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+        font-weight: 600;
+    }
+
+        .btn-login:hover {
+            background: #3d42a5;
+        }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .small-link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+</style>
+
+<div class="login-wrapper">
+
+    <div class="card login-card">
+
+        <div class="login-header">
+            HMS Login
+        </div>
+
+        <div class="login-body">
+
+            <form asp-action="Login" method="post">
+
+                <div class="form-group">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-login w-100 text-white">
+                    Login
+                </button>
+
+            </form>        
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        var errors = ViewData.ModelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage)
+            .Where(message => !string.IsNullOrWhiteSpace(message))
+            .ToList();
+
+        <script>
+            $(function () {
+                @foreach (var error in errors)
+                {
+                    <text>toastr.error(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(error)));</text>
+                }
+            });
+        </script>
+    }
+}

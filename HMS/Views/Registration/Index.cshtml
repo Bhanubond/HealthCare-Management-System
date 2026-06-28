@@ -1,0 +1,143 @@
+﻿@model HMS.Models.OPDSearchViewModel
+
+@{
+    ViewData["Title"] = "OPD Search";
+}
+
+<div class="container-fluid mt-3">
+
+    <h3>OPD Patient Search</h3>
+
+    <!-- ================= FILTER SECTION ================= -->
+    <form method="get">
+
+        <div class="card p-3 mb-3">
+
+            <div class="row">
+
+                <div class="col-md-2">
+                    <label>OP No</label>
+                    <input asp-for="OPNo" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Phone</label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label>Patient Name</label>
+                    <input asp-for="PatientName" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Aadhar</label>
+                    <input asp-for="AadharNo" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label>From Date</label>
+                    <input asp-for="FromDate" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-3 mt-2">
+                    <label>To Date</label>
+                    <input asp-for="ToDate" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-2 mt-2">
+                    <label>Page Size</label>
+                    <select asp-for="PageSize" class="form-control">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 mt-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Search
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <!-- ================= TABLE ================= -->
+    <div class="card p-3">
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>UHID</th>
+                    <th>OP No</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Aadhar</th>
+                    <th>Reg Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr>
+                        <td>@item.UHID</td>
+                        <td>@item.OpNo</td>
+                        <td>@item.PatientName</td>
+                        <td>@item.Phone</td>
+                        <td>@item.AadharNo</td>
+                        <td>@item.RegDate.ToString("dd-MM-yyyy")</td>
+
+                        <td>
+                            <a class="btn btn-sm btn-primary"
+                               href="/Registration/Details/@item.PatientId">View</a>
+
+                            <a class="btn btn-sm btn-warning"
+                               href="/Registration/Edit/@item.PatientId">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+        <!-- ================= PAGINATION ================= -->
+        <div class="mt-3">
+
+            @{
+                int totalPages = (int)Math.Ceiling((double)Model.TotalRecords / Model.PageSize);
+            }
+
+            <nav>
+                <ul class="pagination">
+
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link"
+                               href="?PageNumber=@i&PageSize=@Model.PageSize
+                                   &OPNo=@Model.OPNo
+                                   &Phone=@Model.Phone
+                                   &PatientName=@Model.PatientName
+                                   &AadharNo=@Model.AadharNo
+                                   &FromDate=@Model.FromDate
+                                   &ToDate=@Model.ToDate">
+                                @i
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+
+        </div>
+
+    </div>
+
+</div>

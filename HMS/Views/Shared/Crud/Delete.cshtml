@@ -1,0 +1,37 @@
+@model object
+@using System.Reflection
+@{
+    var modelType = Model.GetType();
+    var keyProperty = CrudViewHelper.GetKeyProperty(modelType);
+    var properties = CrudViewHelper.GetDisplayProperties(modelType).ToList();
+    var title = ViewData["Title"]?.ToString() ?? "Delete";
+    var actionName = ViewData["FormAction"]?.ToString() ?? "Delete";
+}
+
+<h3 class="mb-3">@title</h3>
+
+<div class="alert alert-danger">
+    This action cannot be undone.
+</div>
+
+<table class="table table-bordered">
+    <tbody>
+        @foreach (var property in properties)
+        {
+            <tr>
+                <th style="width: 25%">@CrudViewHelper.GetLabel(property)</th>
+                <td>@CrudViewHelper.GetDisplayValue(CrudViewHelper.GetPropertyValue(Model, property))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="@actionName" method="post">
+    @Html.AntiForgeryToken()
+    @if (keyProperty != null)
+    {
+        <input type="hidden" name="@keyProperty.Name" value="@CrudViewHelper.GetInputValue(CrudViewHelper.GetPropertyValue(Model, keyProperty))" />
+    }
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

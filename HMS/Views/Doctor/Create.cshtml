@@ -1,0 +1,30 @@
+@model HMS.Models.DoctorFormViewModel
+
+@{
+    ViewData["Title"] = "Create Doctor";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-success text-white">
+        <h4>Create Doctor</h4>
+    </div>
+
+
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <partial name="_DoctorForm" model="Model" />
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-success mt-3">Save</button>
+                <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_DoctorScripts" model="Model" />
+}

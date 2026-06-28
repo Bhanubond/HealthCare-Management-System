@@ -1,0 +1,38 @@
+@model HMS.Entities.MASDepartment
+
+<div class="card shadow">
+    <div class="card-header bg-info text-white">
+        <h4>Department Details</h4>
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-4">Department</dt>
+            <dd class="col-sm-8">@Model.DeptName</dd>
+
+            <dt class="col-sm-4">Referred View</dt>
+            <dd class="col-sm-8">@Model.IsReferredView</dd>
+
+            <dt class="col-sm-4">Service</dt>
+            <dd class="col-sm-8">@Model.IsService</dd>
+
+            <dt class="col-sm-4">User Rights</dt>
+            <dd class="col-sm-8">@Model.IsUserRights</dd>
+
+            <dt class="col-sm-4">Load User Dropdown</dt>
+            <dd class="col-sm-8">@Model.LoadUserDropdown</dd>
+
+            <dt class="col-sm-4">Clinical Dept</dt>
+            <dd class="col-sm-8">@Model.ClinicalDept</dd>
+
+            <dt class="col-sm-4">Active</dt>
+            <dd class="col-sm-8">@Model.IsActive</dd>
+
+        </dl>
+
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+    </div>
+</div>

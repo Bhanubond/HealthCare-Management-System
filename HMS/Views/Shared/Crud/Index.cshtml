@@ -1,0 +1,58 @@
+@model IEnumerable<object>
+@using System.Reflection
+@{
+    var rows = Model?.ToList() ?? new List<object>();
+    var firstRow = rows.FirstOrDefault();
+    var modelType = firstRow?.GetType();
+    var properties = modelType == null
+        ? new List<PropertyInfo>()
+        : CrudViewHelper.GetDisplayProperties(modelType).ToList();
+    var title = ViewData["Title"]?.ToString() ?? "Records";
+    var keyProperty = modelType == null ? null : CrudViewHelper.GetKeyProperty(modelType);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">@title</h3>
+    <a asp-action="Create" class="btn btn-primary">+ Add New</a>
+</div>
+
+@if (!rows.Any())
+{
+    <div class="alert alert-info">No records found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    @foreach (var property in properties)
+                    {
+                        <th>@CrudViewHelper.GetLabel(property)</th>
+                    }
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in rows)
+                {
+                    <tr>
+                        @foreach (var property in properties)
+                        {
+                            <td>@CrudViewHelper.GetDisplayValue(CrudViewHelper.GetPropertyValue(row, property))</td>
+                        }
+                        <td class="text-nowrap">
+                            @if (keyProperty != null)
+                            {
+                                var keyValue = CrudViewHelper.GetPropertyValue(row, keyProperty);
+                                <a asp-action="Edit" asp-route-id="@keyValue" class="btn btn-sm btn-warning">Edit</a>
+                                <a asp-action="Details" asp-route-id="@keyValue" class="btn btn-sm btn-info">View</a>
+                                <a asp-action="Delete" asp-route-id="@keyValue" class="btn btn-sm btn-danger">Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

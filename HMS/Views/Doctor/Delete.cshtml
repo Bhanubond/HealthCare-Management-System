@@ -1,0 +1,34 @@
+@model HMS.Entities.Doctor
+
+@{
+    ViewData["Title"] = "Delete Doctor";
+}
+
+<div class="card shadow-sm border-danger">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0 fw-bold">Delete Doctor</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="alert alert-warning">
+            Are you sure you want to delete this record?
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Doctor Code</div><div class="col-sm-8">@Model.DoctorCode</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Doctor Name</div><div class="col-sm-8">@Model.DoctorName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Gender</div><div class="col-sm-8">@Model.Gender</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Phone</div><div class="col-sm-8">@Model.Phone</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Email</div><div class="col-sm-8">@Model.Email</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Department</div><div class="col-sm-8">@Model.Department?.DeptName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Designation</div><div class="col-sm-8">@Model.Designation?.DesignationName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Status</div><div class="col-sm-8"><span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">@(Model.IsActive ? "Active" : "Inactive")</span></div></div></div>
+        </div>
+
+        <form asp-action="Delete" method="post" class="mt-4 d-flex gap-2">
+            <input type="hidden" asp-for="DoctorId" />
+            <button type="submit" class="btn btn-danger fw-bold">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary fw-bold">Cancel</a>
+        </form>
+    </div>
+</div>

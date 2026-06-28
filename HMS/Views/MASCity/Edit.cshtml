@@ -1,0 +1,130 @@
+@model HMS.Entities.MASCity
+
+@{
+    ViewData["Title"] = "Edit City";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-warning">
+        <h4 class="mb-0 fw-bold">Edit City</h4>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <input asp-for="CityId" type="hidden" />
+            <input asp-for="IsDeleted" type="hidden" />
+            <input asp-for="IsDefault" type="hidden" />
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Country</label>
+                    <select id="countryId" class="form-select" asp-items="ViewBag.CountryId">
+                        <option value="">-- Select Country --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">State</label>
+                    <select id="stateId" class="form-select" asp-items="ViewBag.StateId">
+                        <option value="">-- Select State --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="MandalId" class="form-label fw-bold">Mandal</label>
+                    <select id="mandalId" asp-for="MandalId" class="form-select" asp-items="ViewBag.MandalId">
+                        <option value="">-- Select Mandal --</option>
+                    </select>
+                    <span asp-validation-for="MandalId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="CityName" class="form-label fw-bold"></label>
+                    <input asp-for="CityName" class="form-control" />
+                    <span asp-validation-for="CityName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-center">
+                    <div class="form-check mt-4">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-warning fw-bold">Update</button>
+                <a asp-action="Index" class="btn btn-secondary fw-bold">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var selectedCountry = $('#countryId').val();
+            var selectedState = $('#stateId').val();
+            var selectedMandal = $('#mandalId').val();
+
+            if (selectedCountry) {
+                loadStates(selectedCountry, selectedState);
+            }
+
+            if (selectedState) {
+                loadMandals(selectedState, selectedMandal);
+            }
+
+            $('#countryId').change(function () {
+                var countryId = $(this).val();
+                $('#stateId').html('<option value="">-- Select State --</option>');
+                $('#mandalId').html('<option value="">-- Select Mandal --</option>');
+
+                if (countryId) {
+                    loadStates(countryId, null);
+                }
+            });
+
+            $('#stateId').change(function () {
+                var stateId = $(this).val();
+                $('#mandalId').html('<option value="">-- Select Mandal --</option>');
+
+                if (stateId) {
+                    loadMandals(stateId, null);
+                }
+            });
+        });
+
+        function loadStates(countryId, selectedState) {
+            $.get('/MASCity/GetStatesByCountry', { countryId: countryId }, function (data) {
+                $('#stateId').empty().append('<option value="">-- Select State --</option>');
+
+                $.each(data, function (i, item) {
+                    $('#stateId').append($('<option>', {
+                        value: item.stateId,
+                        text: item.stateName,
+                        selected: item.stateId == selectedState
+                    }));
+                });
+            });
+        }
+
+        function loadMandals(stateId, selectedMandal) {
+            $.get('/MASCity/GetMandalsByState', { stateId: stateId }, function (data) {
+                $('#mandalId').empty().append('<option value="">-- Select Mandal --</option>');
+
+                $.each(data, function (i, item) {
+                    $('#mandalId').append($('<option>', {
+                        value: item.mandalId,
+                        text: item.mandalName,
+                        selected: item.mandalId == selectedMandal
+                    }));
+                });
+            });
+        }
+    </script>
+}

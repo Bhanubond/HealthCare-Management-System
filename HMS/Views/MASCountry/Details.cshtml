@@ -1,0 +1,25 @@
+@model HMS.Entities.MASCountry
+
+@{
+    ViewData["Title"] = "Country Details";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0 fw-bold">Country Details</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Country ID</div><div class="col-sm-8">@Model.CountryId</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Country Name</div><div class="col-sm-8">@Model.CountryName</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Status</div><div class="col-sm-8"><span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">@(Model.IsActive ? "Active" : "Inactive")</span></div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Deleted</div><div class="col-sm-8">@(Model.IsDeleted ? "Yes" : "No")</div></div></div>
+            <div class="col-md-6"><div class="row"><div class="col-sm-4 fw-bold">Default</div><div class="col-sm-8">@(Model.IsDefault ? "Yes" : "No")</div></div></div>
+        </div>
+
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary fw-bold">Back</a>
+        </div>
+    </div>
+</div>
