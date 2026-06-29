@@ -45,7 +45,7 @@ namespace HMS.Controllers
 
             TempData["SuccessMessage"] = "Login successful.";
             return RedirectToAction("Index", "Dashboard");
-        }      
+        }
 
         public async Task<IActionResult> Logout()
         {

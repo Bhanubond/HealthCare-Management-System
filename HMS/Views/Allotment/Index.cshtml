@@ -1,0 +1,230 @@
+﻿@model List<AllotmentViewModel>
+
+@{
+    ViewBag.Title = "Allotment Queue";
+    int deptId = ViewBag.DeptId ?? 0;
+}
+
+<h3 class="mb-3">Allotment Queue</h3>
+
+<!-- =========================
+     DATE RANGE FILTER (NEW)
+========================= -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <input type="text"
+               id="AllotmentDateRange"
+               class="form-control"
+               placeholder="Select Date Range" />
+    </div>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        No patients found for this department.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle" id="tblAllotment">
+            <thead class="table-dark">
+                <tr>
+                    <th>OP No</th>
+                    <th>Patient Name</th>
+                    <th>Category</th>
+                    <th>From Department</th>
+                    <th>From Date</th>
+                    <th>Status</th>
+                    <th style="width:120px;">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.OpNo</td>
+                        <td>@item.PatientName</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.FromDepartment</td>
+
+                        <td>
+                            @(item.FromDate?.ToString("dd-MM-yyyy HH:mm") ?? "-")
+                        </td>
+
+                        <td>
+                            <span class="badge bg-warning text-dark">
+                                @item.AllotmentStatus
+                            </span>
+                        </td>
+
+                        <td>
+                            <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    onclick="openDrawer(@item.PatientId, @item.ToDeptId)">
+                                Allot
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="offcanvas offcanvas-end"
+     tabindex="-1"
+     id="allotDrawer"
+     style="width:450px;">
+
+    <div class="offcanvas-header bg-primary text-white">
+        <h5 class="offcanvas-title">Allotment</h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body">
+
+        <form asp-controller="Allotment"
+              asp-action="SaveAllotment"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" id="PatientId" name="PatientId" />
+            <input type="hidden" id="DeptId" name="DeptId" />
+            <input type="hidden" id="ReferredId" name="ReferredId" />
+
+            @* <div class="mb-3">
+                <label class="form-label">Patient</label>
+                <input type="text" id="PatientName" class="form-control" readonly />
+            </div> *@
+            <div id="patientContainer"></div>
+
+            <div class="mb-3">
+                <label class="form-label">Student</label>
+                <select id="StudentId" name="StudentId" class="form-select">
+                    <option value="">-- Select Student --</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Doctor</label>
+                <select id="DoctorId" name="DoctorId" class="form-select">
+                    <option value="">-- Select Doctor --</option>
+                </select>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">
+                    Save Allotment
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+
+            // ==========================
+            // DataTable
+            // ==========================
+            $('#tblAllotment').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                order: [[4, "desc"]]
+            });
+
+        });
+
+        // ==========================
+        // Open Drawer
+        // ==========================
+        function openDrawer(patientId, deptId) {
+
+            console.log("PatientId :", patientId);
+            console.log("DeptId :", deptId);
+
+            // Open drawer first
+            var drawer = bootstrap.Offcanvas.getOrCreateInstance(
+                document.getElementById("allotDrawer")
+            );
+
+            drawer.show();
+
+            $.ajax({
+
+                url: '/Allotment/GetAllotmentData',
+
+                type: 'GET',
+
+                data: {
+                    patientId: patientId,
+                    deptId: deptId
+                },
+
+                success: function (data) {
+
+                    console.log(data);
+
+                    $('#PatientId').val(data.patientId);
+                    $('#DeptId').val(data.deptId);
+                    $('#ReferredId').val(data.referredId);
+
+                    // Students
+                    $('#StudentId').empty();
+                    $('#StudentId').append('<option value="">-- Select Student --</option>');
+
+                    $.each(data.students, function (i, s) {
+
+                        $('#StudentId').append(
+                            '<option value="' + s.studentId + '">' +
+                            s.studentName +
+                            '</option>');
+                    });
+
+                    // Doctors
+                    $('#DoctorId').empty();
+                    $('#DoctorId').append('<option value="">-- Select Doctor --</option>');
+
+                    $.each(data.doctors, function (i, d) {
+
+                        $('#DoctorId').append(
+                            '<option value="' + d.doctorId + '">' +
+                            d.doctorName +
+                            '</option>');
+                    });
+
+                    // Patient Partial
+                    $('#patientContainer').load(
+                        '/Registration/GetPatientPartial?patientId=' + patientId
+                    );
+
+                },
+
+                error: function (xhr) {
+
+                    console.log(xhr);
+
+                    alert("Error while loading allotment data.");
+
+                    console.log(xhr.responseText);
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+}

@@ -1,4 +1,5 @@
-﻿using HMS.Data;
+﻿using HMS.Common;
+using HMS.Data;
 using HMS.Entities;
 using HMS.Models;
 using HMS.Services.Interfaces;
@@ -111,17 +112,43 @@ namespace HMS.Services.Implementations
         // ---------------- CREATE ----------------
         public async Task<long> CreateAsync(OPDPatientRegistration patient)
         {
-            patient.RegDate = DateTime.Now;
-            patient.IsRegCancelled = false;
-            patient.UHID = await GenerateUHIDAsync();
-            patient.OpNo = await GenerateOpNoAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            _context.OPDPatientRegistrations.Add(patient);
-            await _context.SaveChangesAsync();
-            return patient.PatientId;
+            try
+            {
+                patient.RegDate = DateTime.Now;
+                patient.IsRegCancelled = false;
+                patient.UHID = await GenerateUHIDAsync();
+                patient.OpNo = await GenerateOpNoAsync();
+
+                _context.OPDPatientRegistrations.Add(patient);
+                await _context.SaveChangesAsync();
+
+                _context.ReferralStatuses.Add(new ReferralStatus
+                {
+                    PatientId = (int)patient.PatientId,
+                    FromDeptId = (int)Department.OPD,
+                    ToDeptId = (int)Department.GEN,
+                    FromDate = DateTime.Now,
+                    AllotmentStatus = "Pending",
+                    VisitType = "New",
+                    CreatedDate = DateTime.Now,
+                    CreatedSystem = Environment.MachineName
+                });
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return patient.PatientId;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
-        // ---------------- UPDATE ----------------
         public async Task<bool> UpdateAsync(OPDPatientRegistration patient)
         {
             var existing = await _context.OPDPatientRegistrations
@@ -200,7 +227,7 @@ namespace HMS.Services.Implementations
         }
 
         public Task<string> GenerateUHIDAsync()
-        { 
+        {
             lock (_uhidLock)
             {
                 using var con = new SqlConnection(_context.Database.GetConnectionString());
@@ -239,7 +266,7 @@ namespace HMS.Services.Implementations
                     }
 
                     tran.Commit();
-                   return Task.FromResult(uhid);
+                    return Task.FromResult(uhid);
                 }
                 catch
                 {

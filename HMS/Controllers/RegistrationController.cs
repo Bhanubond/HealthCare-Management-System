@@ -1,5 +1,6 @@
 ﻿using HMS.Entities;
 using HMS.Models;
+using HMS.Services.Implementations;
 using HMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using QRCoder;
@@ -13,11 +14,13 @@ namespace HMS.Controllers
     public class RegistrationController : BaseController
     {
         private readonly IRegistrationService _service;
+        private readonly IPatientService _patientService;
         private readonly IWebHostEnvironment _environment;
-        public RegistrationController( IRegistrationService service, IWebHostEnvironment environment)
+        public RegistrationController(IRegistrationService service, IWebHostEnvironment environment, IPatientService patientService)
         {
             _service = service;
             _environment = environment;
+            _patientService = patientService;
         }
 
         [HttpGet]
@@ -176,7 +179,7 @@ namespace HMS.Controllers
             }));
         }
 
-        [HttpGet]       
+        [HttpGet]
         public async Task<IActionResult> PrintOPCard(long id)
         {
             var patient = await _service.GetByIdAsync(id);
@@ -252,6 +255,14 @@ namespace HMS.Controllers
             bitmap.Save(ms, ImageFormat.Png);
 
             return Convert.ToBase64String(ms.ToArray());
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPatientPartial(int patientId)
+        {
+            var model = await _patientService.GetPatientDetails(patientId);
+
+            return PartialView("_PatientDetails", model);
         }
     }
 }

@@ -1,0 +1,23 @@
+﻿@model PatientDetailsViewModel
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>@Model.PatientName (@Model.OpNo)</h5>
+
+        <div class="row">
+            <div class="col-md-3"><b>UHID:</b> @Model.UHID</div>
+            <div class="col-md-3"><b>Age:</b> @Model.Age</div>
+            <div class="col-md-3"><b>Gender:</b> @Model.Gender</div>
+            <div class="col-md-3"><b>Phone:</b> @Model.Phone</div>
+
+            <div class="col-md-12 mt-2">
+                <b>Address:</b>
+                @Model.Address,
+                @Model.CityName,
+                @Model.MandalName,
+                @Model.StateName,
+                @Model.CountryName
+            </div>
+        </div>
+    </div>
+</div>

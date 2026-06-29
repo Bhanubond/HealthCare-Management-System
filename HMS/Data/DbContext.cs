@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using HMS.Entities;
-
+using HMS.Models;
 namespace HMS.Data
 {
     public class HmsDbContext : DbContext
@@ -25,5 +25,19 @@ namespace HMS.Data
         public DbSet<OPDPatientRegistration> OPDPatientRegistrations { get; set; }
         public DbSet<MASPaymentCode> MASPaymentCodes { get; set; }
         public DbSet<MASHospital> MASHospitals { get; set; }
+        public DbSet<ReferralStatus> ReferralStatuses { get; set; }
+        public DbSet<StudentAllotment> StudentAllotments { get; set; }
+
+        public DbSet<AllotmentDbModel> AllotmentDbModels { get; set; }
+
+        public DbSet<PatientDetailsViewModel> PatientDetailsViewModel { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AllotmentDbModel>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PatientDetailsViewModel>().HasNoKey();
+        }
+
     }
 }

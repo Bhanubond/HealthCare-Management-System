@@ -28,6 +28,8 @@ builder.Services.AddScoped<IMASCityService, MASCityService>();
 builder.Services.AddScoped<IMASDeptScreenMappingService, MASDeptScreenMappingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IAllotmentService, AllotmentService>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 
 // REQUIRED for Session
 builder.Services.AddDistributedMemoryCache();
