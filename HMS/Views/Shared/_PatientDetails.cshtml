@@ -1,0 +1,100 @@
+﻿@model PatientDetailsViewModel
+<style>
+    .patient-line-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        flex-wrap: wrap; /* IMPORTANT FIX */
+    }
+
+    /* NAME BLOCK */
+    .pl-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e3a8a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-right: 10px;
+        border-right: 2px solid #e5e7eb;
+    }
+
+    .pl-op {
+        background: #2563eb;
+        color: white;
+        font-size: 11px;
+        padding: 3px 7px;
+        border-radius: 20px;
+    }
+
+    /* ITEMS */
+    .pl-item {
+        font-size: 12.5px;
+        color: #374151;
+        padding: 5px 8px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    .lbl {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    /* ADDRESS */
+    .pl-address {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #065f46;
+        background: #ecfdf5;
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 1px solid #a7f3d0;
+        white-space: nowrap;
+    }
+
+    /* MOBILE */
+    @@media (max-width: 768px) {
+        .patient-line-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .pl-name {
+            border-right: none;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 6px;
+            width: 100%;
+        }
+
+        .pl-address {
+            width: 100%;
+        }
+    }
+</style>
+<div class="patient-line-card">
+
+    <div class="pl-name">
+        @Model.PatientName
+        <span class="pl-op">OP: @Model.OpNo</span>
+    </div>
+
+    <div class="pl-item"><span class="lbl">UHID:</span> @Model.UHID</div>
+    <div class="pl-item"><span class="lbl">Age:</span> @Model.Age</div>
+    <div class="pl-item"><span class="lbl">Gender:</span> @Model.Gender</div>
+    <div class="pl-item"><span class="lbl">Phone:</span> @Model.Phone</div>
+
+    <div class="pl-address">
+        📍 @Model.CityName - @Model.StateName
+    </div>
+
+</div>

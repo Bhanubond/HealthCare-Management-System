@@ -44,33 +44,27 @@ namespace HMS.Services.Implementations
         {
             var patient = await _patientService.GetPatientDetails(patientId);
 
-            var referralTask = _db.ReferralStatuses
+            var referredId = await _db.ReferralStatuses
                 .Where(x => x.PatientId == patientId && x.ToDeptId == deptId)
                 .Select(x => x.ReferredId)
                 .FirstOrDefaultAsync();
 
-            var studentsTask = _db.Students
+            var students = await _db.Students
                 .Where(x => x.DepartmentId == deptId)
                 .ToListAsync();
 
-            var doctorsTask = _db.Doctors
+            var doctors = await _db.Doctors
                 .Where(x => x.DepartmentId == deptId)
                 .ToListAsync();
-
-            await Task.WhenAll(referralTask, studentsTask, doctorsTask);
 
             return new StudentAllotmentViewModel
             {
                 PatientId = patientId,
                 DeptId = deptId,
-
-                // 👇 PATIENT DETAILS COMES FROM PATIENT SERVICE
                 PatientName = patient?.PatientName,
-                // you can also add Age, UHID etc later
-
-                ReferredId = await referralTask,
-                Students = await studentsTask,
-                Doctors = await doctorsTask
+                ReferredId = referredId,
+                Students = students,
+                Doctors = doctors
             };
         }
 
@@ -90,11 +84,12 @@ namespace HMS.Services.Implementations
             _db.StudentAllotments.Add(entity);
 
             var referral = await _db.ReferralStatuses
-        .FirstOrDefaultAsync(x =>  x.ReferredId ==  model.ReferredId);
+        .FirstOrDefaultAsync(x => x.ReferredId == model.ReferredId);
 
             if (referral != null)
             {
                 referral.AllotmentStatus = "Allotted";
+                referral.TreatmentStatus = "Pending";
 
                 _db.ReferralStatuses.Update(referral);
             }

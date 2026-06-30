@@ -130,101 +130,123 @@ else
 </div>
 
 @section Scripts {
-
     <script>
-        $(document).ready(function () {
+        $(function () {
 
-            // ==========================
-            // DataTable
-            // ==========================
-            $('#tblAllotment').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                order: [[4, "desc"]]
+            // =========================
+            // DATE RANGE PICKER
+            // =========================
+            $('#AllotmentDateRange').daterangepicker({
+                autoUpdateInput: false,
+                opens: 'left',
+                startDate: moment(),
+                endDate: moment(),
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    cancelLabel: 'Clear'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [
+                        moment().subtract(1, 'month').startOf('month'),
+                        moment().subtract(1, 'month').endOf('month')
+                    ]
+                }
             });
+
+            $('#AllotmentDateRange').on('apply.daterangepicker', function (ev, picker) {
+
+                $(this).val(
+                    picker.startDate.format('DD/MM/YYYY') +
+                    ' - ' +
+                    picker.endDate.format('DD/MM/YYYY')
+                );
+
+                console.log("From:", picker.startDate.format('YYYY-MM-DD'));
+                console.log("To:", picker.endDate.format('YYYY-MM-DD'));
+
+                // TODO:
+                // Reload DataTable or call AJAX here
+            });
+
+            $('#AllotmentDateRange').on('cancel.daterangepicker', function () {
+                $(this).val('');
+            });
+
+            // =========================
+            // DATATABLE
+            // =========================
+            if (!$.fn.DataTable.isDataTable('#tblAllotment')) {
+
+                $('#tblAllotment').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    pageLength: 10,
+                    order: [[4, 'desc']]
+                });
+
+            }
 
         });
 
-        // ==========================
-        // Open Drawer
-        // ==========================
+        // =========================
+        // OPEN OFFCANVAS
+        // =========================
         function openDrawer(patientId, deptId) {
 
-            console.log("PatientId :", patientId);
-            console.log("DeptId :", deptId);
-
-            // Open drawer first
-            var drawer = bootstrap.Offcanvas.getOrCreateInstance(
-                document.getElementById("allotDrawer")
-            );
-
-            drawer.show();
-
             $.ajax({
-
                 url: '/Allotment/GetAllotmentData',
-
                 type: 'GET',
-
                 data: {
                     patientId: patientId,
                     deptId: deptId
                 },
-
                 success: function (data) {
-
-                    console.log(data);
 
                     $('#PatientId').val(data.patientId);
                     $('#DeptId').val(data.deptId);
                     $('#ReferredId').val(data.referredId);
 
-                    // Students
-                    $('#StudentId').empty();
-                    $('#StudentId').append('<option value="">-- Select Student --</option>');
+                    $('#StudentId').empty()
+                        .append('<option value="">-- Select Student --</option>');
 
                     $.each(data.students, function (i, s) {
-
                         $('#StudentId').append(
-                            '<option value="' + s.studentId + '">' +
-                            s.studentName +
-                            '</option>');
+                            `<option value="${s.studentId}">${s.studentName}</option>`
+                        );
                     });
 
-                    // Doctors
-                    $('#DoctorId').empty();
-                    $('#DoctorId').append('<option value="">-- Select Doctor --</option>');
+                    $('#DoctorId').empty()
+                        .append('<option value="">-- Select Doctor --</option>');
 
                     $.each(data.doctors, function (i, d) {
-
                         $('#DoctorId').append(
-                            '<option value="' + d.doctorId + '">' +
-                            d.doctorName +
-                            '</option>');
+                            `<option value="${d.doctorId}">${d.doctorName}</option>`
+                        );
                     });
 
-                    // Patient Partial
                     $('#patientContainer').load(
                         '/Registration/GetPatientPartial?patientId=' + patientId
                     );
 
+                    bootstrap.Offcanvas.getOrCreateInstance(
+                        document.getElementById('allotDrawer')
+                    ).show();
                 },
+                       error: function (xhr) {
 
-                error: function (xhr) {
+            console.log(xhr.responseText);
 
-                    console.log(xhr);
-
-                    alert("Error while loading allotment data.");
-
-                    console.log(xhr.responseText);
-
-                }
-
+            alert(xhr.responseText);
+        }
             });
 
         }
 
     </script>
-
 }

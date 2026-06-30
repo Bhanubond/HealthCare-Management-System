@@ -5,77 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HMS</title>
 
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HMS.styles.css" asp-append-version="true" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- DataTables -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
+
+    <!-- Date Range Picker -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- Toastr -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+    <!-- Site CSS -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/HMS.styles.css"
+          asp-append-version="true" />
 </head>
+
 <body>
+
+    <!-- Top Navbar -->
     <header class="topbar navbar navbar-expand-lg navbar-dark shadow-sm">
         <div class="container-fluid px-4">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-controller="Dashboard" asp-action="Index">
-                <span class="brand-mark"><i class="bi bi-hospital"></i></span>
+
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold"
+               asp-controller="Dashboard"
+               asp-action="Index">
+                <span class="brand-mark">
+                    <i class="bi bi-hospital"></i>
+                </span>
                 <span>HMS ERP</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbarNav">
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#topbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="topbarNav">
+
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+
                     @if (Context.Session.GetInt32("UserId") != null)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
-                                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                            <a class="nav-link"
+                               asp-controller="Dashboard"
+                               asp-action="Index">
+                                <i class="bi bi-speedometer2 me-1"></i>
+                                Dashboard
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <span class="nav-link text-white-50">
-                                Welcome, <strong class="text-white">@Context.Session.GetString("UserName")</strong>
+                                Welcome,
+                                <strong class="text-white">
+                                    @Context.Session.GetString("UserName")
+                                </strong>
                             </span>
                         </li>
+
                         <li class="nav-item">
-                            <a class="btn btn-outline-light btn-sm ms-lg-2" asp-controller="Account" asp-action="Logout">
+                            <a class="btn btn-outline-light btn-sm ms-lg-2"
+                               asp-controller="Account"
+                               asp-action="Logout">
                                 Logout
                             </a>
                         </li>
                     }
+
                 </ul>
+
             </div>
         </div>
     </header>
 
+    <!-- Main -->
     <main class="app-shell">
+
         @if (Context.Session.GetInt32("UserId") != null)
         {
             <div class="container-fluid py-3">
+
                 <div class="row g-3">
+
+                    <!-- Sidebar -->
                     <aside class="col-12 col-lg-2">
-                        @await Component.InvokeAsync("DepartmentSidebar", new { selectedDepartmentId = Context.Session.GetInt32("DeptId") })
-                    </aside>
-                    <section class="col-12 col-lg-10">
-                        <div class="content-shell">
-                            @{
+                        @await Component.InvokeAsync(
+                        "DepartmentSidebar",
+                                        new
+                                        {
+                                            selectedDepartmentId = Context.Session.GetInt32("DeptId")
+                                        })
+                </aside>
+
+                <!-- Content -->
+                <section class="col-12 col-lg-10">
+
+                    <div class="content-shell">
+
+                        @{
                                 var selectedDeptId = Context.Session.GetInt32("DeptId");
                             }
 
                             @if (selectedDeptId.HasValue)
                             {
                                 <div class="mb-4">
-                                    @await Component.InvokeAsync("ScreenCards", new { departmentId = selectedDeptId.Value })
-                                </div>
-                            }
+                                    @await Component.InvokeAsync(
+                                    "ScreenCards",
+                                                        new
+                                                        {
+                                                            departmentId = selectedDeptId.Value
+                                                        })
+                        </div>
+                                                }
 
                             @RenderBody()
+
                         </div>
+
                     </section>
+
                 </div>
+
             </div>
         }
         else
@@ -84,14 +157,38 @@
                 @RenderBody()
             </div>
         }
+
     </main>
 
+    <!-- ========================= -->
+    <!-- JavaScript -->
+    <!-- ========================= -->
+    <!-- jQuery -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- Moment.js -->
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <!-- Date Range Picker -->
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <!-- Bootstrap -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Toastr -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- Site JS -->
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Toastr Messages -->
     <script>
         (function () {
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,
@@ -103,8 +200,11 @@
                 escapeHtml: true
             };
 
-            const successMessage = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["SuccessMessage"]?.ToString()));
-            const errorMessage = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ErrorMessage"]?.ToString()));
+            const successMessage =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["SuccessMessage"]?.ToString()));
+
+            const errorMessage =
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ErrorMessage"]?.ToString()));
 
             if (successMessage) {
                 toastr.success(successMessage);
@@ -113,8 +213,11 @@
             if (errorMessage) {
                 toastr.error(errorMessage);
             }
+
         })();
     </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
