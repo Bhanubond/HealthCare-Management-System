@@ -17,7 +17,43 @@ namespace HMS.Controllers
 
         public IActionResult Index() => View();
 
-        public async Task<IActionResult> Allotment(int deptId)
+        //public async Task<IActionResult> Allotment(int deptId)
+        //{
+        //    if (deptId == 0)
+        //        deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
+
+        //    if (deptId == 0)
+        //        return BadRequest("Department not selected");
+
+        //    var data = await _allotmentService.GetPatientsByDepartment(deptId);
+        //    ViewBag.DeptId = deptId;
+        //    return View("~/Views/Allotment/Index.cshtml", data);
+        //}
+
+        //public async Task<IActionResult> Allotment(int deptId, DateTime? fromDate, DateTime? toDate)
+        //{
+        //    if (deptId == 0)
+        //        deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
+
+        //    if (deptId == 0)
+        //        return BadRequest("Department not selected");
+
+        //    fromDate ??= DateTime.Today;
+        //    toDate ??= DateTime.Today;
+
+        //    var data = await _allotmentService.GetPatientsByDepartment(
+        //        deptId,
+        //        fromDate.Value,
+        //        toDate.Value);
+
+        //    ViewBag.DeptId = deptId;
+        //    ViewBag.FromDate = fromDate.Value;
+        //    ViewBag.ToDate = toDate.Value;
+
+        //    return View("~/Views/Allotment/Index.cshtml", data);
+        //}
+
+        public IActionResult Allotment(int deptId)
         {
             if (deptId == 0)
                 deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
@@ -25,9 +61,12 @@ namespace HMS.Controllers
             if (deptId == 0)
                 return BadRequest("Department not selected");
 
-            var data = await _allotmentService.GetPatientsByDepartment(deptId);
             ViewBag.DeptId = deptId;
-            return View("~/Views/Allotment/Index.cshtml", data);
+
+            ViewBag.FromDate = DateTime.Today;
+            ViewBag.ToDate = DateTime.Today;
+
+            return View("~/Views/Allotment/Index.cshtml");
         }
 
         public async Task<IActionResult> PatientSearch()

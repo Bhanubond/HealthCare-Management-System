@@ -1,4 +1,5 @@
 ﻿using HMS.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HMS.Models
 {
@@ -31,5 +32,18 @@ namespace HMS.Models
 
         // dropdown list
         public List<MASMedication> MedicationMaster { get; set; } = new();
+
+        public DateTime? NextVisitDate { get; set; }
+        public TimeSpan? NextVisitTime { get; set; }
+        public int? NextVisitDepartmentId { get; set; }
+        public int? NextVisitDoctorId { get; set; }
+        public int? NextVisitStudentId { get; set; }
+        public string? NextVisitReason { get; set; }
+        public string? FollowUpNotes { get; set; }
+        public string? Status { get; set; }
+
+        public List<SelectListItem> Doctors { get; set; } = new();
+        public List<SelectListItem> Students { get; set; } = new();
+        public List<SelectListItem> Departments { get; set; } = new();
     }
 }

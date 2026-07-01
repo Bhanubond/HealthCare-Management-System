@@ -8,7 +8,7 @@ namespace HMS.Models
         public string? OpNo { get; set; }
         public string? Phone { get; set; }
         public string? Gender { get; set; }
-        public int Age { get; set; }
+        public int? Age { get; set; }
         public string? DoctorName { get; set; }
         public string? StudentName { get; set; }
         public DateTime CaseDate { get; set; }

@@ -15,7 +15,7 @@ namespace HMS.Services.Implementations
             _db = db;
         }
 
-        public async Task<PatientDetailsViewModel> GetPatientDetails(int patientId)
+        public async Task<PatientDetailsViewModel?> GetPatientDetails(int patientId)
         {
             var param = new SqlParameter("@PatientId", patientId);
 

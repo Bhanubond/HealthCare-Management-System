@@ -4,6 +4,6 @@ namespace HMS.Services.Interfaces
 {
     public interface IPatientService
     {
-        Task<PatientDetailsViewModel> GetPatientDetails(int patientId);
+        Task<PatientDetailsViewModel?> GetPatientDetails(int patientId);
     }
 }

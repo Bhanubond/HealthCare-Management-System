@@ -12,12 +12,57 @@ public class AllotmentController : Controller
     }
 
     // Main Page (ALL departments)
-    public async Task<IActionResult> Index(int deptId)
+    //public async Task<IActionResult> Index(int deptId)
+    //{
+    //    var patients = await _service.GetPatientsByDepartment(deptId);
+
+    //    ViewBag.DeptId = deptId;
+    //    return View(patients);
+    //}
+
+    //public async Task<IActionResult> Index(int deptId, DateTime? fromDate, DateTime? toDate)
+    //{
+    //    fromDate ??= DateTime.Today;
+    //    toDate ??= DateTime.Today;
+
+    //    var model = await _service.GetPatientsByDepartment(
+    //        deptId,
+    //        fromDate.Value,
+    //        toDate.Value);
+
+    //    ViewBag.DeptId = deptId;
+
+    //    return View(model);
+    //}
+
+    public IActionResult Index(int deptId)
     {
-        var patients = await _service.GetPatientsByDepartment(deptId);
+        deptId = deptId == 0
+            ? HttpContext.Session.GetInt32("DeptId") ?? 0
+            : deptId;
+
+        if (deptId == 0)
+            return BadRequest("Department not selected");
 
         ViewBag.DeptId = deptId;
-        return View(patients);
+        ViewBag.FromDate = DateTime.Today;
+        ViewBag.ToDate = DateTime.Today;
+
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetPatients(
+    int deptId,
+    DateTime fromDate,
+    DateTime toDate)
+    {
+        var data = await _service.GetPatientsByDepartment(
+            deptId,
+            fromDate,
+            toDate);
+
+        return Json(data);
     }
 
     [HttpGet]

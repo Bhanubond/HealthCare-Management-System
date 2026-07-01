@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace HMS.Models
 {
     public class GMCasesheetSaveVm
@@ -20,5 +22,18 @@ namespace HMS.Models
         public string? DoctorName { get; set; }
         public string? StudentName { get; set; }
         public List<PatientMedicationVm> Medications { get; set; } = new();
+
+        public DateTime? NextVisitDate { get; set; }
+        public TimeSpan? NextVisitTime { get; set; }
+        public int? NextVisitDepartmentId { get; set; }
+        public int? NextVisitDoctorId { get; set; }
+        public int? NextVisitStudentId { get; set; }
+        public string? NextVisitReason { get; set; }
+        public string? Status { get; set; }
+
+        public List<SelectListItem> Doctors { get; set; } = new();
+        public List<SelectListItem> Students { get; set; } = new();
+        public List<SelectListItem> Departments { get; set; } = new();
+        public string? FollowUpNotes { get; set; }
     }
 }

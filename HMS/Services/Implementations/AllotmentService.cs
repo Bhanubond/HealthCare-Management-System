@@ -16,14 +16,45 @@ namespace HMS.Services.Implementations
         {
             _db = db;
             _patientService = patientService;
+
         }
 
-        public async Task<List<AllotmentViewModel>> GetPatientsByDepartment(int deptId)
+        //public async Task<List<AllotmentViewModel>> GetPatientsByDepartment(int deptId)
+        //{
+        //    var param = new SqlParameter("@DeptId", deptId);
+
+        //    var data = await _db.AllotmentDbModels
+        //        .FromSqlRaw("EXEC SP_GetPatientsByDepartment @DeptId", param)
+        //        .ToListAsync();
+
+        //    return data.Select(x => new AllotmentViewModel
+        //    {
+        //        PatientId = x.PatientId,
+        //        OpNo = x.OpNo,
+        //        PatientName = x.PatientName,
+        //        CategoryName = x.CategoryName,
+        //        FromDepartment = x.FromDepartment,
+        //        FromDeptId = x.FromDeptId,
+        //        ToDeptId = x.ToDeptId,
+        //        AllotmentStatus = x.AllotmentStatus,
+        //        FromDate = x.FromDate
+        //    }).ToList();
+        //}
+
+        public async Task<List<AllotmentViewModel>> GetPatientsByDepartment(int deptId, DateTime fromDate, DateTime toDate)
         {
-            var param = new SqlParameter("@DeptId", deptId);
+            var deptParam = new SqlParameter("@DeptId", deptId);
+
+            var fromParam = new SqlParameter("@FromDate", fromDate.Date);
+
+            var toParam = new SqlParameter("@ToDate", toDate.Date);
 
             var data = await _db.AllotmentDbModels
-                .FromSqlRaw("EXEC SP_GetPatientsByDepartment @DeptId", param)
+                .FromSqlRaw(
+                    "EXEC SP_GetPatientsByDepartment @DeptId,@FromDate,@ToDate",
+                    deptParam,
+                    fromParam,
+                    toParam)
                 .ToListAsync();
 
             return data.Select(x => new AllotmentViewModel

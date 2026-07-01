@@ -1,4 +1,7 @@
-﻿@model PatientDetailsViewModel
+@model PatientDetailsViewModel
+@{
+    var patient = Model ?? new PatientDetailsViewModel();
+}
 <style>
     .patient-line-card {
         display: flex;
@@ -84,17 +87,17 @@
 <div class="patient-line-card">
 
     <div class="pl-name">
-        @Model.PatientName
-        <span class="pl-op">OP: @Model.OpNo</span>
+        @patient.PatientName
+        <span class="pl-op">OP: @patient.OpNo</span>
     </div>
 
-    <div class="pl-item"><span class="lbl">UHID:</span> @Model.UHID</div>
-    <div class="pl-item"><span class="lbl">Age:</span> @Model.Age</div>
-    <div class="pl-item"><span class="lbl">Gender:</span> @Model.Gender</div>
-    <div class="pl-item"><span class="lbl">Phone:</span> @Model.Phone</div>
+    <div class="pl-item"><span class="lbl">UHID:</span> @patient.UHID</div>
+    <div class="pl-item"><span class="lbl">Age:</span> @(patient.Age?.ToString() ?? "-")</div>
+    <div class="pl-item"><span class="lbl">Gender:</span> @patient.Gender</div>
+    <div class="pl-item"><span class="lbl">Phone:</span> @patient.Phone</div>
 
     <div class="pl-address">
-        📍 @Model.CityName - @Model.StateName
+        📍 @patient.CityName - @patient.StateName
     </div>
 
 </div>

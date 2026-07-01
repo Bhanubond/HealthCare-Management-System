@@ -1,89 +1,119 @@
-﻿@model List<AllotmentViewModel>
-
-@{
-    ViewBag.Title = "Allotment Queue";
+﻿@{
+    ViewData["Title"] = "Allotment Queue";
     int deptId = ViewBag.DeptId ?? 0;
 }
 
-<h3 class="mb-3">Allotment Queue</h3>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
 
-<!-- =========================
-     DATE RANGE FILTER (NEW)
-========================= -->
-<div class="row mb-3">
-    <div class="col-md-4">
-        <input type="text"
-               id="AllotmentDateRange"
-               class="form-control"
-               placeholder="Select Date Range" />
+<style>
+    .page-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,.08);
+    }
+
+    .page-header {
+        background: linear-gradient(135deg,#0d6efd,#2563eb);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .wrap-text {
+        white-space: normal !important;
+        word-break: break-word;
+    }
+
+    table.dataTable td {
+        vertical-align: middle;
+    }
+
+    .dt-buttons {
+        margin-bottom: 10px;
+    }
+
+    .badge-pending {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .badge-allotted {
+        background: #198754;
+        color: #fff;
+    }
+</style>
+
+<div class="card page-card">
+
+    <div class="page-header d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+            <i class="bi bi-people-fill"></i>
+            Allotment Queue
+        </h4>
+
+        <div style="width:280px">
+
+            <input type="text"
+                   id="AllotmentDateRange"
+                   class="form-control"
+                   placeholder="Select Date Range" />
+
+        </div>
+
     </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table id="tblAllotment"
+                   class="table table-bordered table-hover align-middle"
+                   style="width:100%">
+
+                <thead class="table-primary">
+                    <tr>
+                        <th>OP No</th>
+                        <th>Patient Name</th>
+                        <th>Category</th>
+                        <th>From Department</th>
+                        <th>From Date</th>
+                        <th>Status</th>
+                        <th width="120">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!-- ❌ REMOVE FOREACH COMPLETELY -->
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
 
-@if (Model == null || !Model.Any())
-{
-    <div class="alert alert-info">
-        No patients found for this department.
-    </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped align-middle" id="tblAllotment">
-            <thead class="table-dark">
-                <tr>
-                    <th>OP No</th>
-                    <th>Patient Name</th>
-                    <th>Category</th>
-                    <th>From Department</th>
-                    <th>From Date</th>
-                    <th>Status</th>
-                    <th style="width:120px;">Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.OpNo</td>
-                        <td>@item.PatientName</td>
-                        <td>@item.CategoryName</td>
-                        <td>@item.FromDepartment</td>
-
-                        <td>
-                            @(item.FromDate?.ToString("dd-MM-yyyy HH:mm") ?? "-")
-                        </td>
-
-                        <td>
-                            <span class="badge bg-warning text-dark">
-                                @item.AllotmentStatus
-                            </span>
-                        </td>
-
-                        <td>
-                            <button type="button"
-                                    class="btn btn-success btn-sm"
-                                    onclick="openDrawer(@item.PatientId, @item.ToDeptId)">
-                                Allot
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+<!-- OFFCANVAS -->
 
 <div class="offcanvas offcanvas-end"
      tabindex="-1"
      id="allotDrawer"
-     style="width:450px;">
+     style="width:500px;">
 
     <div class="offcanvas-header bg-primary text-white">
-        <h5 class="offcanvas-title">Allotment</h5>
-        <button type="button"
-                class="btn-close btn-close-white"
-                data-bs-dismiss="offcanvas"></button>
+
+        <h5 class="offcanvas-title">
+
+            Student / Doctor Allotment
+
+        </h5>
+
+        <button class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas">
+        </button>
+
     </div>
 
     <div class="offcanvas-body">
@@ -94,159 +124,252 @@ else
 
             @Html.AntiForgeryToken()
 
-            <input type="hidden" id="PatientId" name="PatientId" />
-            <input type="hidden" id="DeptId" name="DeptId" />
-            <input type="hidden" id="ReferredId" name="ReferredId" />
+            <input type="hidden"
+                   id="PatientId"
+                   name="PatientId" />
 
-            @* <div class="mb-3">
-                <label class="form-label">Patient</label>
-                <input type="text" id="PatientName" class="form-control" readonly />
-            </div> *@
-            <div id="patientContainer"></div>
+            <input type="hidden"
+                   id="DeptId"
+                   name="DeptId" />
 
-            <div class="mb-3">
-                <label class="form-label">Student</label>
-                <select id="StudentId" name="StudentId" class="form-select">
-                    <option value="">-- Select Student --</option>
-                </select>
+            <input type="hidden"
+                   id="ReferredId"
+                   name="ReferredId" />
+
+            <div id="patientContainer"
+                 class="mb-3">
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Doctor</label>
-                <select id="DoctorId" name="DoctorId" class="form-select">
-                    <option value="">-- Select Doctor --</option>
+
+                <label class="form-label">
+                    Student
+                </label>
+
+                <select class="form-select"
+                        id="StudentId"
+                        name="StudentId">
+
+                    <option value="">
+                        -- Select Student --
+                    </option>
+
                 </select>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Doctor
+                </label>
+
+                <select class="form-select"
+                        id="DoctorId"
+                        name="DoctorId">
+
+                    <option value="">
+                        -- Select Doctor --
+                    </option>
+
+                </select>
+
             </div>
 
             <div class="text-end">
-                <button type="submit" class="btn btn-success">
+
+                <button class="btn btn-success">
+
+                    <i class="bi bi-save"></i>
+
                     Save Allotment
+
                 </button>
+
             </div>
 
         </form>
 
     </div>
+
 </div>
-
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 @section Scripts {
-    <script>
-        $(function () {
 
-            // =========================
-            // DATE RANGE PICKER
-            // =========================
+    <script>
+
+              var table;
+
+        $(document).ready(function () {
+
+            loadTable();
+
+            var start = moment();
+            var end = moment();
+
             $('#AllotmentDateRange').daterangepicker({
-                autoUpdateInput: false,
-                opens: 'left',
-                startDate: moment(),
-                endDate: moment(),
-                locale: {
-                    format: 'DD/MM/YYYY',
-                    cancelLabel: 'Clear'
-                },
+                startDate: start,
+                endDate: end,
+                locale: { format: 'DD/MM/YYYY' },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [
-                        moment().subtract(1, 'month').startOf('month'),
-                        moment().subtract(1, 'month').endOf('month')
-                    ]
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 }
             });
 
             $('#AllotmentDateRange').on('apply.daterangepicker', function (ev, picker) {
-
-                $(this).val(
-                    picker.startDate.format('DD/MM/YYYY') +
-                    ' - ' +
-                    picker.endDate.format('DD/MM/YYYY')
-                );
-
-                console.log("From:", picker.startDate.format('YYYY-MM-DD'));
-                console.log("To:", picker.endDate.format('YYYY-MM-DD'));
-
-                // TODO:
-                // Reload DataTable or call AJAX here
+                loadTable(picker.startDate, picker.endDate);
             });
-
-            $('#AllotmentDateRange').on('cancel.daterangepicker', function () {
-                $(this).val('');
-            });
-
-            // =========================
-            // DATATABLE
-            // =========================
-            if (!$.fn.DataTable.isDataTable('#tblAllotment')) {
-
-                $('#tblAllotment').DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    pageLength: 10,
-                    order: [[4, 'desc']]
-                });
-
-            }
 
         });
 
-        // =========================
-        // OPEN OFFCANVAS
-        // =========================
-        function openDrawer(patientId, deptId) {
+        function loadTable(fromDate, toDate) {
+
+            var deptId = '@deptId';
+
+            var from = fromDate ? fromDate.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+            var to = toDate ? toDate.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
 
             $.ajax({
-                url: '/Allotment/GetAllotmentData',
+                url: '/Allotment/GetPatients',
                 type: 'GET',
                 data: {
-                    patientId: patientId,
-                    deptId: deptId
+                    deptId: deptId,
+                    fromDate: from,
+                    toDate: to
                 },
                 success: function (data) {
 
-                    $('#PatientId').val(data.patientId);
-                    $('#DeptId').val(data.deptId);
-                    $('#ReferredId').val(data.referredId);
+                    if ($.fn.DataTable.isDataTable('#tblAllotment')) {
+                        $('#tblAllotment').DataTable().destroy();
+                    }
 
-                    $('#StudentId').empty()
+                    $('#tblAllotment').DataTable({
+                        data: data,
+                        columns: [
+                            { data: 'opNo' },
+                            { data: 'patientName' },
+                            { data: 'categoryName' },
+                            { data: 'fromDepartment' },
+                            {
+                                data: 'fromDate',
+                                render: function (d) {
+                                    return d ? moment(d).format('DD/MM/YYYY HH:mm') : '-';
+                                }
+                            },
+                            {
+                                data: 'allotmentStatus',
+                                render: function (d) {
+                                    if (d === "Pending")
+                                        return '<span class="badge badge-pending">Pending</span>';
+                                    return '<span class="badge badge-allotted">' + d + '</span>';
+                                }
+                            },
+                            {
+                                data: null,
+                                render: function (row) {
+                                    return `<button class="btn btn-primary btn-sm"
+                                                onclick="openDrawer(${row.patientId}, ${row.toDeptId})">
+                                                Allot
+                                            </button>`;
+                                }
+                            }
+                        ]
+                    });
+                }
+            });
+        }
+
+        //=========================
+        // OPEN OFFCANVAS
+        //=========================
+
+        function openDrawer(patientId, deptId) {
+
+            $.ajax({
+
+                url: '@Url.Action("GetAllotmentData", "Allotment")',
+
+                type: 'GET',
+
+                data: {
+
+                    patientId: patientId,
+
+                    deptId: deptId
+
+                },
+
+                success: function (data) {
+
+                    $("#PatientId").val(data.patientId);
+                    $("#DeptId").val(data.deptId);
+                    $("#ReferredId").val(data.referredId);
+
+                    $("#StudentId").empty()
                         .append('<option value="">-- Select Student --</option>');
 
                     $.each(data.students, function (i, s) {
-                        $('#StudentId').append(
-                            `<option value="${s.studentId}">${s.studentName}</option>`
+
+                        $("#StudentId").append(
+
+                            '<option value="' + s.studentId + '">' +
+                            s.studentName +
+                            '</option>'
+
                         );
+
                     });
 
-                    $('#DoctorId').empty()
+                    $("#DoctorId").empty()
                         .append('<option value="">-- Select Doctor --</option>');
 
                     $.each(data.doctors, function (i, d) {
-                        $('#DoctorId').append(
-                            `<option value="${d.doctorId}">${d.doctorName}</option>`
+
+                        $("#DoctorId").append(
+
+                            '<option value="' + d.doctorId + '">' +
+                            d.doctorName +
+                            '</option>'
+
                         );
+
                     });
 
-                    $('#patientContainer').load(
-                        '/Registration/GetPatientPartial?patientId=' + patientId
+                    $("#patientContainer").load(
+
+                        '@Url.Action("GetPatientPartial", "Registration")?patientId='
+                        + patientId
+
                     );
 
                     bootstrap.Offcanvas.getOrCreateInstance(
+
                         document.getElementById('allotDrawer')
+
                     ).show();
+
                 },
-                       error: function (xhr) {
 
-            console.log(xhr.responseText);
+                error: function (xhr) {
 
-            alert(xhr.responseText);
-        }
+                    toastr.error(xhr.responseText);
+
+                }
+
             });
 
         }
 
     </script>
+
 }

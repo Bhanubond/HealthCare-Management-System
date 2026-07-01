@@ -8,6 +8,7 @@ namespace HMS.Entities
     {
         [Key]
         public int AllotId { get; set; }
+
         public DateTime? AllotDate { get; set; }
 
         public int? PatientId { get; set; }
@@ -23,7 +24,8 @@ namespace HMS.Entities
         public DateTime CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
-        public string CreatedSystem { get; set; }
-        public string ModifiedSystem { get; set; }
+        // 🔴 FIXED (nullable strings)
+        public string? CreatedSystem { get; set; }
+        public string? ModifiedSystem { get; set; }
     }
 }
