@@ -1,4 +1,5 @@
-﻿using HMS.Services.Interfaces;
+﻿using HMS.Models;
+using HMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.Controllers
@@ -6,52 +7,62 @@ namespace HMS.Controllers
     public class GeneralMedicineController : Controller
     {
         private readonly IAllotmentService _allotmentService;
+        private readonly IGeneralMedicineServices _generalMedicineServices;
 
-        public GeneralMedicineController(IAllotmentService allotmentService)
+        public GeneralMedicineController(IAllotmentService allotmentService, IGeneralMedicineServices generalMedicineServices)
         {
             _allotmentService = allotmentService;
+            _generalMedicineServices = generalMedicineServices;
         }
 
-        // 🔹 Dashboard / Main Page
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
 
-        // 🔹 Allotment Queue (Department-wise patients)
         public async Task<IActionResult> Allotment(int deptId)
         {
             if (deptId == 0)
-            {
                 deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
-            }
 
             if (deptId == 0)
                 return BadRequest("Department not selected");
 
             var data = await _allotmentService.GetPatientsByDepartment(deptId);
-
             ViewBag.DeptId = deptId;
             return View("~/Views/Allotment/Index.cshtml", data);
         }
 
-        // 🔹 Patient Details Page
-        public IActionResult PatientSearch()
+        public async Task<IActionResult> PatientSearch()
+            => View(await _generalMedicineServices.GetCompletedCases());
+
+        [HttpGet]
+        public async Task<IActionResult> EditCaseSheet(int gmId)
         {
-            return View();
+            var model = await _generalMedicineServices.GetCaseSheetById(gmId);
+            return model.GMID == 0 ? NotFound() : View(model);
         }
 
-        // 🔹 Treatment Screen
-        public IActionResult Treatment(int patientId)
+        [HttpPost]
+        public async Task<IActionResult> EditCaseSheet(GMCasesheetSaveVm model)
         {
-            ViewBag.PatientId = patientId;
-            return View();
+            await _generalMedicineServices.UpdateCaseSheet(model);
+            return RedirectToAction(nameof(PatientSearch));
         }
 
-        // 🔹 Approvals Screen
-        public IActionResult Approvals()
+        public async Task<IActionResult> Treatment()
+            => View(await _generalMedicineServices.GetPendingTreatmentPatients());
+
+        public async Task<IActionResult> TreatmentDetails(int patientId)
         {
-            return View();
+            var model = await _generalMedicineServices.GetTreatmentScreenAsync(patientId);
+            return model.PatientId == 0 ? NotFound() : View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveCaseSheet(GMCasesheetSaveVm model)
+        {
+            await _generalMedicineServices.SaveCaseSheet(model);
+            return RedirectToAction(nameof(Treatment));
+        }
+
+        public IActionResult Approvals() => View();
     }
 }

@@ -30,6 +30,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IAllotmentService, AllotmentService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IGeneralMedicineServices, GeneralMedicineServices>();
 
 // REQUIRED for Session
 builder.Services.AddDistributedMemoryCache();

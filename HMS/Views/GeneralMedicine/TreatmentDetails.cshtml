@@ -1,0 +1,151 @@
+@model HMS.Models.GMCasesheetScreenVm
+@{
+    var vm = Model ?? new HMS.Models.GMCasesheetScreenVm();
+    var meds = vm.Medications ?? new List<HMS.Models.PatientMedicationVm> { new() };
+    var master = vm.MedicationMaster ?? new List<HMS.Entities.MASMedication>();
+    var frequencyList = new[] { "1-0-1", "1-1-1", "1-0-0", "0-0-1", "0-1-0", "SOS", "HS" };
+    var index = meds.Count;
+}
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 fw-semibold">Treatment - Case Sheet</h3>
+                <span class="badge bg-light text-dark border px-3 py-2">OP No : @vm.OpNo</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3"><b>Patient:</b> @vm.PatientName</div>
+                <div class="col-md-2"><b>Age:</b> @vm.Age</div>
+                <div class="col-md-2"><b>Gender:</b> @vm.Gender</div>
+                <div class="col-md-3"><b>Doctor:</b> @vm.DoctorName</div>
+                <div class="col-md-2"><b>Student:</b> @vm.StudentName</div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="SaveCaseSheet" asp-controller="GeneralMedicine" method="post">
+        <input type="hidden" asp-for="PatientId" />
+        <input type="hidden" asp-for="DoctorId" />
+        <input type="hidden" asp-for="StudentId" />
+        <input type="hidden" asp-for="AllotId" />
+        <input type="hidden" asp-for="ReferredId" />
+        <input type="hidden" asp-for="OpNo" />
+
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#general">General</button>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#medication">Medication</button>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#appointment">Appointment</button>
+            </li>
+        </ul>
+
+        <div class="tab-content border p-4 bg-white">
+            <div class="tab-pane fade show active" id="general">
+                <div class="row g-3">
+                    <div class="col-md-6"><label>Chief Complaint</label><textarea asp-for="ChiefComplaint" class="form-control"></textarea></div>
+                    <div class="col-md-6"><label>Symptoms</label><textarea asp-for="Symptoms" class="form-control"></textarea></div>
+                    <div class="col-md-6"><label>Diagnosis</label><textarea asp-for="Diagnosis" class="form-control"></textarea></div>
+                    <div class="col-md-6"><label>Notes</label><textarea asp-for="Notes" class="form-control"></textarea></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="medication">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5 class="fw-bold">Prescription</h5>
+                    <button type="button" class="btn btn-success btn-sm" onclick="addRow()">+ Add Medicine</button>
+                </div>
+                <div id="medicationContainer">
+                    @for (int i = 0; i < meds.Count; i++)
+                    {
+                        <div class="row g-2 mb-2 align-items-end medication-row">
+                            <div class="col-md-4">
+                                <label class="form-label">Medicine</label>
+                                <select class="form-select" name="Medications[@i].MedicationId">
+                                    <option value="">-- Select Medicine --</option>
+                                    @foreach (var med in master)
+                                    {
+                                        <option value="@med.MedId">@med.Medication</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Frequency</label>
+                                <select class="form-select" name="Medications[@i].Frequency">
+                                    <option value="">-- Select --</option>
+                                    @foreach (var f in frequencyList)
+                                    {
+                                        <option value="@f">@f</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Remarks</label>
+                                <input class="form-control" name="Medications[@i].Remarks" placeholder="e.g. After food" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Duration</label>
+                                <input class="form-control" name="Medications[@i].Duration" placeholder="e.g. 5 days" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="appointment">
+                <div class="row g-3">
+                    <div class="col-md-4"><label>Next Visit Date</label><input type="date" class="form-control" /></div>
+                    <div class="col-md-8"><label>Follow-up Notes</label><textarea class="form-control"></textarea></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-5"><i class="fa fa-save me-2"></i> Save Prescription</button>
+            <a asp-action="Treatment" class="btn btn-secondary px-4 ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    let index = @(vm.Medications?.Count ?? 0);
+
+    function addRow() {
+        const container = document.getElementById("medicationContainer");
+        const html = `
+        <div class="row g-2 mb-2 align-items-end medication-row">
+            <div class="col-md-4">
+                <select class="form-select" name="Medications[${index}].MedicationId">
+                    <option value="">-- Select Medicine --</option>
+                    @foreach (var med in master)
+                    {
+                        <option value="@med.MedId">@med.Medication</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="Medications[${index}].Frequency">
+                    <option value="">-- Select --</option>
+                    @foreach (var f in frequencyList)
+                    {
+                        <option value="@f">@f</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="Medications[${index}].Remarks" placeholder="Remarks" />
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="Medications[${index}].Duration" placeholder="Duration" />
+            </div>
+        </div>`;
+        container.insertAdjacentHTML("beforeend", html);
+        index++;
+    }
+</script>

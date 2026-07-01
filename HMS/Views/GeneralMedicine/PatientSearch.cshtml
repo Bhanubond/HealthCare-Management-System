@@ -1,0 +1,40 @@
+﻿@model List<GMCasesheetSearchVm>
+
+<h3>Completed Cases</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>OP No</th>
+            <th>Patient Name</th>
+            <th>Phone</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>Doctor</th>
+            <th>Student</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.OpNo</td>
+                <td>@item.PatientName</td>
+                <td>@item.Phone</td>
+                <td>@item.Gender</td>
+                <td>@item.Age</td>
+                <td>@item.DoctorName</td>
+                <td>@item.StudentName</td>
+
+                <td>
+                    <a href="/GeneralMedicine/EditCaseSheet?gmId=@item.GMID"
+                       class="btn btn-sm btn-primary">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,57 @@
+﻿@model List<HMS.Models.TreatmentPatientVm>
+
+@{
+    ViewData["Title"] = "Treatment Queue";
+}
+
+<h3 class="mb-3">Treatment Queue (Pending Patients)</h3>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>OP No</th>
+            <th>Patient Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Phone</th>
+            <th>Category</th>
+            <th>Doctor</th>
+            <th>Student</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.OpNo</td>
+                    <td>@item.PatientName</td>
+                    <td>@item.Age</td>
+                    <td>@item.Gender</td>
+                    <td>@item.Phone</td>
+                    <td>@item.CategoryName</td>
+                    <td>@item.DoctorName</td>
+                    <td>@item.StudentName</td>
+
+                    <td>
+                        <a class="btn btn-primary btn-sm"
+                           href="@Url.Action("TreatmentDetails", "GeneralMedicine", new { patientId = item.PatientId })">
+                            Treat
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9" class="text-center text-danger">
+                    No patients found in treatment queue
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
