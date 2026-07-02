@@ -19,28 +19,6 @@ namespace HMS.Services.Implementations
 
         }
 
-        //public async Task<List<AllotmentViewModel>> GetPatientsByDepartment(int deptId)
-        //{
-        //    var param = new SqlParameter("@DeptId", deptId);
-
-        //    var data = await _db.AllotmentDbModels
-        //        .FromSqlRaw("EXEC SP_GetPatientsByDepartment @DeptId", param)
-        //        .ToListAsync();
-
-        //    return data.Select(x => new AllotmentViewModel
-        //    {
-        //        PatientId = x.PatientId,
-        //        OpNo = x.OpNo,
-        //        PatientName = x.PatientName,
-        //        CategoryName = x.CategoryName,
-        //        FromDepartment = x.FromDepartment,
-        //        FromDeptId = x.FromDeptId,
-        //        ToDeptId = x.ToDeptId,
-        //        AllotmentStatus = x.AllotmentStatus,
-        //        FromDate = x.FromDate
-        //    }).ToList();
-        //}
-
         public async Task<List<AllotmentViewModel>> GetPatientsByDepartment(int deptId, DateTime fromDate, DateTime toDate)
         {
             var deptParam = new SqlParameter("@DeptId", deptId);

@@ -10,31 +10,6 @@ public class AllotmentController : Controller
     {
         _service = service;
     }
-
-    // Main Page (ALL departments)
-    //public async Task<IActionResult> Index(int deptId)
-    //{
-    //    var patients = await _service.GetPatientsByDepartment(deptId);
-
-    //    ViewBag.DeptId = deptId;
-    //    return View(patients);
-    //}
-
-    //public async Task<IActionResult> Index(int deptId, DateTime? fromDate, DateTime? toDate)
-    //{
-    //    fromDate ??= DateTime.Today;
-    //    toDate ??= DateTime.Today;
-
-    //    var model = await _service.GetPatientsByDepartment(
-    //        deptId,
-    //        fromDate.Value,
-    //        toDate.Value);
-
-    //    ViewBag.DeptId = deptId;
-
-    //    return View(model);
-    //}
-
     public IActionResult Index(int deptId)
     {
         deptId = deptId == 0
@@ -52,16 +27,9 @@ public class AllotmentController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPatients(
-    int deptId,
-    DateTime fromDate,
-    DateTime toDate)
+    public async Task<IActionResult> GetPatients(int deptId, DateTime fromDate, DateTime toDate)
     {
-        var data = await _service.GetPatientsByDepartment(
-            deptId,
-            fromDate,
-            toDate);
-
+        var data = await _service.GetPatientsByDepartment(deptId, fromDate, toDate);
         return Json(data);
     }
 
@@ -89,7 +57,6 @@ public class AllotmentController : Controller
         });
     }
 
-    // Save (COMMON)
     [HttpPost]
     public async Task<IActionResult> SaveAllotment(StudentAllotmentViewModel model)
     {
