@@ -44,7 +44,7 @@
 
                             <div class="col-md-8">
                                 <label>Patient Name *</label>
-                                <input asp-for="Patient.PatientName" class="form-control" required />
+                                <input asp-for="Patient.PatientName" class="form-control"/>
                             </div>
 
                         </div>
@@ -77,7 +77,7 @@
 
                             <div class="col-md-6">
                                 <label>Phone *</label>
-                                <input asp-for="Patient.Phone" class="form-control" required />
+                                <input asp-for="Patient.Phone" class="form-control" maxlength="10" />
                             </div>
 
                         </div>
@@ -86,7 +86,7 @@
 
                             <div class="col-md-6">
                                 <label>Aadhar No</label>
-                                <input asp-for="Patient.AadharNo" class="form-control" />
+                                <input asp-for="Patient.AadharNo" class="form-control" maxlength="12" />
                             </div>
 
                             <div class="col-md-6">
@@ -174,7 +174,7 @@
                         <input asp-for="Patient.NetAmount" id="NetAmount" class="form-control" readonly />
 
                         <label class="mt-2">Paid Amount</label>
-                        <input asp-for="Patient.PaidAmount" class="form-control" />
+                        <input asp-for="Patient.PaidAmount" id="PaidAmount" class="form-control" readonly />
 
                         <label class="mt-2">Payment Mode</label>
                         <select asp-for="Patient.PaymodeId"
@@ -202,40 +202,200 @@
 
     </form>
 </div>
+
+
 @section Scripts {
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>     
+        function showError(msg) {
+            toastr.error(msg);
+        }
 
-    <script>
         $("#patientImage").change(function () {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $("#previewImg").show();
-                $("#previewImg").attr("src", e.target.result);
-            };
-            reader.readAsDataURL(this.files[0]);
+            var file = this.files[0];
+
+            if (file) {
+                var ext = file.name.split('.').pop().toLowerCase();
+
+                if ($.inArray(ext, ['jpg', 'jpeg', 'png']) == -1) {
+                    showError("Only JPG / JPEG / PNG allowed");
+                    $(this).val('');
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#previewImg").show();
+                    $("#previewImg").attr("src", e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
         });
+
         function calculateNet() {
             let total = parseFloat($("#TotalAmount").val()) || 0;
             let discount = parseFloat($("#DiscountPer").val()) || 0;
 
             let net = total - (total * discount / 100);
-
             $("#NetAmount").val(net.toFixed(2));
+            $("#PaidAmount").val(net.toFixed(2));
         }
 
         $("#TotalAmount, #DiscountPer").on("input", function () {
             calculateNet();
         });
 
+               function validateForm() {
+
+            let title = $("#Patient_Title").val();
+            if (!title) {
+                showError("Select Title");
+                $("#Patient_Title").focus();
+                return false;
+            }
+
+            let name = $("#Patient_PatientName").val()?.trim();
+            if (!name) {
+                showError("Patient Name is required");
+                $("#Patient_PatientName").focus();
+                return false;
+            }
+
+            let dob = $("#Patient_Dob").val();
+            if (!dob) {
+                showError("Date of Birth is required");
+                $("#Patient_Dob").focus();
+                return false;
+            }
+
+            let gender = $("#Patient_Gender").val();
+            if (!gender) {
+                showError("Select Gender");
+                $("#Patient_Gender").focus();
+                return false;
+            }
+
+            let phone = $("#Patient_Phone").val()?.trim();
+            if (!phone) {
+                showError("Phone is required");
+                $("#Patient_Phone").focus();
+                return false;
+            }
+
+            if (!/^[0-9]{10}$/.test(phone)) {
+                showError("Phone must be 10 digits");
+                $("#Patient_Phone").focus();
+                return false;
+            }
+
+            let aadhar = $("#Patient_AadharNo").val()?.trim();
+            if (aadhar && !/^[0-9]{12}$/.test(aadhar)) {
+                showError("Aadhar must be 12 digits");
+                $("#Patient_AadharNo").focus();
+                return false;
+            }
+
+            let category = $("#Patient_CategoryId").val();
+            if (!category) {
+                showError("Select Category");
+                $("#Patient_CategoryId").focus();
+                return false;
+            }
+
+            let address = $("#Patient_Address").val()?.trim();
+            if (!address) {
+                showError("Address is required");
+                $("#Patient_Address").focus();
+                return false;
+            }
+
+            let country = $("#CountryId").val();
+            if (!country) {
+                showError("Select Country");
+                $("#CountryId").focus();
+                return false;
+            }
+
+            let state = $("#StateId").val();
+            if (!state) {
+                showError("Select State");
+                $("#StateId").focus();
+                return false;
+            }
+
+            let mandal = $("#MandalId").val();
+            if (!mandal) {
+                showError("Select Mandal");
+                $("#MandalId").focus();
+                return false;
+            }
+
+            let city = $("#CityId").val();
+            if (!city) {
+                showError("Select City");
+                $("#CityId").focus();
+                return false;
+            }
+
+            let total = parseFloat($("#TotalAmount").val()) || 0;
+            if (total <= 0) {
+                showError("Enter valid Total Amount");
+                $("#TotalAmount").focus();
+                return false;
+            }
+
+            let discount = parseFloat($("#DiscountPer").val()) || 0;
+            if (discount < 0 || discount > 100) {
+                showError("Discount must be 0–100");
+                $("#DiscountPer").focus();
+                return false;
+            }
+
+            let paid = parseFloat($("#Patient_PaidAmount").val()) || 0;
+            if (paid < 0) {
+                showError("Enter valid Paid Amount");
+                $("#Patient_PaidAmount").focus();
+                return false;
+            }
+
+            if (paid > total) {
+                showError("Paid cannot be greater than Total");
+                $("#Patient_PaidAmount").focus();
+                return false;
+            }
+
+            let paymode = $("#Patient_PaymodeId").val();
+            if (!paymode) {
+                showError("Select Payment Mode");
+                $("#Patient_PaymodeId").focus();
+                return false;
+            }
+
+            let file = $("#patientImage")[0].files[0];
+            if (file) {
+                let ext = file.name.split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['jpg', 'jpeg', 'png']) == -1) {
+                    showError("Only JPG / JPEG / PNG allowed");
+                    $("#patientImage").focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+       
+
+
         $("#CountryId").change(function () {
 
             $("#StateId").empty();
             $("#MandalId").empty();
             $("#CityId").empty();
+
             $.getJSON('/Registration/GetStatesByCountry', { countryId: $(this).val() }, function (data) {
 
-                $("#StateId").append('<option>Select</option>');
+                $("#StateId").append('<option value="">Select</option>');
 
                 $.each(data, function (i, item) {
                     $("#StateId").append('<option value="' + item.stateId + '">' + item.stateName + '</option>');
@@ -251,7 +411,7 @@
 
             $.getJSON('/Registration/GetMandalsByState', { stateId: $(this).val() }, function (data) {
 
-                $("#MandalId").append('<option>Select</option>');
+                $("#MandalId").append('<option value="">Select</option>');
 
                 $.each(data, function (i, item) {
                     $("#MandalId").append('<option value="' + item.mandalId + '">' + item.mandalName + '</option>');
@@ -266,7 +426,7 @@
 
             $.getJSON('/Registration/GetCitiesByMandal', { mandalId: $(this).val() }, function (data) {
 
-                $("#CityId").append('<option>Select</option>');
+                $("#CityId").append('<option value="">Select</option>');
 
                 $.each(data, function (i, item) {
                     $("#CityId").append('<option value="' + item.cityId + '">' + item.cityName + '</option>');
@@ -275,5 +435,13 @@
             });
         });
 
+        $("form").on("submit", function (e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
     </script>
+
 }
