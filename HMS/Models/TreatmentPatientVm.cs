@@ -12,5 +12,6 @@ namespace HMS.Models
         public string? DoctorName { get; set; }
         public string? StudentName { get; set; }
         public int PatientId { get; set; }
+        public DateTime? AllotDate { get; set; }
     }
 }

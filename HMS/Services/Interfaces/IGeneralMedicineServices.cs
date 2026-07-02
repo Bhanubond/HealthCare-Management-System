@@ -10,7 +10,9 @@ namespace HMS.Services.Interfaces
         Task<List<MASMedication>> GetActiveMedications();
         Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int patientId);
         Task SaveCaseSheet(GMCasesheetSaveVm model);
-        Task<List<GMCasesheetSearchVm>> GetCompletedCases();
+        //Task<List<GMCasesheetSearchVm>> GetCompletedCases();
+
+        Task<List<GMCasesheetSearchVm>> GetCompletedCases(DateTime from, DateTime to);
         Task<GMCasesheetScreenVm> GetCaseSheetById(int gmId);
         Task UpdateCaseSheet(GMCasesheetSaveVm model);
     }

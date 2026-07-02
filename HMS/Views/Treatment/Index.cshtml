@@ -26,6 +26,16 @@
     .dt-buttons {
         margin-bottom: 10px;
     }
+
+    .badge-pending {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .badge-allotted {
+        background: #198754;
+        color: #fff;
+    }
 </style>
 
 <div class="card page-card">
@@ -60,8 +70,8 @@
                     <tr>
                         <th>OP No</th>
                         <th>Patient Name</th>
-                        <th>Department</th>
                         <th>Category</th>
+                        <th>Department</th>
                         <th>Doctor</th>
                         <th>Student</th>
                         <th>Allotted On</th>
@@ -102,9 +112,7 @@
                 startDate: start,
                 endDate: end,
 
-                locale: {
-                    format: 'DD/MM/YYYY'
-                },
+                locale: { format: 'DD/MM/YYYY' },
 
                 ranges: {
                     'Today': [moment(), moment()],
@@ -130,7 +138,7 @@
 
         function loadTreatmentQueue(fromDate, toDate) {
 
-            var deptId='@deptId';
+            var deptId = @deptId;
 
             var from = fromDate
                 ? fromDate.format('YYYY-MM-DD')
@@ -142,64 +150,49 @@
 
             $.ajax({
 
-                url: '/GeneralMedicine/GetTreatmentQueue',
+                url: '/Treatment/GetTreatmentQueue',
 
                 type: 'GET',
 
                 data: {
-
                     deptId: deptId,
                     fromDate: from,
                     toDate: to
-
                 },
 
                 success: function (data) {
 
                     if ($.fn.DataTable.isDataTable('#tblTreatment')) {
-
                         $('#tblTreatment').DataTable().destroy();
-
                     }
 
                     $('#tblTreatment').DataTable({
 
                         data: data,
 
-                        responsive: true,
-
                         dom: 'Bfrtip',
 
                         buttons: [
-
                             'excelHtml5',
                             'pdfHtml5',
                             'print'
-
                         ],
 
                         columns: [
 
                             { data: 'opNo' },
-
                             { data: 'patientName' },
-
-                            { data: 'departmentName' },
-
                             { data: 'categoryName' },
-
+                            { data: 'departmentName' },
                             { data: 'doctorName' },
-
                             { data: 'studentName' },
 
                             {
                                 data: 'allotDate',
                                 render: function (d) {
-
                                     return d
                                         ? moment(d).format('DD/MM/YYYY HH:mm')
                                         : '-';
-
                                 }
                             },
 
@@ -207,27 +200,30 @@
                                 data: null,
                                 orderable: false,
                                 searchable: false,
-                                render: function (row) {
+                                // render: function (row) {
 
-                                    return `<a href="/GeneralMedicine/TreatmentDetails?patientId=${row.patientId}"
-                                                class="btn btn-success btn-sm">
-                                                <i class="bi bi-pencil-square"></i> Treat
-                                            </a>`;
+                                //     return `<a href="/GeneralMedicine/TreatmentDetails?patientId=${row.patientId}"
+                                //                 class="btn btn-success btn-sm">
+                                //                 Treat
+                                //             </a>`;
+                                // }
+                                        render: function (row) {
 
-                                }
+                                        return `<a href="/Treatment/TreatmentDetails?deptId=${row.deptId}&patientId=${row.patientId}"
+                                                    class="btn btn-success btn-sm">
+                                                    Treat
+                                                </a>`;
+                                    }
                             }
-
                         ]
-
                     });
 
                 },
 
-                error: function () {
-
-                    toastr.error("Unable to load treatment queue.");
-
-                }
+                        error: function (xhr) {
+            console.log("ERROR:", xhr.responseText);
+            toastr.error("Failed to load treatment queue.");
+        }
 
             });
 

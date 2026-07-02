@@ -138,10 +138,24 @@ namespace HMS.Services.Implementations
             await SaveOrUpdateCaseSheetAsync(model, isUpdate: false);
         }
 
-        public async Task<List<GMCasesheetSearchVm>> GetCompletedCases()
+        //public async Task<List<GMCasesheetSearchVm>> GetCompletedCases()
+        //{
+        //    return await _db.Set<GMCasesheetSearchVm>()
+        //        .FromSqlRaw("EXEC usp_GetCompletedCasesheets")
+        //        .AsNoTracking()
+        //        .ToListAsync();
+        //}
+
+        public async Task<List<GMCasesheetSearchVm>> GetCompletedCases(DateTime fromDate, DateTime toDate)
         {
+            var fromParam = new SqlParameter("@FromDate", fromDate.Date);
+            var toParam = new SqlParameter("@ToDate", toDate.Date);
+
             return await _db.Set<GMCasesheetSearchVm>()
-                .FromSqlRaw("EXEC usp_GetCompletedCasesheets")
+                .FromSqlRaw(
+                    "EXEC usp_GetCompletedCasesheets @FromDate, @ToDate",
+                    fromParam,
+                    toParam)
                 .AsNoTracking()
                 .ToListAsync();
         }

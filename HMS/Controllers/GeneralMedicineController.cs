@@ -8,69 +8,30 @@ namespace HMS.Controllers
     {
         private readonly IAllotmentService _allotmentService;
         private readonly IGeneralMedicineServices _generalMedicineServices;
+        private readonly ITreatmentService _treatmentService;
 
-        public GeneralMedicineController(IAllotmentService allotmentService, IGeneralMedicineServices generalMedicineServices)
+        public GeneralMedicineController(IAllotmentService allotmentService, IGeneralMedicineServices generalMedicineServices, ITreatmentService treatmentService)
         {
             _allotmentService = allotmentService;
             _generalMedicineServices = generalMedicineServices;
+            _treatmentService = treatmentService;
         }
 
         public IActionResult Index() => View();
 
-        //public async Task<IActionResult> Allotment(int deptId)
-        //{
-        //    if (deptId == 0)
-        //        deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
-
-        //    if (deptId == 0)
-        //        return BadRequest("Department not selected");
-
-        //    var data = await _allotmentService.GetPatientsByDepartment(deptId);
-        //    ViewBag.DeptId = deptId;
-        //    return View("~/Views/Allotment/Index.cshtml", data);
-        //}
-
-        //public async Task<IActionResult> Allotment(int deptId, DateTime? fromDate, DateTime? toDate)
-        //{
-        //    if (deptId == 0)
-        //        deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
-
-        //    if (deptId == 0)
-        //        return BadRequest("Department not selected");
-
-        //    fromDate ??= DateTime.Today;
-        //    toDate ??= DateTime.Today;
-
-        //    var data = await _allotmentService.GetPatientsByDepartment(
-        //        deptId,
-        //        fromDate.Value,
-        //        toDate.Value);
-
-        //    ViewBag.DeptId = deptId;
-        //    ViewBag.FromDate = fromDate.Value;
-        //    ViewBag.ToDate = toDate.Value;
-
-        //    return View("~/Views/Allotment/Index.cshtml", data);
-        //}
-
-        public IActionResult Allotment(int deptId)
+        //public async Task<IActionResult> PatientSearch()
+        //    => View(await _generalMedicineServices.GetCompletedCases());
+        public IActionResult PatientSearch()
         {
-            if (deptId == 0)
-                deptId = HttpContext.Session.GetInt32("DeptId") ?? 0;
-
-            if (deptId == 0)
-                return BadRequest("Department not selected");
-
-            ViewBag.DeptId = deptId;
-
-            ViewBag.FromDate = DateTime.Today;
-            ViewBag.ToDate = DateTime.Today;
-
-            return View("~/Views/Allotment/Index.cshtml");
+            return View();
         }
 
-        public async Task<IActionResult> PatientSearch()
-            => View(await _generalMedicineServices.GetCompletedCases());
+        [HttpGet]
+        public async Task<IActionResult> GetCompletedCases(DateTime fromDate, DateTime toDate)
+        {
+            var data = await _generalMedicineServices.GetCompletedCases(fromDate, toDate);
+            return Json(data);
+        }
 
         [HttpGet]
         public async Task<IActionResult> EditCaseSheet(int gmId)
@@ -86,20 +47,12 @@ namespace HMS.Controllers
             return RedirectToAction(nameof(PatientSearch));
         }
 
-        public async Task<IActionResult> Treatment()
-            => View(await _generalMedicineServices.GetPendingTreatmentPatients());
-
-        public async Task<IActionResult> TreatmentDetails(int patientId)
-        {
-            var model = await _generalMedicineServices.GetTreatmentScreenAsync(patientId);
-            return model.PatientId == 0 ? NotFound() : View(model);
-        }
 
         [HttpPost]
         public async Task<IActionResult> SaveCaseSheet(GMCasesheetSaveVm model)
         {
             await _generalMedicineServices.SaveCaseSheet(model);
-            return RedirectToAction(nameof(Treatment));
+            return RedirectToAction(nameof(PatientSearch));
         }
 
         public IActionResult Approvals() => View();

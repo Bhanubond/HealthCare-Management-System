@@ -35,6 +35,7 @@ namespace HMS.Data
         public DbSet<MASMedication> MASMedications { get; set; }
         public DbSet<PatientMedicationDetails> PatientMedicationDetails { get; set; }
         public DbSet<FollowUp> FollowUps { get; set; }
+        //public DbSet<TreatmentQueueVm> TreatmentQueueVm { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -46,6 +47,7 @@ namespace HMS.Data
             modelBuilder.Entity<GMCasesheetViewVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<GMCasesheetSearchVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<GMCasesheetEditVm>().HasNoKey().ToView(null);
+            modelBuilder.Entity<TreatmentQueueVm>().HasNoKey().ToView(null);
         }
 
     }
