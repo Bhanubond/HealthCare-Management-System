@@ -11,12 +11,13 @@ namespace HMS.Services.Implementations
     {
         private readonly HmsDbContext _db;
         private readonly IPatientService _patientService;
+        private readonly ILookupService _lookupService;
 
-        public AllotmentService(HmsDbContext db, IPatientService patientService)
+        public AllotmentService(HmsDbContext db, IPatientService patientService, ILookupService lookupService)
         {
             _db = db;
             _patientService = patientService;
-
+            _lookupService = lookupService;
         }
 
         public async Task<List<AllotmentViewModel>> GetPatientsByDepartment(int deptId, DateTime fromDate, DateTime toDate)
@@ -58,13 +59,16 @@ namespace HMS.Services.Implementations
                 .Select(x => x.ReferredId)
                 .FirstOrDefaultAsync();
 
-            var students = await _db.Students
-                .Where(x => x.DepartmentId == deptId)
-                .ToListAsync();
+            //var students = await _db.Students
+            //    .Where(x => x.DepartmentId == deptId)
+            //    .ToListAsync();
 
-            var doctors = await _db.Doctors
-                .Where(x => x.DepartmentId == deptId)
-                .ToListAsync();
+            //var doctors = await _db.Doctors
+            //    .Where(x => x.DepartmentId == deptId)
+            //    .ToListAsync();
+
+            var students = await _lookupService.GetStudentsByDepartmentAsync(deptId);
+            var doctors = await _lookupService.GetDoctorsByDepartmentAsync(deptId);
 
             return new StudentAllotmentViewModel
             {

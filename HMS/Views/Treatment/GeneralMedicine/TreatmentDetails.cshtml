@@ -56,8 +56,19 @@
                     <div class="col-md-6"><label>Prescription</label><textarea asp-for="Prescription" class="form-control"></textarea></div>
                 </div>
             </div>
-
             <div class="tab-pane fade" id="medication">
+                @await Html.PartialAsync("_MedicationPartial", new MedicationPartialVm
+                {
+                    Medications = vm.Medications,
+                                MedicationMaster = vm.MedicationMaster
+                })
+            </div>
+
+            <div class="tab-pane fade" id="appointment">
+                @await Html.PartialAsync("_AppointmentPartial", vm)
+            </div>
+
+           @*  <div class="tab-pane fade" id="medication">
                 <div class="d-flex justify-content-between mb-3">
                     <h5 class="fw-bold">Prescription</h5>
                     <button type="button" class="btn btn-success btn-sm" onclick="addRow()">+ Add Medicine</button>
@@ -97,7 +108,7 @@
                         </div>
                     }
                 </div>
-            </div>
+            </div> *@
 
             @* <div class="tab-pane fade" id="appointment">
                 <div class="row g-3">
@@ -106,7 +117,7 @@
                 </div>
             </div> *@
 
-            <div class="tab-pane fade" id="appointment">
+          @*   <div class="tab-pane fade" id="appointment">
                 <div class="row g-3">
 
                     <div class="col-md-4">
@@ -169,7 +180,7 @@
                     </div>
 
                 </div>
-            </div>
+            </div> *@
         </div>
 
         <div class="text-center mt-4">
@@ -179,7 +190,7 @@
     </form>
 </div>
 
-<script>
+@* <script>
     let index = @(vm.Medications?.Count ?? 0);
 
     function addRow() {
@@ -214,4 +225,4 @@
         container.insertAdjacentHTML("beforeend", html);
         index++;
     }
-</script>
+</script> *@

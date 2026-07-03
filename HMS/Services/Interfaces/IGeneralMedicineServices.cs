@@ -7,7 +7,7 @@ namespace HMS.Services.Interfaces
     {
         Task<List<TreatmentPatientVm>> GetPendingTreatmentPatients();
         Task<GMCasesheetViewVm> GetCaseSheetPatient(int patientId);
-        Task<List<MASMedication>> GetActiveMedications();
+        //Task<List<MASMedication>> GetActiveMedications();
         Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int patientId);
         Task SaveCaseSheet(GMCasesheetSaveVm model);
         //Task<List<GMCasesheetSearchVm>> GetCompletedCases();

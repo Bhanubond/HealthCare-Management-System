@@ -33,6 +33,10 @@ builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IGeneralMedicineServices, GeneralMedicineServices>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<ITreatmentService, TreatmentService>();
+builder.Services.AddScoped<IMedicationService, MedicationService>();
+builder.Services.AddScoped<IFollowUpService, FollowUpService>();
+builder.Services.AddScoped<ILookupService, LookupService>();
+
 
 // REQUIRED for Session
 builder.Services.AddDistributedMemoryCache();

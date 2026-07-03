@@ -1,0 +1,84 @@
+﻿@using HMS.Entities
+@model HMS.Models.MedicationPartialVm
+
+@{
+    var master = Model.MedicationMaster ?? new List<HMS.Entities.MASMedication>();
+    var meds = Model.Medications ?? new List<HMS.Models.PatientMedicationVm>();
+
+    var frequencyList = new[] { "1-0-1", "1-1-1", "1-0-0", "0-0-1", "0-1-0", "SOS", "HS" };
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <h5 class="fw-bold">Prescription</h5>
+    <button type="button" class="btn btn-success btn-sm" onclick="addMedicationRow()">+ Add Medicine</button>
+</div>
+
+<div id="medicationContainer">
+
+    @for (int i = 0; i < meds.Count; i++)
+    {
+        <div class="row g-2 mb-2 align-items-end medication-row">
+
+            <div class="col-md-4">
+                <select class="form-select" name="Medications[@i].MedicationId">
+                    <option value="">-- Select Medicine --</option>
+                    @foreach (var med in master)
+                    {
+                        <option value="@med.MedId">@med.Medication</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-select" name="Medications[@i].Frequency">
+                    <option value="">-- Select --</option>
+                    @foreach (var f in frequencyList)
+                    {
+                        <option value="@f">@f</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-control" name="Medications[@i].Remarks" />
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-control" name="Medications[@i].Duration" />
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<script>
+    let medIndex = @Model.Medications.Count;
+
+    function addMedicationRow() {
+        const container = document.getElementById("medicationContainer");
+
+        const html = `
+        <div class="row g-2 mb-2 align-items-end medication-row">
+            <div class="col-md-4">
+                <select class="form-select" name="Medications[${medIndex}].MedicationId">
+                    <option value="">-- Select Medicine --</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="Medications[${medIndex}].Frequency">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="Medications[${medIndex}].Remarks" />
+            </div>
+            <div class="col-md-3">
+                <input class="form-control" name="Medications[${medIndex}].Duration" />
+            </div>
+        </div>`;
+
+        container.insertAdjacentHTML("beforeend", html);
+        medIndex++;
+    }
+</script>
