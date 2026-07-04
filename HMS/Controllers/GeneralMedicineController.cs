@@ -19,8 +19,6 @@ namespace HMS.Controllers
 
         public IActionResult Index() => View();
 
-        //public async Task<IActionResult> PatientSearch()
-        //    => View(await _generalMedicineServices.GetCompletedCases());
         public IActionResult PatientSearch()
         {
             return View();
@@ -55,6 +53,39 @@ namespace HMS.Controllers
             return RedirectToAction(nameof(PatientSearch));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SendForApproval(int gmId)
+        {
+            try
+            {
+                await _generalMedicineServices.ProcessApprovalFlow(gmId);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Case sheet sent for approval successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
         public IActionResult Approvals() => View();
+
+        [HttpGet]
+        public async Task<IActionResult> GetApprovalQueue(DateTime? fromDate, DateTime? toDate)
+        {
+            fromDate ??= DateTime.Now.AddMonths(-1);
+            toDate ??= DateTime.Now;
+
+            var data = await _generalMedicineServices.GetApprovalQueue(fromDate.Value, toDate.Value);
+
+            return Json(data);
+        }
     }
 }

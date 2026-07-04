@@ -22,5 +22,11 @@
         public string? Diagnosis { get; set; }
         public string? Prescription { get; set; }
         public string? Notes { get; set; }
+
+        public bool? IsSentForApproval1 { get; set; }
+        public bool? Approval1Status { get; set; }
+
+        public bool? IsSentForApproval2 { get; set; }
+        public bool? Approval2Status { get; set; }
     }
 }

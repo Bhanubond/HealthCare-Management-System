@@ -35,5 +35,10 @@ namespace HMS.Models
         public List<SelectListItem> Students { get; set; } = new();
         public List<SelectListItem> Departments { get; set; } = new();
         public string? FollowUpNotes { get; set; }
+
+        public int FromDeptId { get; set; }
+        public List<int> SelectedToDeptIds { get; set; } = new();
+        public Dictionary<int, string> Reasons { get; set; } = new();
+        public ReferralStatusVm ReferralStatus { get; set; }
     }
 }

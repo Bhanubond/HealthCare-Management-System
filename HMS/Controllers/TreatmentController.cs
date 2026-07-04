@@ -29,8 +29,6 @@ namespace HMS.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTreatmentQueue(int deptId, string fromDate, string toDate)
         {
-            //var from = DateTime.Parse(fromDate);
-            //var to = DateTime.Parse(toDate);
             var from = DateTime.Parse(fromDate).Date;
             var to = DateTime.Parse(toDate).Date;
 

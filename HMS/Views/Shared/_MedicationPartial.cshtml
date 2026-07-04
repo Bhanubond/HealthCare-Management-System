@@ -6,11 +6,16 @@
     var meds = Model.Medications ?? new List<HMS.Models.PatientMedicationVm>();
 
     var frequencyList = new[] { "1-0-1", "1-1-1", "1-0-0", "0-0-1", "0-1-0", "SOS", "HS" };
+
+    // safe index for new rows
+    var initialCount = meds.Count;
 }
 
 <div class="d-flex justify-content-between mb-3">
     <h5 class="fw-bold">Prescription</h5>
-    <button type="button" class="btn btn-success btn-sm" onclick="addMedicationRow()">+ Add Medicine</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="addMedicationRow()">
+        + Add Medicine
+    </button>
 </div>
 
 <div id="medicationContainer">
@@ -19,32 +24,52 @@
     {
         <div class="row g-2 mb-2 align-items-end medication-row">
 
+            <!-- Medicine -->
             <div class="col-md-4">
-                <select class="form-select" name="Medications[@i].MedicationId">
+                <select class="form-select"
+                        name="Medications[@i].MedicationId">
+
                     <option value="">-- Select Medicine --</option>
+
                     @foreach (var med in master)
                     {
-                        <option value="@med.MedId">@med.Medication</option>
+                        <option value="@med.MedId"
+                                selected="@(med.MedId == meds[i].MedicationId)">
+                            @med.Medication
+                        </option>
                     }
                 </select>
             </div>
 
+            <!-- Frequency -->
             <div class="col-md-2">
-                <select class="form-select" name="Medications[@i].Frequency">
+                <select class="form-select"
+                        name="Medications[@i].Frequency">
+
                     <option value="">-- Select --</option>
+
                     @foreach (var f in frequencyList)
                     {
-                        <option value="@f">@f</option>
+                        <option value="@f"
+                                selected="@(f == meds[i].Frequency)">
+                            @f
+                        </option>
                     }
                 </select>
             </div>
 
+            <!-- Remarks -->
             <div class="col-md-3">
-                <input class="form-control" name="Medications[@i].Remarks" />
+                <input class="form-control"
+                       name="Medications[@i].Remarks"
+                       value="@meds[i].Remarks" />
             </div>
 
+            <!-- Duration -->
             <div class="col-md-3">
-                <input class="form-control" name="Medications[@i].Duration" />
+                <input class="form-control"
+                       name="Medications[@i].Duration"
+                       value="@meds[i].Duration" />
             </div>
 
         </div>
@@ -53,29 +78,43 @@
 </div>
 
 <script>
-    let medIndex = @Model.Medications.Count;
+    let medIndex = @initialCount;
 
     function addMedicationRow() {
+
         const container = document.getElementById("medicationContainer");
 
         const html = `
         <div class="row g-2 mb-2 align-items-end medication-row">
+
             <div class="col-md-4">
                 <select class="form-select" name="Medications[${medIndex}].MedicationId">
                     <option value="">-- Select Medicine --</option>
+                    @foreach (var med in master)
+                    {
+                            <option value="@med.MedId">@med.Medication</option>
+                    }
                 </select>
             </div>
+
             <div class="col-md-2">
                 <select class="form-select" name="Medications[${medIndex}].Frequency">
                     <option value="">-- Select --</option>
+                    @foreach (var f in frequencyList)
+                    {
+                            <option value="@f">@f</option>
+                    }
                 </select>
             </div>
+
             <div class="col-md-3">
                 <input class="form-control" name="Medications[${medIndex}].Remarks" />
             </div>
+
             <div class="col-md-3">
                 <input class="form-control" name="Medications[${medIndex}].Duration" />
             </div>
+
         </div>`;
 
         container.insertAdjacentHTML("beforeend", html);

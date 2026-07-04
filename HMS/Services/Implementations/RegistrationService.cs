@@ -19,7 +19,6 @@ namespace HMS.Services.Implementations
             _context = context;
         }
 
-        // ---------------- GET ALL ----------------
         public async Task<List<OPDPatientRegistration>> GetAllAsync()
         {
             return await _context.OPDPatientRegistrations
@@ -27,7 +26,6 @@ namespace HMS.Services.Implementations
                 .ToListAsync();
         }
 
-        // ---------------- GET BY ID ----------------
         public async Task<OPDPatientRegistration?> GetByIdAsync(long id)
         {
             return await _context.OPDPatientRegistrations
@@ -37,7 +35,6 @@ namespace HMS.Services.Implementations
         public async Task<OPDPatientRegistration?> GetForDeleteAsync(long id)
             => await GetByIdAsync(id);
 
-        // ---------------- BUILD CREATE ----------------
         public async Task<RegistrationFormViewModel> BuildCreateAsync()
         {
             return await BuildFormAsync(new OPDPatientRegistration
@@ -47,14 +44,12 @@ namespace HMS.Services.Implementations
             });
         }
 
-        // ---------------- BUILD EDIT ----------------
         public async Task<RegistrationFormViewModel?> BuildEditAsync(long id)
         {
             var patient = await GetByIdAsync(id);
             return patient == null ? null : await BuildFormAsync(patient);
         }
 
-        // ---------------- FORM BUILDER ----------------
         public async Task<RegistrationFormViewModel> BuildFormAsync(OPDPatientRegistration patient)
         {
             return new RegistrationFormViewModel
@@ -109,7 +104,6 @@ namespace HMS.Services.Implementations
             };
         }
 
-        // ---------------- CREATE ----------------
         public async Task<long> CreateAsync(OPDPatientRegistration patient)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -130,6 +124,7 @@ namespace HMS.Services.Implementations
                     FromDeptId = (int)Department.OPD,
                     ToDeptId = (int)Department.GEN,
                     FromDate = DateTime.Now,
+                    ReferredReason = "Initial Examination",
                     AllotmentStatus = "Pending",
                     VisitType = "New",
                     CreatedDate = DateTime.Now,
@@ -157,7 +152,6 @@ namespace HMS.Services.Implementations
             if (existing == null)
                 return false;
 
-            // ---------------- UPDATE FIELDS ----------------
             existing.Title = patient.Title;
             existing.PatientName = patient.PatientName;
             existing.FatherOrHusband = patient.FatherOrHusband;
@@ -184,7 +178,6 @@ namespace HMS.Services.Implementations
             return true;
         }
 
-        // ---------------- DELETE ----------------
         public async Task<bool> DeleteAsync(long id)
         {
             var data = await _context.OPDPatientRegistrations.FindAsync(id);
@@ -195,7 +188,6 @@ namespace HMS.Services.Implementations
             return true;
         }
 
-        // ---------------- DUPLICATE CHECK ----------------
         public async Task<bool> IsDuplicateAsync(string phone, string aadharNo)
         {
             return await _context.OPDPatientRegistrations
@@ -204,7 +196,6 @@ namespace HMS.Services.Implementations
                     (!string.IsNullOrEmpty(aadharNo) && x.AadharNo == aadharNo));
         }
 
-        // ---------------- LOCATION ----------------
         public async Task<List<MASState>> GetStatesByCountryAsync(int countryId)
         {
             return await _context.MASStates
@@ -334,30 +325,21 @@ namespace HMS.Services.Implementations
         {
             var query = _context.OPDPatientRegistrations.AsQueryable();
 
-            // ---------------- FILTERS ----------------
 
-            if (!string.IsNullOrEmpty(model.OPNo))
-                query = query.Where(x => x.OpNo.Contains(model.OPNo));
+            if (!string.IsNullOrEmpty(model.OPNo)) query = query.Where(x => x.OpNo.Contains(model.OPNo));
 
-            if (!string.IsNullOrEmpty(model.Phone))
-                query = query.Where(x => x.Phone.Contains(model.Phone));
+            if (!string.IsNullOrEmpty(model.Phone)) query = query.Where(x => x.Phone.Contains(model.Phone));
 
-            if (!string.IsNullOrEmpty(model.PatientName))
-                query = query.Where(x => x.PatientName.Contains(model.PatientName));
+            if (!string.IsNullOrEmpty(model.PatientName)) query = query.Where(x => x.PatientName.Contains(model.PatientName));
 
-            if (!string.IsNullOrEmpty(model.AadharNo))
-                query = query.Where(x => x.AadharNo.Contains(model.AadharNo));
+            if (!string.IsNullOrEmpty(model.AadharNo)) query = query.Where(x => x.AadharNo.Contains(model.AadharNo));
 
-            if (model.FromDate.HasValue)
-                query = query.Where(x => x.RegDate >= model.FromDate);
+            if (model.FromDate.HasValue) query = query.Where(x => x.RegDate >= model.FromDate);
 
-            if (model.ToDate.HasValue)
-                query = query.Where(x => x.RegDate <= model.ToDate);
+            if (model.ToDate.HasValue) query = query.Where(x => x.RegDate <= model.ToDate);
 
-            // ---------------- TOTAL COUNT ----------------
             model.TotalRecords = await query.CountAsync();
 
-            // ---------------- PAGINATION ----------------
             model.Results = await query
                 .OrderByDescending(x => x.PatientId)
                 .Skip((model.PageNumber - 1) * model.PageSize)

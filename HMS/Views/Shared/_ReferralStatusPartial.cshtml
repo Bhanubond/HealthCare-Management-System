@@ -1,0 +1,59 @@
+﻿@model ReferralStatusVm
+
+<div class="referral-section">
+
+    <h4>Refer to Other Departments</h4>
+
+    @foreach (var dept in Model.Departments)
+    {
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <input type="checkbox"
+                       name="SelectedToDeptIds"
+                       value="@dept.Value" />
+                @dept.Text
+            </div>
+
+            <div class="col-md-6">
+                <input type="text"
+                       name="Reasons[@dept.Value]"
+                       class="form-control"
+                       placeholder="Enter referral reason" />
+            </div>
+        </div>
+    }
+
+    <hr />
+
+    <h4>Already Referred Departments</h4>
+
+    @if (Model.ExistingReferrals.Any())
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ExistingReferrals)
+                {
+                    <tr>
+                        <td>@item.DepartmentName</td>
+                        <td>@item.Reason</td>
+                        <td>@item.Status</td>
+                        <td>@item.Date?.ToString("dd-MM-yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No referrals yet.</p>
+    }
+
+</div>

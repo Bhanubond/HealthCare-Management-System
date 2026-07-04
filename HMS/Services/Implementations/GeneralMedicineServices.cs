@@ -1,3 +1,4 @@
+using HMS.Common;
 using HMS.Data;
 using HMS.Entities;
 using HMS.Models;
@@ -5,6 +6,7 @@ using HMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace HMS.Services.Implementations
 {
@@ -14,13 +16,14 @@ namespace HMS.Services.Implementations
         private readonly IMedicationService _medicationService;
         private readonly IFollowUpService _followUpService;
         private readonly ILookupService _lookupService;
-        public GeneralMedicineServices(HmsDbContext db, IMedicationService medicationService, IFollowUpService followUpService, ILookupService lookupService)
+        private readonly IReferralStatusService _referralService;
+        public GeneralMedicineServices(HmsDbContext db, IMedicationService medicationService, IFollowUpService followUpService, ILookupService lookupService, IReferralStatusService referralService)
         {
             _db = db;
             _medicationService = medicationService;
             _followUpService = followUpService;
             _lookupService = lookupService;
-
+            _referralService = referralService;
         }
 
         public async Task<List<TreatmentPatientVm>> GetPendingTreatmentPatients()
@@ -45,19 +48,9 @@ namespace HMS.Services.Implementations
             return model;
         }
 
-        //public async Task<List<MASMedication>> GetActiveMedications()
-        //{
-        //    return await _db.MASMedications
-        //        .AsNoTracking()
-        //        .Where(x => x.IsActive && !x.DelInd)
-        //        .OrderBy(x => x.Medication)
-        //        .ToListAsync();
-        //}
-
         public async Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int patientId)
         {
             var patient = await GetCaseSheetPatient(patientId);
-            //var medications = await GetActiveMedications();
             var medications = await _medicationService.GetActiveMedications();
             var context = await GetLatestTreatmentContextAsync(patientId);
             var currentDept = await _followUpService.GetCurrentDepartmentIdAsync(patientId);
@@ -74,17 +67,11 @@ namespace HMS.Services.Implementations
                 StudentName = context.StudentName,
                 AllotId = context.AllotId,
                 ReferredId = context.ReferredId,
-                //NextVisitDepartmentId = context.DeptId,
-                
-
                 NextVisitDepartmentId = currentDept,
                 NextVisitDoctorId = context.DoctorId == 0 ? null : context.DoctorId,
                 NextVisitStudentId = context.StudentId == 0 ? null : context.StudentId,
                 MedicationMaster = medications,
                 Medications = new List<PatientMedicationVm> { new() },
-                //Doctors = await GetDoctors(),
-                //Students = await GetStudents(),
-                //Departments = await GetDepartments()
                 Doctors = await _lookupService.GetDoctorsAsync(),
                 Students = await _lookupService.GetStudentsAsync(),
                 Departments = await _lookupService.GetDepartmentsAsync()
@@ -107,14 +94,13 @@ namespace HMS.Services.Implementations
                 return new GMCasesheetScreenVm();
             }
 
-            //var medications = await GetActiveMedications();
             var medications = await _medicationService.GetActiveMedications();
-            //var existingMeds = await GetPatientMedications(model.PatientId);
             var existingMeds = await _medicationService.GetPatientMedications(model.PatientId);
-            //var followUp = await GetLatestFollowUpAsync(model.PatientId);
-            //var currentDeptId = await GetCurrentDepartmentId(model.PatientId);
             var followUp = await _followUpService.GetLatestFollowUpAsync(model.PatientId);
             var currentDeptId = await _followUpService.GetCurrentDepartmentIdAsync(model.PatientId);
+
+            var departments = await _lookupService.GetDepartmentsAsync();
+            var referrals = await _referralService.GetReferralsByPatientAsync(model.PatientId);
 
             return new GMCasesheetScreenVm
             {
@@ -135,6 +121,10 @@ namespace HMS.Services.Implementations
                 Diagnosis = model.Diagnosis ?? string.Empty,
                 Prescription = model.Prescription ?? string.Empty,
                 Notes = model.Notes ?? string.Empty,
+                IsSentForApproval1 = model.IsSentForApproval1,
+                IsSentForApproval2 = model.IsSentForApproval2,
+                Approval1Status = model.Approval1Status,
+                Approval2Status = model.Approval2Status,
                 MedicationMaster = medications,
                 Medications = existingMeds.Any() ? existingMeds : new List<PatientMedicationVm> { new() },
                 NextVisitDate = followUp?.FollowupDate,
@@ -144,12 +134,16 @@ namespace HMS.Services.Implementations
                 NextVisitStudentId = followUp?.StudentId,
                 NextVisitReason = followUp?.FollowupReason,
                 Status = followUp?.Status ?? "Yet to visit",
-                //Doctors = await GetDoctors(),
-                //Students = await GetStudents(),
-                //Departments = await GetDepartments()
                 Doctors = await _lookupService.GetDoctorsAsync(),
                 Students = await _lookupService.GetStudentsAsync(),
-                Departments = await _lookupService.GetDepartmentsAsync()
+                Departments = await _lookupService.GetDepartmentsAsync(),
+                ReferralStatus = new ReferralStatusVm
+                {
+                    PatientId = model.PatientId,
+                    FromDeptId = (int)currentDeptId,
+                    Departments = departments,
+                    ExistingReferrals = referrals
+                }
             };
         }
 
@@ -158,13 +152,7 @@ namespace HMS.Services.Implementations
             await SaveOrUpdateCaseSheetAsync(model, isUpdate: false);
         }
 
-        //public async Task<List<GMCasesheetSearchVm>> GetCompletedCases()
-        //{
-        //    return await _db.Set<GMCasesheetSearchVm>()
-        //        .FromSqlRaw("EXEC usp_GetCompletedCasesheets")
-        //        .AsNoTracking()
-        //        .ToListAsync();
-        //}
+
 
         public async Task<List<GMCasesheetSearchVm>> GetCompletedCases(DateTime fromDate, DateTime toDate)
         {
@@ -222,6 +210,9 @@ namespace HMS.Services.Implementations
             entity.Diagnosis = model.Diagnosis;
             entity.Prescription = model.Prescription;
             entity.Notes = model.Notes;
+            entity.Approval1Status = false;
+            entity.Approval2Status = false;
+
 
             if (isUpdate)
             {
@@ -232,9 +223,8 @@ namespace HMS.Services.Implementations
 
             await _db.SaveChangesAsync();
 
-            //await ReplacePatientMedicationsAsync(model.PatientId, model.Medications, now);
             await _medicationService.SavePatientMedications(model.PatientId, model.Medications);
-            //await SaveOrUpdateFollowUpAsync(model, now);
+
             await _followUpService.SaveOrUpdateFollowUpAsync(model);
             await UpdateAllotmentAndReferralAsync(model, entity.GMID);
 
@@ -242,98 +232,10 @@ namespace HMS.Services.Implementations
             await tx.CommitAsync();
         }
 
-        //private async Task ReplacePatientMedicationsAsync(int patientId, IEnumerable<PatientMedicationVm>? medications, DateTime now)
-        //{
-        //    await _db.PatientMedicationDetails
-        //        .Where(x => x.PatientId == patientId)
-        //        .ExecuteDeleteAsync();
-
-        //    var validMedications = (medications ?? Enumerable.Empty<PatientMedicationVm>())
-        //        .Where(x => x.MedicationId > 0)
-        //        .ToList();
-
-        //    if (!validMedications.Any())
-        //    {
-        //        return;
-        //    }
-
-        //    foreach (var med in validMedications)
-        //    {
-        //        _db.PatientMedicationDetails.Add(new PatientMedicationDetails
-        //        {
-        //            PatientId = patientId,
-        //            MedicationId = med.MedicationId,
-        //            Frequency = med.Frequency,
-        //            Remarks = med.Remarks,
-        //            Duration = med.Duration,
-        //            CreatedDate = now,
-        //            CreatedBy = 1
-        //        });
-        //    }
-        //}
-
-        //private async Task SaveOrUpdateFollowUpAsync(GMCasesheetSaveVm model, DateTime now)
-        //{
-        //    if (!model.NextVisitDate.HasValue)
-        //    {
-        //        return;
-        //    }
-
-        //    var deptId = model.NextVisitDepartmentId.GetValueOrDefault();
-        //    if (deptId <= 0)
-        //    {
-        //        deptId = await GetCurrentDepartmentId(model.PatientId) ?? 0;
-        //    }
-
-        //    if (deptId <= 0)
-        //    {
-        //        return;
-        //    }
-
-        //    var reason = model.NextVisitReason ?? model.FollowUpNotes;
-        //    var doctorId = model.NextVisitDoctorId ?? model.DoctorId;
-        //    var studentId = model.NextVisitStudentId ?? model.StudentId;
-        //    var latest = await _db.FollowUps
-        //        .Where(x => x.PatientId == model.PatientId)
-        //        .OrderByDescending(x => x.FollowupId)
-        //        .FirstOrDefaultAsync();
-
-        //    if (latest == null)
-        //    {
-        //        _db.FollowUps.Add(new FollowUp
-        //        {
-        //            PatientId = model.PatientId,
-        //            FollowupDate = model.NextVisitDate.Value,
-        //            FollowupTime = model.NextVisitTime,
-        //            DeptId = deptId,
-        //            FollowupReason = reason,
-        //            DoctorId = doctorId,
-        //            StudentId = studentId,
-        //            Status = model.Status ?? "Yet to visit",
-        //            ReferredTreatmentId = model.ReferredId.GetValueOrDefault(),
-        //            CreatedDate = now,
-        //            CreatedBy = "System",
-        //            CreatedSystem = Environment.MachineName,
-        //            IsCancelled = false
-        //        });
-        //        return;
-        //    }
-
-        //    latest.FollowupDate = model.NextVisitDate.Value;
-        //    latest.FollowupTime = model.NextVisitTime;
-        //    latest.DeptId = deptId;
-        //    latest.FollowupReason = reason;
-        //    latest.DoctorId = doctorId;
-        //    latest.StudentId = studentId;
-        //    latest.Status = model.Status ?? latest.Status;
-        //    latest.ReferredTreatmentId = model.ReferredId.GetValueOrDefault();
-        //    latest.ModifiedDate = now;
-        //    latest.ModifiedBy = "System";
-        //    latest.ModifiedSystem = Environment.MachineName;
-        //}
 
         private async Task UpdateAllotmentAndReferralAsync(GMCasesheetSaveVm model, int gmId)
         {
+            // 1. Update allotment
             if (model.AllotId.HasValue)
             {
                 var allotment = await _db.StudentAllotments
@@ -345,54 +247,27 @@ namespace HMS.Services.Implementations
                 }
             }
 
+            // 2. Complete the referral that brought the patient here
             if (model.ReferredId.HasValue)
             {
-                var referral = await _db.ReferralStatuses
-                    .FirstOrDefaultAsync(x => x.ReferredId == model.ReferredId.Value);
+                await _referralService.CompleteReferralAsync(model.ReferredId.Value);
+            }
 
-                if (referral != null)
+            // 3. Create new referrals only if any departments were selected
+            if (model.SelectedToDeptIds != null && model.SelectedToDeptIds.Any())
+            {
+                var fromDeptId = await _followUpService.GetCurrentDepartmentIdAsync(model.PatientId);
+
+                if (fromDeptId.HasValue)
                 {
-                    referral.TreatmentStatus = "Completed";
+                    await _referralService.CreateReferralsAsync(
+                        model.PatientId,
+                        fromDeptId.Value,
+                        model.SelectedToDeptIds,
+                        model.Reasons ?? new Dictionary<int, string>());
                 }
             }
         }
-
-        //private async Task<List<PatientMedicationVm>> GetPatientMedications(int patientId)
-        //{
-        //    return await (
-        //        from detail in _db.PatientMedicationDetails.AsNoTracking()
-        //        join med in _db.MASMedications.AsNoTracking()
-        //            on detail.MedicationId equals med.MedId
-        //        where detail.PatientId == patientId && detail.IsActive && med.IsActive && !med.DelInd
-        //        orderby detail.PatientMedicationId
-        //        select new PatientMedicationVm
-        //        {
-        //            MedicationId = detail.MedicationId,
-        //            MedicationName = med.Medication,
-        //            Frequency = detail.Frequency,
-        //            Remarks = detail.Remarks,
-        //            Duration = detail.Duration
-        //        }).ToListAsync();
-        //}
-
-        //private async Task<FollowUp?> GetLatestFollowUpAsync(int patientId)
-        //{
-        //    return await _db.FollowUps
-        //        .AsNoTracking()
-        //        .Where(x => x.PatientId == patientId)
-        //        .OrderByDescending(x => x.FollowupId)
-        //        .FirstOrDefaultAsync();
-        //}
-
-        //private async Task<int?> GetCurrentDepartmentId(int patientId)
-        //{
-        //    return await _db.StudentAllotments
-        //        .AsNoTracking()
-        //        .Where(x => x.PatientId == patientId && x.DeptId.HasValue)
-        //        .OrderByDescending(x => x.AllotId)
-        //        .Select(x => x.DeptId)
-        //        .FirstOrDefaultAsync();
-        //}
 
         private async Task<TreatmentContextVm> GetLatestTreatmentContextAsync(int patientId)
         {
@@ -440,48 +315,63 @@ namespace HMS.Services.Implementations
             };
         }
 
-        //private async Task<List<SelectListItem>> GetDoctors()
-        //{
-        //    return await _db.Doctors
-        //        .AsNoTracking()
-        //        .Where(x => x.IsActive)
-        //        .OrderBy(x => x.DoctorName)
-        //        .Select(x => new SelectListItem
-        //        {
-        //            Value = x.DoctorId.ToString(),
-        //            Text = x.DoctorName
-        //        })
-        //        .ToListAsync();
-        //}
+        public async Task ProcessApprovalFlow(int gmId)
+        {
+            var gm = await _db.GMCasesheets
+                .FirstOrDefaultAsync(x => x.GMID == gmId);
 
-        //private async Task<List<SelectListItem>> GetStudents()
-        //{
-        //    return await _db.Students
-        //        .AsNoTracking()
-        //        .Where(x => x.IsActive)
-        //        .OrderBy(x => x.StudentName)
-        //        .Select(x => new SelectListItem
-        //        {
-        //            Value = x.StudentId.ToString(),
-        //            Text = x.StudentName
-        //        })
-        //        .ToListAsync();
-        //}
+            if (gm == null)
+                return;
 
-        //private async Task<List<SelectListItem>> GetDepartments()
-        //{
-        //    return await _db.MASDepartments
-        //        .AsNoTracking()
-        //        .Where(x => x.IsActive)
-        //        .OrderBy(x => x.DeptName)
-        //        .Select(x => new SelectListItem
-        //        {
-        //            Value = x.DeptId.ToString(),
-        //            Text = x.DeptName
-        //        })
-        //        .ToListAsync();
-        //}
+            if ((bool)!gm.IsSentForApproval1)
+            {
+                gm.IsSentForApproval1 = true;
+                gm.ModifiedDate = DateTime.Now;
+            }
 
+            else if (gm.IsSentForApproval1 == true
+                  && gm.Approval1Status != true
+                  && gm.IsSentForApproval2 == false)
+            {
+                gm.Approval1Status = true;
+                gm.ModifiedDate = DateTime.Now;
+            }
+
+            else if (gm.IsSentForApproval1 == true
+                  && gm.Approval1Status == true
+                  && gm.IsSentForApproval2 == false)
+            {
+                gm.IsSentForApproval2 = true;
+                gm.ModifiedDate = DateTime.Now;
+            }
+
+            else if (gm.IsSentForApproval1 == true
+                  && gm.Approval1Status == true
+                  && gm.IsSentForApproval2 == true
+                  && gm.Approval2Status != true)
+            {
+                gm.Approval2Status = true;
+                gm.ModifiedDate = DateTime.Now;
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
+
+
+        public async Task<List<GMApprovalQueueVm>> GetApprovalQueue(DateTime fromDate, DateTime toDate)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@FromDate", fromDate),
+                new SqlParameter("@ToDate", toDate)
+            };
+
+            return await _db.Set<GMApprovalQueueVm>()
+                .FromSqlRaw("EXEC usp_GetGMApprovalQueue @FromDate,@ToDate", parameters)
+                .AsNoTracking()
+                .ToListAsync();
+        }
         private sealed class TreatmentContextVm
         {
             public int? AllotId { get; set; }
