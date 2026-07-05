@@ -11,10 +11,9 @@
         public string CategoryName { get; set; }
         public DateTime AllotDate { get; set; }
 
-        public bool? IsSentForApproval1 { get; set; }
-        public bool? Approval1Status { get; set; }
-
-        public bool? IsSentForApproval2 { get; set; }
-        public bool? Approval2Status { get; set; }
+        public bool IsSentForApproval1 { get; set; } = false;
+        public bool Approval1Status { get; set; } = false;
+        public bool IsSentForApproval2 { get; set; } = false;
+        public bool Approval2Status { get; set; } = false;
     }
 }
