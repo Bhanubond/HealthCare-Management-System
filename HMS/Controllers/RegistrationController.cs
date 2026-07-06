@@ -24,10 +24,34 @@ namespace HMS.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(OPDSearchViewModel model)
+        public IActionResult Index()
         {
-            model = await _service.SearchOPDAsync(model);
-            return View(model);
+            return View();
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetOPDPatients(OPDSearchViewModel model)
+        {
+            try
+            {
+                var data = await _service.SearchOPDAsync(model);
+
+                return Json(new
+                {
+                    data = data.Results ?? new List<OPDPatientRegistration>(),
+                    recordsTotal = data.TotalRecords,
+                    recordsFiltered = data.TotalRecords
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    data = new List<object>(),
+                    recordsTotal = 0,
+                    recordsFiltered = 0,
+                    error = ex.Message
+                });
+            }
         }
 
         [HttpGet]

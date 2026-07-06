@@ -1,79 +1,439 @@
-@model HMS.Models.GMCasesheetScreenVm
+﻿@model HMS.Models.GMCasesheetScreenVm
+
 @{
     var vm = Model ?? new HMS.Models.GMCasesheetScreenVm();
-    var meds = vm.Medications ?? new List<HMS.Models.PatientMedicationVm> { new() };
-    var master = vm.MedicationMaster ?? new List<HMS.Entities.MASMedication>();
-    var frequencyList = new[] { "1-0-1", "1-1-1", "1-0-0", "0-0-1", "0-1-0", "SOS", "HS" };
-    var index = meds.Count;
 }
 
-<div class="container-fluid py-4">
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white border-bottom">
-            <div class="d-flex justify-content-between align-items-center">
-                <h3 class="mb-0 fw-semibold">Treatment - Case Sheet</h3>
-                <span class="badge bg-light text-dark border px-3 py-2">OP No : @vm.OpNo</span>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+<style>
+    body {
+        background: #f4f6fb;
+        font-family: 'Segoe UI';
+    }
+
+    .cardx {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        border: none;
+    }
+
+    .badge-soft {
+        background: #f1f3f9;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+    }
+
+    .nav-pills .nav-link {
+        border-radius: 50px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+    }
+
+    .sticky-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 15px;
+        border-top: 1px solid #eee;
+    }
+</style>
+
+<div class="container-fluid py-3">
+
+    <!-- HEADER -->
+    <div class="cardx p-3 mb-3">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+
+            <div>
+                <h5 class="mb-0">🩺 Case Sheet</h5>
+                <small class="text-muted">OP No: @vm.OpNo</small>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3"><b>Patient:</b> @vm.PatientName</div>
-                <div class="col-md-2"><b>Age:</b> @vm.Age</div>
-                <div class="col-md-2"><b>Gender:</b> @vm.Gender</div>
-                <div class="col-md-3"><b>Doctor:</b> @vm.DoctorName</div>
-                <div class="col-md-2"><b>Student:</b> @vm.StudentName</div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="badge-soft">👤 @vm.PatientName</span>
+                <span class="badge-soft">🎂 @vm.Age yrs</span>
+                <span class="badge-soft">⚧ @vm.Gender</span>
+                <span class="badge-soft">👨‍⚕️ @vm.DoctorName</span>
+                <span class="badge-soft">🎓 @vm.StudentName</span>
             </div>
+
         </div>
     </div>
 
-    <form asp-action="SaveCaseSheet" asp-controller="GeneralMedicine" method="post">
-        <input type="hidden" asp-for="PatientId" />
-        <input type="hidden" asp-for="DoctorId" />
-        <input type="hidden" asp-for="StudentId" />
-        <input type="hidden" asp-for="AllotId" />
-        <input type="hidden" asp-for="ReferredId" />
-        <input type="hidden" asp-for="OpNo" />
+    <!-- FORM CONTAINER (NO SUBMIT) -->
+    <div class="cardx">
 
-        <ul class="nav nav-tabs mb-3">
-            <li class="nav-item">
-                <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#general">General</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#medication">Medication</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#appointment">Appointment</button>
-            </li>
-        </ul>
+        <!-- TABS -->
+        <div class="p-3 border-bottom">
+            <ul class="nav nav-pills gap-2">
 
-        <div class="tab-content border p-4 bg-white">
-            <div class="tab-pane fade show active" id="general">
-                <div class="row g-3">
-                    <div class="col-md-6"><label>Chief Complaint</label><textarea asp-for="ChiefComplaint" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Symptoms</label><textarea asp-for="Symptoms" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Diagnosis</label><textarea asp-for="Diagnosis" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Notes</label><textarea asp-for="Notes" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Prescription</label><textarea asp-for="Prescription" class="form-control"></textarea></div>
+                <li class="nav-item">
+                    <button type="button" class="nav-link active rounded-pill"
+                            data-bs-toggle="tab"
+                            data-bs-target="#history">
+                        🧾 History
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link rounded-pill"
+                            data-bs-toggle="tab"
+                            data-bs-target="#vitals">
+                        🧾 Vitals
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link rounded-pill"
+                            data-bs-toggle="tab"
+                            data-bs-target="#exam">
+                        🧾 Examination
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link rounded-pill"
+                            data-bs-toggle="tab"
+                            data-bs-target="#general">
+                        🧾 General
+                    </button>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="p-3 bg-light">
+
+            <div class="tab-content">
+
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="history">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label>HOPI</label>
+                            <textarea id="HistoryOfPresentIllness" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Past Medical</label>
+                            <textarea id="PastMedicalHistory" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Past Surgical</label>
+                            <textarea id="PastSurgicalHistory" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Family History</label>
+                            <textarea id="FamilyHistory" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label>Personal History</label>
+                            <textarea id="PersonalHistory" class="form-control"></textarea>
+                        </div>
+
+                    </div>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="medication">
-                @await Html.PartialAsync("_MedicationPartial", new MedicationPartialVm
-                {
-                    Medications = vm.Medications,
-                                MedicationMaster = vm.MedicationMaster
-                })
+                </div>
+                </div>
+                </div>
+
+
+                <div class="tab-content">
+                    <div class="tab-pane fade" id="vitals">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <label class="form-label">Blood Pressure</label>
+                            <input id="BloodPressure" class="form-control" placeholder="BP" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Pulse Rate</label>
+                            <input id="PulseRate" class="form-control" placeholder="Pulse" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Temperature (°C)</label>
+                            <input id="Temperature" class="form-control" placeholder="Temp °C" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Respiratory Rate</label>
+                            <input id="RespiratoryRate" class="form-control" placeholder="RR" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">SpO₂</label>
+                            <input id="SpO2" class="form-control" placeholder="SpO2" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Weight (kg)</label>
+                            <input id="Weight" class="form-control" placeholder="Weight (kg)" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Height (cm)</label>
+                            <input id="Height" class="form-control" placeholder="Height (cm)" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">BMI</label>
+                            <input id="BMI" class="form-control" placeholder="BMI" readonly />
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+                </div>
+                </div>
+
+
+                <div class="tab-content">
+                    <div class="tab-pane fade" id="exam">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">General Examination</label>
+                            <textarea id="GeneralExamination" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Cardiovascular System (CVS) Examination</label>
+                            <textarea id="CVSExamination" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Respiratory System (RS) Examination</label>
+                            <textarea id="RSExamination" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Abdomen Examination</label>
+                            <textarea id="AbdomenExamination" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Central Nervous System (CNS) Examination</label>
+                            <textarea id="CNSExamination" class="form-control"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+                </div>
+                </div>
+
+
+                <div class="tab-content">
+                    <div class="tab-pane fade " id="general">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label>Chief Complaint *</label>
+                            <textarea id="ChiefComplaint" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Symptoms</label>
+                            <textarea id="Symptoms" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Diagnosis</label>
+                            <textarea id="Diagnosis" class="form-control"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Notes</label>
+                            <textarea id="Notes" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Prescription</label>
+                            <textarea id="Prescription" class="form-control"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+                </div>
+                </div>
+
             </div>
 
-            <div class="tab-pane fade" id="appointment">
-                @await Html.PartialAsync("_AppointmentPartial", vm)
-            </div>
-
-         
         </div>
+    </div>
 
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary px-5"><i class="fa fa-save me-2"></i> Save Prescription</button>
-            <a asp-action="Treatment" class="btn btn-secondary px-4 ms-2">Cancel</a>
-        </div>
-    </form>
+    <!-- SAVE BUTTON -->
+    <div class="sticky-bar text-center">
+        <button type="button" id="btnSave" class="btn btn-primary px-5 rounded-pill">
+            💾 Save Case Sheet
+        </button>
+    </div>
+
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- TOASTR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        console.log("JS Loaded");
+
+        // =========================
+        // LIMITS
+        // =========================
+        const limits = {
+            tempMin: 30,
+            tempMax: 45,
+            spo2Min: 50,
+            spo2Max: 100
+        };
+
+        // =========================
+        // BMI CALCULATION
+        // =========================
+        function calcBMI() {
+
+            let w = parseFloat($("#Weight").val());
+            let h = parseFloat($("#Height").val());
+
+            if (!w || !h) return;
+
+            let bmi = w / ((h / 100) * (h / 100));
+            $("#BMI").val(bmi.toFixed(2));
+        }
+
+        $("#Weight, #Height").on("input", calcBMI);
+
+        // =========================
+        // BUILD MODEL
+        // =========================
+        function getModel() {
+
+            return {
+                PatientId: '@vm.PatientId',
+                DoctorId: '@vm.DoctorId',
+                StudentId: '@vm.StudentId',
+                AllotId: '@vm.AllotId',
+                ReferredId: '@vm.ReferredId',
+                OpNo: '@vm.OpNo',
+
+                HistoryOfPresentIllness: $("#HistoryOfPresentIllness").val(),
+                PastMedicalHistory: $("#PastMedicalHistory").val(),
+                PastSurgicalHistory: $("#PastSurgicalHistory").val(),
+                FamilyHistory: $("#FamilyHistory").val(),
+                PersonalHistory: $("#PersonalHistory").val(),
+
+                BloodPressure: $("#BloodPressure").val(),
+                PulseRate: parseInt($("#PulseRate").val()) || null,
+                Temperature: parseFloat($("#Temperature").val()) || null,
+                RespiratoryRate: parseInt($("#RespiratoryRate").val()) || null,
+                SpO2: parseInt($("#SpO2").val()) || null,
+                Weight: parseFloat($("#Weight").val()) || null,
+                Height: parseFloat($("#Height").val()) || null,
+                BMI: parseFloat($("#BMI").val()) || null,
+
+                GeneralExamination: $("#GeneralExamination").val(),
+                CVSExamination: $("#CVSExamination").val(),
+                RSExamination: $("#RSExamination").val(),
+                AbdomenExamination: $("#AbdomenExamination").val(),
+                CNSExamination: $("#CNSExamination").val(),
+
+                ChiefComplaint: $("#ChiefComplaint").val(),
+                Symptoms: $("#Symptoms").val(),
+                Diagnosis: $("#Diagnosis").val(),
+                Notes: $("#Notes").val(),
+                Prescription: $("#Prescription").val()
+            };
+        }
+
+        // =========================
+        // VALIDATION
+        // =========================
+        function validate(model) {
+
+            let errors = [];
+
+            if (!model.ChiefComplaint)
+                errors.push("Chief Complaint is required");
+
+            if (model.Temperature && (model.Temperature < limits.tempMin || model.Temperature > limits.tempMax))
+                errors.push("Temperature must be between 30–45°C");
+
+            if (model.SpO2 && (model.SpO2 < limits.spo2Min || model.SpO2 > limits.spo2Max))
+                errors.push("SpO2 must be between 50–100");
+
+            if (model.PulseRate && model.PulseRate > 200)
+                errors.push("Invalid Pulse Rate");
+
+            return errors;
+        }
+
+        // =========================
+        // SAVE CLICK
+        // =========================
+        $("#btnSave").on("click", function () {
+
+            let model = getModel();
+            let errors = validate(model);
+
+            if (errors.length > 0) {
+
+                errors.forEach(e => {
+                    toastr.error(e, "Validation Error");
+                });
+
+                return;
+            }
+
+            $.ajax({
+                url: '/GeneralMedicine/SaveCaseSheet',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+
+                beforeSend: function () {
+                    $("#btnSave").prop("disabled", true).text("Saving...");
+                },
+
+                success: function (res) {
+                    toastr.success("Saved Successfully");
+
+                    setTimeout(() => {
+                        window.location.href = '/GeneralMedicine/PatientSearch';
+                    }, 800);
+                },
+
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    toastr.error("Save Failed");
+                },
+
+                complete: function () {
+                    $("#btnSave").prop("disabled", false).text("💾 Save Case Sheet");
+                }
+            });
+
+        });
+
+    });
+
+</script>

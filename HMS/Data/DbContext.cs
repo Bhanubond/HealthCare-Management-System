@@ -50,6 +50,7 @@ namespace HMS.Data
             modelBuilder.Entity<GMCasesheetEditVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<TreatmentQueueVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<GMApprovalQueueVm>().HasNoKey().ToView(null);
+            modelBuilder.Entity<OPDSearchResultVm>().HasNoKey().ToView(null);
         }
 
     }

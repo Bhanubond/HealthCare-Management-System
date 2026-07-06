@@ -23,6 +23,27 @@
         public string? Prescription { get; set; }
         public string? Notes { get; set; }
 
+        public string HistoryOfPresentIllness { get; set; }
+        public string PastMedicalHistory { get; set; }
+        public string PastSurgicalHistory { get; set; }
+        public string FamilyHistory { get; set; }
+        public string PersonalHistory { get; set; }
+
+        public string BloodPressure { get; set; }
+        public int? PulseRate { get; set; }
+        public decimal? Temperature { get; set; }
+        public int? RespiratoryRate { get; set; }
+        public int? SpO2 { get; set; }
+        public decimal? Weight { get; set; }
+        public decimal? Height { get; set; }
+        public decimal? BMI { get; set; }
+
+        public string GeneralExamination { get; set; }
+        public string CVSExamination { get; set; }
+        public string RSExamination { get; set; }
+        public string AbdomenExamination { get; set; }
+        public string CNSExamination { get; set; }
+
         public bool IsSentForApproval1 { get; set; } = false;
         public bool Approval1Status { get; set; } = false;
         public bool IsSentForApproval2 { get; set; } = false;

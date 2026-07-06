@@ -15,7 +15,9 @@ namespace HMS.Services.Interfaces
         Task<List<GMCasesheetSearchVm>> GetCompletedCases(DateTime from, DateTime to);
         Task<GMCasesheetScreenVm> GetCaseSheetById(int gmId);
         Task UpdateCaseSheet(GMCasesheetSaveVm model);
-        Task ProcessApprovalFlow(int gmId);
+        //Task ProcessApprovalFlow(int gmId);
+
+        Task<string> ProcessApprovalFlow(int gmId);
 
         Task<List<GMApprovalQueueVm>> GetApprovalQueue(DateTime fromDate, DateTime toDate);
     }

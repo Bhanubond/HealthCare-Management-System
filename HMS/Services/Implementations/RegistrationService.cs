@@ -323,28 +323,37 @@ namespace HMS.Services.Implementations
 
         public async Task<OPDSearchViewModel> SearchOPDAsync(OPDSearchViewModel model)
         {
-            var query = _context.OPDPatientRegistrations.AsQueryable();
+            var parameters = new[]
+            {
+                new SqlParameter("@OPNo",(object?)model.OPNo ?? DBNull.Value),
+                new SqlParameter("@Phone",(object?)model.Phone ?? DBNull.Value),
+                new SqlParameter("@PatientName",(object?)model.PatientName ?? DBNull.Value),
+                new SqlParameter("@AadharNo",(object?)model.AadharNo ?? DBNull.Value),
+                new SqlParameter("@FromDate",(object?)model.FromDate ?? DBNull.Value),
+                new SqlParameter("@ToDate",(object?)model.ToDate ?? DBNull.Value),
+                new SqlParameter("@PageNumber",model.PageNumber),
+                new SqlParameter("@PageSize",model.PageSize)
+            };
 
-
-            if (!string.IsNullOrEmpty(model.OPNo)) query = query.Where(x => x.OpNo.Contains(model.OPNo));
-
-            if (!string.IsNullOrEmpty(model.Phone)) query = query.Where(x => x.Phone.Contains(model.Phone));
-
-            if (!string.IsNullOrEmpty(model.PatientName)) query = query.Where(x => x.PatientName.Contains(model.PatientName));
-
-            if (!string.IsNullOrEmpty(model.AadharNo)) query = query.Where(x => x.AadharNo.Contains(model.AadharNo));
-
-            if (model.FromDate.HasValue) query = query.Where(x => x.RegDate >= model.FromDate);
-
-            if (model.ToDate.HasValue) query = query.Where(x => x.RegDate <= model.ToDate);
-
-            model.TotalRecords = await query.CountAsync();
-
-            model.Results = await query
-                .OrderByDescending(x => x.PatientId)
-                .Skip((model.PageNumber - 1) * model.PageSize)
-                .Take(model.PageSize)
+            var result = await _context.Set<OPDSearchResultVm>()
+                .FromSqlRaw(
+                    "EXEC usp_SearchOPDPatients @OPNo,@Phone,@PatientName,@AadharNo,@FromDate,@ToDate,@PageNumber,@PageSize",
+                    parameters)
+                .AsNoTracking()
                 .ToListAsync();
+
+            model.TotalRecords = result.FirstOrDefault()?.TotalRecords ?? 0;
+
+            model.Results = result.Select(x => new OPDPatientRegistration
+            {
+                PatientId = x.PatientId,
+                UHID = x.UHID,
+                OpNo = x.OpNo,
+                PatientName = x.PatientName,
+                Phone = x.Phone,
+                AadharNo = x.AadharNo,
+                RegDate = x.RegDate
+            }).ToList();
 
             return model;
         }

@@ -1,59 +1,133 @@
 ﻿@model ReferralStatusVm
 
-<div class="referral-section">
+<div class="card shadow-sm border-0">
 
-    <h4>Refer to Other Departments</h4>
+    <!-- Header -->
+    <div class="card-header bg-white border-0">
+        <h5 class="fw-bold mb-0">🔁 Department Referrals</h5>
+        <small class="text-muted">Select departments and add referral reasons</small>
+    </div>
 
-    @foreach (var dept in Model.Departments)
-    {
-        <div class="row mb-2">
-            <div class="col-md-3">
-                <input type="checkbox"
-                       name="SelectedToDeptIds"
-                       value="@dept.Value" />
-                @dept.Text
-            </div>
+    <div class="card-body">
 
-            <div class="col-md-6">
-                <input type="text"
-                       name="Reasons[@dept.Value]"
-                       class="form-control"
-                       placeholder="Enter referral reason" />
-            </div>
+        <!-- NEW REFERRALS -->
+        <h6 class="fw-semibold mb-3">Create New Referral</h6>
+
+        <div class="row g-3">
+
+            @foreach (var dept in Model.Departments)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="referral-card">
+
+                        <label class="d-flex align-items-center gap-2 fw-semibold">
+                            <input type="checkbox"
+                                   name="SelectedToDeptIds"
+                                   value="@dept.Value"
+                                   class="form-check-input" />
+
+                            <span>@dept.Text</span>
+                        </label>
+
+                        <input type="text"
+                               name="Reasons[@dept.Value]"
+                               class="form-control form-control-sm mt-2"
+                               placeholder="Reason for referral..." />
+
+                    </div>
+                </div>
+            }
+
         </div>
-    }
 
-    <hr />
+        <hr class="my-4" />
 
-    <h4>Already Referred Departments</h4>
+        <!-- HISTORY -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold mb-0">Referral History</h6>
+            <span class="badge bg-primary">
+                @Model.ExistingReferrals.Count() Total
+            </span>
+        </div>
 
-    @if (Model.ExistingReferrals.Any())
-    {
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Department</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.ExistingReferrals)
-                {
-                    <tr>
-                        <td>@item.DepartmentName</td>
-                        <td>@item.Reason</td>
-                        <td>@item.Status</td>
-                        <td>@item.Date?.ToString("dd-MM-yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No referrals yet.</p>
-    }
+        @if (Model.ExistingReferrals.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Department</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
+                        @foreach (var item in Model.ExistingReferrals)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.DepartmentName</td>
+                                <td>@item.Reason</td>
+                                <td>
+                                    <span class="status-badge @item.Status?.ToLower()">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>@item.Date?.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-inbox fs-3"></i>
+                <p class="mb-0">No referrals yet</p>
+            </div>
+        }
+
+    </div>
 </div>
+
+<style>
+    .referral-card {
+        border: 1px solid #e9ecef;
+        border-radius: 14px;
+        padding: 12px;
+        background: #fff;
+        transition: 0.2s ease-in-out;
+        height: 100%;
+    }
+
+        .referral-card:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+</style>

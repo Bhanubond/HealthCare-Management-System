@@ -214,11 +214,28 @@
                                 searchable: false,
                                 render: function (row) {
 
+                                    // Hide if Approval 1 is already completed
+                                    if (row.isSentForApproval1 == 1 && row.approval1Status == 1) {
+                                        return "";
+                                    }
+
+                                    // Hide if Approval 2 is already completed
+                                    if (row.isSentForApproval2 == 1 && row.approval2Status == 1) {
+                                        return "";
+                                    }
+
+                                    // Show Approve button when approval is pending
+                                    if ((row.isSentForApproval1 == 1 && row.approval1Status != 1) ||
+                                        (row.isSentForApproval2 == 1 && row.approval2Status != 1)) {
+
                                         return `
                                             <button class="btn btn-success btn-sm"
                                                     onclick="sendForApproval(${row.gmid})">
                                                 Approve
                                             </button>`;
+                                    }
+
+                                    return "";
                                 }
                             }
 

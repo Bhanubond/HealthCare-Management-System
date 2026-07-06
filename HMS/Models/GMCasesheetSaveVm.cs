@@ -21,6 +21,27 @@ namespace HMS.Models
         public string? Gender { get; set; }
         public string? DoctorName { get; set; }
         public string? StudentName { get; set; }
+
+        public string? HistoryOfPresentIllness { get; set; }
+        public string? PastMedicalHistory { get; set; }
+        public string? PastSurgicalHistory { get; set; }
+        public string? FamilyHistory { get; set; }
+        public string? PersonalHistory { get; set; } 
+
+        public string? BloodPressure { get; set; }
+        public int? PulseRate { get; set; }
+        public decimal? Temperature { get; set; }
+        public int? RespiratoryRate { get; set; }
+        public int? SpO2 { get; set; }
+        public decimal? Weight { get; set; }
+        public decimal? Height { get; set; }
+        public decimal? BMI { get; set; }
+        public string? GeneralExamination { get; set; }
+        public string? CVSExamination { get; set; }
+        public string? RSExamination { get; set; }
+        public string? AbdomenExamination { get; set; }
+        public string? CNSExamination { get; set; }
+
         public List<PatientMedicationVm> Medications { get; set; } = new();
 
         public DateTime? NextVisitDate { get; set; }

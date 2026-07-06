@@ -1,4 +1,4 @@
-using HMS.Common;
+﻿using HMS.Common;
 using HMS.Data;
 using HMS.Entities;
 using HMS.Models;
@@ -121,6 +121,38 @@ namespace HMS.Services.Implementations
                 Diagnosis = model.Diagnosis ?? string.Empty,
                 Prescription = model.Prescription ?? string.Empty,
                 Notes = model.Notes ?? string.Empty,
+
+                // =========================
+                // 🧍 HISTORY
+                // =========================
+                HistoryOfPresentIllness = model.HistoryOfPresentIllness ?? string.Empty,
+                PastMedicalHistory = model.PastMedicalHistory ?? string.Empty,
+                PastSurgicalHistory = model.PastSurgicalHistory ?? string.Empty,
+                FamilyHistory = model.FamilyHistory ?? string.Empty,
+                PersonalHistory = model.PersonalHistory ?? string.Empty,
+
+                // =========================
+                // 📊 VITALS
+                // =========================
+                BloodPressure = model.BloodPressure ?? string.Empty,
+                PulseRate = model.PulseRate,
+                Temperature = model.Temperature,
+                RespiratoryRate = model.RespiratoryRate,
+                SpO2 = model.SpO2,
+                Weight = model.Weight,
+                Height = model.Height,
+                BMI = model.BMI,
+
+                // =========================
+                // 🩻 EXAMINATION
+                // =========================
+                GeneralExamination = model.GeneralExamination ?? string.Empty,
+                CVSExamination = model.CVSExamination ?? string.Empty,
+                RSExamination = model.RSExamination ?? string.Empty,
+                AbdomenExamination = model.AbdomenExamination ?? string.Empty,
+                CNSExamination = model.CNSExamination ?? string.Empty,
+
+
                 IsSentForApproval1 = model.IsSentForApproval1,
                 IsSentForApproval2 = model.IsSentForApproval2,
                 Approval1Status = model.Approval1Status,
@@ -178,59 +210,247 @@ namespace HMS.Services.Implementations
             await using var tx = await _db.Database.BeginTransactionAsync();
             var now = DateTime.Now;
 
-            GMCasesheet? entity;
-            if (isUpdate)
+            try
             {
-                entity = await _db.GMCasesheets.FirstOrDefaultAsync(x => x.GMID == model.GMID);
-                if (entity == null)
+                Console.WriteLine("STEP 1: Transaction started");
+
+                GMCasesheet? entity;
+
+                if (isUpdate)
                 {
-                    return;
+                    entity = await _db.GMCasesheets.FirstOrDefaultAsync(x => x.GMID == model.GMID);
+
+                    if (entity == null)
+                    {
+                        Console.WriteLine("ERROR: Entity not found for update");
+                        throw new Exception("CaseSheet not found");
+                    }
                 }
-            }
-            else
-            {
-                entity = new GMCasesheet
+                else
                 {
-                    CreatedDate = now,
-                    CreatedBy = 1,
-                    CreatedSystem = Environment.MachineName
-                };
-                _db.GMCasesheets.Add(entity);
+                    entity = new GMCasesheet
+                    {
+                        CreatedDate = now,
+                        CreatedBy = 1,
+                        CreatedSystem = Environment.MachineName
+                    };
+
+                    _db.GMCasesheets.Add(entity);
+                }
+
+                Console.WriteLine("STEP 2: Entity created/loaded");
+
+                // =========================
+                // SAFE VITALS (IMPORTANT FIX)
+                // =========================
+                decimal? SafeDecimal(decimal? val, decimal min, decimal max, string field)
+                {
+                    if (!val.HasValue) return null;
+
+                    if (val < min || val > max)
+                    {
+                        Console.WriteLine($"WARNING: {field} out of range -> {val}");
+                        return null; // prevent SQL overflow
+                    }
+
+                    return Math.Round(val.Value, 2);
+                }
+
+                int? SafeInt(int? val, int min, int max, string field)
+                {
+                    if (!val.HasValue) return null;
+
+                    if (val < min || val > max)
+                    {
+                        Console.WriteLine($"WARNING: {field} out of range -> {val}");
+                        return null;
+                    }
+
+                    return val;
+                }
+
+                // =========================
+                // BASIC INFO
+                // =========================
+                entity.PatientId = model.PatientId;
+                entity.DoctorId = model.DoctorId;
+                entity.StudentId = model.StudentId;
+                entity.AllotId = model.AllotId;
+                entity.ReferredId = model.ReferredId;
+                entity.OpNo = model.OpNo;
+                entity.CaseDate = isUpdate ? entity.CaseDate : now;
+
+                Console.WriteLine("STEP 3: Basic info mapped");
+
+                // =========================
+                // HISTORY
+                // =========================
+                entity.HistoryOfPresentIllness = model.HistoryOfPresentIllness;
+                entity.PastMedicalHistory = model.PastMedicalHistory;
+                entity.PastSurgicalHistory = model.PastSurgicalHistory;
+                entity.FamilyHistory = model.FamilyHistory;
+                entity.PersonalHistory = model.PersonalHistory;
+
+                Console.WriteLine("STEP 4: History mapped");
+
+                // =========================
+                // VITALS (SAFE MAPPING)
+                // =========================
+                entity.BloodPressure = model.BloodPressure;
+                entity.PulseRate = SafeInt(model.PulseRate, 0, 250, "PulseRate");
+                entity.RespiratoryRate = SafeInt(model.RespiratoryRate, 0, 80, "RR");
+                entity.SpO2 = SafeInt(model.SpO2, 0, 100, "SpO2");
+
+                entity.Temperature = SafeDecimal(model.Temperature, 20, 60, "Temperature");
+                entity.Weight = SafeDecimal(model.Weight, 0, 300, "Weight");
+                entity.Height = SafeDecimal(model.Height, 0, 250, "Height");
+                //entity.BMI = SafeDecimal(model.BMI, 5, 60, "BMI");
+                //if (model.Weight.HasValue && model.Height.HasValue && model.Height > 0)
+                //{
+                //    double weight = (double)model.Weight.Value;
+                //    double heightCm = (double)model.Height.Value;
+
+                //    double bmi = weight / Math.Pow(heightCm / 100.0, 2);
+
+                //    entity.BMI = (decimal)Math.Round(bmi, 2);
+                //}
+                //else
+                //{
+                //    entity.BMI = null;
+                //}
+
+                Console.WriteLine("STEP 5: Vitals mapped");
+
+                // =========================
+                // EXAMINATION
+                // =========================
+                entity.GeneralExamination = model.GeneralExamination;
+                entity.CVSExamination = model.CVSExamination;
+                entity.RSExamination = model.RSExamination;
+                entity.AbdomenExamination = model.AbdomenExamination;
+                entity.CNSExamination = model.CNSExamination;
+
+                Console.WriteLine("STEP 6: Examination mapped");
+
+                // =========================
+                // CORE DATA
+                // =========================
+                entity.ChiefComplaint = model.ChiefComplaint;
+                entity.Symptoms = model.Symptoms;
+                entity.Diagnosis = model.Diagnosis;
+                entity.Prescription = model.Prescription;
+                entity.Notes = model.Notes;
+
+                Console.WriteLine("STEP 7: Core data mapped");
+
+                // =========================
+                // APPROVAL RESET
+                // =========================
+                entity.Approval1Status = false;
+                entity.Approval2Status = false;
+
+                if (isUpdate)
+                {
+                    entity.ModifiedDate = now;
+                    entity.ModifiedBy = 1;
+                    entity.ModifiedSystem = Environment.MachineName;
+                }
+
+                Console.WriteLine("STEP 8: Before SaveChanges (ENTITY READY)");
+
+                // =========================
+                // SAVE 1
+                // =========================
+                await _db.SaveChangesAsync();
+                Console.WriteLine("STEP 9: Main Save SUCCESS");
+
+                // =========================
+                // CHILD TABLES
+                // =========================
+                await _medicationService.SavePatientMedications(model.PatientId, model.Medications);
+                Console.WriteLine("STEP 10: Medications saved");
+
+                await _followUpService.SaveOrUpdateFollowUpAsync(model);
+                Console.WriteLine("STEP 11: FollowUp saved");
+
+                await UpdateAllotmentAndReferralAsync(model, entity.GMID);
+                Console.WriteLine("STEP 12: Allotment updated");
+
+                await _db.SaveChangesAsync();
+                Console.WriteLine("STEP 13: Final Save SUCCESS");
+
+                await tx.CommitAsync();
+                Console.WriteLine("STEP 14: Transaction COMMITTED");
             }
-
-            entity.PatientId = model.PatientId;
-            entity.DoctorId = model.DoctorId;
-            entity.StudentId = model.StudentId;
-            entity.AllotId = model.AllotId;
-            entity.ReferredId = model.ReferredId;
-            entity.OpNo = model.OpNo;
-            entity.CaseDate = isUpdate ? entity.CaseDate : now;
-            entity.ChiefComplaint = model.ChiefComplaint;
-            entity.Symptoms = model.Symptoms;
-            entity.Diagnosis = model.Diagnosis;
-            entity.Prescription = model.Prescription;
-            entity.Notes = model.Notes;
-            entity.Approval1Status = false;
-            entity.Approval2Status = false;
-
-
-            if (isUpdate)
+            catch (Exception ex)
             {
-                entity.ModifiedDate = now;
-                entity.ModifiedBy = 1;
-                entity.ModifiedSystem = Environment.MachineName;
+                Console.WriteLine("❌ ERROR OCCURRED:");
+                Console.WriteLine(ex.ToString());
+
+                await tx.RollbackAsync();
+
+                throw; // IMPORTANT: sends real error to controller
             }
-
-            await _db.SaveChangesAsync();
-
-            await _medicationService.SavePatientMedications(model.PatientId, model.Medications);
-
-            await _followUpService.SaveOrUpdateFollowUpAsync(model);
-            await UpdateAllotmentAndReferralAsync(model, entity.GMID);
-
-            await _db.SaveChangesAsync();
-            await tx.CommitAsync();
         }
+
+        //private async Task SaveOrUpdateCaseSheetAsync(GMCasesheetSaveVm model, bool isUpdate)
+        //{
+        //    await using var tx = await _db.Database.BeginTransactionAsync();
+        //    var now = DateTime.Now;
+
+        //    GMCasesheet? entity;
+        //    if (isUpdate)
+        //    {
+        //        entity = await _db.GMCasesheets.FirstOrDefaultAsync(x => x.GMID == model.GMID);
+        //        if (entity == null)
+        //        {
+        //            return;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        entity = new GMCasesheet
+        //        {
+        //            CreatedDate = now,
+        //            CreatedBy = 1,
+        //            CreatedSystem = Environment.MachineName
+        //        };
+        //        _db.GMCasesheets.Add(entity);
+        //    }
+
+        //    entity.PatientId = model.PatientId;
+        //    entity.DoctorId = model.DoctorId;
+        //    entity.StudentId = model.StudentId;
+        //    entity.AllotId = model.AllotId;
+        //    entity.ReferredId = model.ReferredId;
+        //    entity.OpNo = model.OpNo;
+        //    entity.CaseDate = isUpdate ? entity.CaseDate : now;
+        //    entity.ChiefComplaint = model.ChiefComplaint;
+        //    entity.Symptoms = model.Symptoms;
+        //    entity.Diagnosis = model.Diagnosis;
+        //    entity.Prescription = model.Prescription;
+        //    entity.Notes = model.Notes;
+        //    entity.Approval1Status = false;
+        //    entity.Approval2Status = false;
+
+
+        //    if (isUpdate)
+        //    {
+        //        entity.ModifiedDate = now;
+        //        entity.ModifiedBy = 1;
+        //        entity.ModifiedSystem = Environment.MachineName;
+        //    }
+
+        //    await _db.SaveChangesAsync();
+
+        //    await _medicationService.SavePatientMedications(model.PatientId, model.Medications);
+
+        //    await _followUpService.SaveOrUpdateFollowUpAsync(model);
+        //    await UpdateAllotmentAndReferralAsync(model, entity.GMID);
+
+        //    await _db.SaveChangesAsync();
+        //    await tx.CommitAsync();
+        //}
 
 
         private async Task UpdateAllotmentAndReferralAsync(GMCasesheetSaveVm model, int gmId)
@@ -315,46 +535,58 @@ namespace HMS.Services.Implementations
             };
         }
 
-        public async Task ProcessApprovalFlow(int gmId)
+        public async Task<string> ProcessApprovalFlow(int gmId)
         {
             var gm = await _db.GMCasesheets
                 .FirstOrDefaultAsync(x => x.GMID == gmId);
 
             if (gm == null)
-                return;
+                return "Case sheet not found.";
 
-            if ((bool)!gm.IsSentForApproval1)
+            if (gm.IsSentForApproval1 != true)
             {
                 gm.IsSentForApproval1 = true;
                 gm.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Case sheet sent for Approval 1 successfully.";
             }
 
-            else if (gm.IsSentForApproval1 == true
-                  && gm.Approval1Status != true
-                  && gm.IsSentForApproval2 == false)
+            if (gm.IsSentForApproval1 == true
+                && gm.Approval1Status != true
+                && gm.IsSentForApproval2 != true)
             {
                 gm.Approval1Status = true;
                 gm.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Approval 1 completed successfully.";
             }
 
-            else if (gm.IsSentForApproval1 == true
-                  && gm.Approval1Status == true
-                  && gm.IsSentForApproval2 == false)
+            if (gm.IsSentForApproval1 == true
+                && gm.Approval1Status == true
+                && gm.IsSentForApproval2 != true)
             {
                 gm.IsSentForApproval2 = true;
                 gm.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Case sheet sent for Approval 2 successfully.";
             }
 
-            else if (gm.IsSentForApproval1 == true
-                  && gm.Approval1Status == true
-                  && gm.IsSentForApproval2 == true
-                  && gm.Approval2Status != true)
+            if (gm.IsSentForApproval1 == true
+                && gm.Approval1Status == true
+                && gm.IsSentForApproval2 == true
+                && gm.Approval2Status != true)
             {
                 gm.Approval2Status = true;
                 gm.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Approval 2 completed successfully.";
             }
 
-            await _db.SaveChangesAsync();
+            return "No action performed.";
         }
 
 

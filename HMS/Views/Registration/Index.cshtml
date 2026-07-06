@@ -1,143 +1,237 @@
 ﻿@model HMS.Models.OPDSearchViewModel
 
 @{
-    ViewData["Title"] = "OPD Search";
+    ViewData["Title"] = "OPD Patient Registration";
 }
 
-<div class="container-fluid mt-3">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
 
-    <h3>OPD Patient Search</h3>
+<style>
+    .page-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,.08);
+    }
 
-    <!-- ================= FILTER SECTION ================= -->
-    <form method="get">
+    .page-header {
+        background: linear-gradient(135deg,#0d6efd,#2563eb);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px 12px 0 0;
+    }
 
-        <div class="card p-3 mb-3">
+    .filter-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
 
-            <div class="row">
+    table.dataTable td {
+        vertical-align: middle;
+    }
+
+    .dt-buttons {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="card page-card">
+
+    <!-- HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">OPD Patient Registration</h4>
+
+        <div style="width:280px">
+            <input type="text"
+                   id="RegDateRange"
+                   class="form-control"
+                   placeholder="Select Date Range" />
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <!-- FILTERS -->
+        <div class="card filter-card p-3 mb-3">
+
+            <div class="row g-2">
 
                 <div class="col-md-2">
-                    <label>OP No</label>
-                    <input asp-for="OPNo" class="form-control" />
+                    <input id="OPNo" class="form-control" placeholder="OP No" />
                 </div>
 
                 <div class="col-md-2">
-                    <label>Phone</label>
-                    <input asp-for="Phone" class="form-control" />
+                    <input id="Phone" class="form-control" placeholder="Phone" />
                 </div>
 
                 <div class="col-md-3">
-                    <label>Patient Name</label>
-                    <input asp-for="PatientName" class="form-control" />
+                    <input id="PatientName" class="form-control" placeholder="Patient Name" />
                 </div>
 
                 <div class="col-md-2">
-                    <label>Aadhar</label>
-                    <input asp-for="AadharNo" class="form-control" />
+                    <input id="AadharNo" class="form-control" placeholder="Aadhar No" />
                 </div>
 
                 <div class="col-md-3">
-                    <label>From Date</label>
-                    <input asp-for="FromDate" type="date" class="form-control" />
-                </div>
-
-                <div class="col-md-3 mt-2">
-                    <label>To Date</label>
-                    <input asp-for="ToDate" type="date" class="form-control" />
-                </div>
-
-                <div class="col-md-2 mt-2">
-                    <label>Page Size</label>
-                    <select asp-for="PageSize" class="form-control">
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 mt-4">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button class="btn btn-primary w-100" onclick="loadData()">
                         Search
                     </button>
                 </div>
 
             </div>
-
         </div>
 
-    </form>
+        <!-- TABLE -->
+        <div class="table-responsive">
 
-    <!-- ================= TABLE ================= -->
-    <div class="card p-3">
+            <table id="tblOPD"
+                   class="table table-bordered table-hover align-middle"
+                   style="width:100%">
 
-        <table class="table table-bordered table-striped">
-
-            <thead class="table-dark">
-                <tr>
-                    <th>UHID</th>
-                    <th>OP No</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Aadhar</th>
-                    <th>Reg Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var item in Model.Results)
-                {
+                <thead class="table-primary">
                     <tr>
-                        <td>@item.UHID</td>
-                        <td>@item.OpNo</td>
-                        <td>@item.PatientName</td>
-                        <td>@item.Phone</td>
-                        <td>@item.AadharNo</td>
-                        <td>@item.RegDate.ToString("dd-MM-yyyy")</td>
-
-                        <td>
-                            <a class="btn btn-sm btn-primary"
-                               href="/Registration/Details/@item.PatientId">View</a>
-
-                            <a class="btn btn-sm btn-warning"
-                               href="/Registration/Edit/@item.PatientId">Edit</a>
-                        </td>
+                        <th>UHID</th>
+                        <th>OP No</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Aadhar</th>
+                        <th>Reg Date</th>
+                        <th width="120">Action</th>
                     </tr>
-                }
-            </tbody>
+                </thead>
 
-        </table>
+                <tbody></tbody>
 
-        <!-- ================= PAGINATION ================= -->
-        <div class="mt-3">
-
-            @{
-                int totalPages = (int)Math.Ceiling((double)Model.TotalRecords / Model.PageSize);
-            }
-
-            <nav>
-                <ul class="pagination">
-
-                    @for (int i = 1; i <= totalPages; i++)
-                    {
-                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            <a class="page-link"
-                               href="?PageNumber=@i&PageSize=@Model.PageSize
-                                   &OPNo=@Model.OPNo
-                                   &Phone=@Model.Phone
-                                   &PatientName=@Model.PatientName
-                                   &AadharNo=@Model.AadharNo
-                                   &FromDate=@Model.FromDate
-                                   &ToDate=@Model.ToDate">
-                                @i
-                            </a>
-                        </li>
-                    }
-
-                </ul>
-            </nav>
+            </table>
 
         </div>
 
     </div>
-
 </div>
+
+<!-- 1. jQuery FIRST (must be before everything) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- 2. Bootstrap (optional but usually used) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 3. Moment (for daterangepicker) -->
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+<!-- 4. Daterangepicker -->
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<!-- 5. DataTables -->
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
+
+<!-- 6. DataTables Buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script><script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<script>
+
+    var table;
+
+    $(document).ready(function () {
+
+        // Date Range Picker (same as Treatment)
+        var start = moment();
+        var end = moment();
+
+        $('#RegDateRange').daterangepicker({
+
+            startDate: start,
+            endDate: end,
+
+            locale: { format: 'DD/MM/YYYY' },
+
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+
+        });
+
+        loadData();
+    });
+
+    function loadData() {
+
+        if ($.fn.DataTable.isDataTable('#tblOPD')) {
+            $('#tblOPD').DataTable().destroy();
+        }
+
+        table = $('#tblOPD').DataTable({
+
+            processing: true,
+            serverSide: false,
+
+            ajax: {
+                url: '/Registration/GetOPDPatients',
+                type: 'GET',
+
+                data: function (d) {
+
+                    var range = $('#RegDateRange').data('daterangepicker');
+
+                    d.OPNo = $('#OPNo').val();
+                    d.Phone = $('#Phone').val();
+                    d.PatientName = $('#PatientName').val();
+                    d.AadharNo = $('#AadharNo').val();
+
+                    if (range) {
+                        d.FromDate = range.startDate.format('YYYY-MM-DD');
+                        d.ToDate = range.endDate.format('YYYY-MM-DD');
+                    }
+                },
+
+                dataSrc: 'data'
+            },
+
+            dom: 'Bfrtip',
+
+            buttons: [
+                'excelHtml5',
+                'pdfHtml5',
+                'print'
+            ],
+
+            columns: [
+
+                { data: 'uhid' },
+                { data: 'opNo' },
+                { data: 'patientName' },
+                { data: 'phone' },
+                { data: 'aadharNo' },
+
+                {
+                    data: 'regDate',
+                    render: function (d) {
+                        return d ? moment(d).format('DD-MM-YYYY') : '-';
+                    }
+                },
+
+                {
+                    data: null,
+                    render: function (row) {
+                        return `
+                            <a class="btn btn-sm btn-primary" href="/Registration/Details/${row.patientId}">View</a>
+                            <a class="btn btn-sm btn-warning" href="/Registration/Edit/${row.patientId}">Edit</a>
+                        `;
+                    }
+                }
+            ]
+        });
+    }
+
+</script>

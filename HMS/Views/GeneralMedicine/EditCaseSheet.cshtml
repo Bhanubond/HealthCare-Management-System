@@ -1,31 +1,39 @@
-@model HMS.Models.GMCasesheetScreenVm
+﻿@model HMS.Models.GMCasesheetScreenVm
+
 @{
     var vm = Model ?? new HMS.Models.GMCasesheetScreenVm();
-    var meds = vm.Medications ?? new List<HMS.Models.PatientMedicationVm> { new() };
-    var master = vm.MedicationMaster ?? new List<HMS.Entities.MASMedication>();
-    var frequencyList = new[] { "1-0-1", "1-1-1", "1-0-0", "0-0-1", "SOS", "HS" };
 }
 
-<div class="container-fluid py-4">
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white border-bottom">
-            <div class="d-flex justify-content-between align-items-center">
-                <h3 class="mb-0 fw-semibold">Edit Case Sheet</h3>
-                <span class="badge bg-light text-dark border px-3 py-2">OP No : @vm.OpNo</span>
-            </div>
-        </div>
+<div class="container-fluid py-3">
+
+    <!-- PATIENT HEADER (EMR STYLE) -->
+    <div class="card shadow-sm border-0 mb-3">
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3"><b>Patient:</b> @vm.PatientName</div>
-                <div class="col-md-2"><b>Age:</b> @vm.Age</div>
-                <div class="col-md-2"><b>Gender:</b> @vm.Gender</div>
-                <div class="col-md-3"><b>Doctor:</b> @vm.DoctorName</div>
-                <div class="col-md-2"><b>Student:</b> @vm.StudentName</div>
+
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+
+                <div>
+                    <h4 class="fw-bold mb-1">🩺 Edit Case Sheet</h4>
+                    <div class="text-muted small">OP No: @vm.OpNo</div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+
+                    <span class="badge bg-light text-dark border px-3 py-2">👤 @vm.PatientName</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">🎂 @vm.Age yrs</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">⚧ @vm.Gender</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">👨‍⚕️ @vm.DoctorName</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">🎓 @vm.StudentName</span>
+
+                </div>
+
             </div>
+
         </div>
     </div>
 
     <form asp-action="EditCaseSheet" method="post">
+
         <input type="hidden" asp-for="GMID" />
         <input type="hidden" asp-for="PatientId" />
         <input type="hidden" asp-for="DoctorId" />
@@ -34,103 +42,361 @@
         <input type="hidden" asp-for="ReferredId" />
         <input type="hidden" asp-for="OpNo" />
 
-        <ul class="nav nav-tabs mb-3">
-            <li class="nav-item">
-                <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#general">General</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#medication">Medication</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#appointment">Appointment</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#referrals">Referrals</button>
-            </li>
-        </ul>
+        <!-- MODERN NAV TABS -->
+        <div class="card shadow-sm border-0">
 
-        <div class="tab-content border p-4 bg-white">
-            <div class="tab-pane fade show active" id="general">
-                <div class="row g-3">
-                    <div class="col-md-6"><label>Chief Complaint</label><textarea asp-for="ChiefComplaint" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Symptoms</label><textarea asp-for="Symptoms" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Diagnosis</label><textarea asp-for="Diagnosis" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label>Notes</label><textarea asp-for="Notes" class="form-control"></textarea></div>
-                </div>
+            <div class="card-header bg-white border-bottom p-0">
+
+                <ul class="nav nav-pills nav-fill p-2 gap-2">
+
+                    <li class="nav-item">
+                        <button type="button"  class="nav-link active rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#history">
+                            🧾 History
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button"  class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#vitals">
+                            🧾 Vitals
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#exam">
+                            🧾 Examination
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button"  class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#general">
+                            🧾 General
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#medication">
+                            💊 Medication
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button"  class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#appointment">
+                            📅 Appointment
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#referrals">
+                            🔁 Referrals
+                        </button>
+                    </li>
+
+                </ul>
+
             </div>
 
-            <div class="tab-pane fade" id="medication">
-                @await Html.PartialAsync("_MedicationPartial", new MedicationPartialVm
-                {
-                    Medications = vm.Medications,
-                                MedicationMaster = vm.MedicationMaster
+            <div class="card-body bg-light">
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="history">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label>HOPI</label>
+                                <textarea asp-for="HistoryOfPresentIllness" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Past Medical</label>
+                                <textarea asp-for="PastMedicalHistory" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Past Surgical</label>
+                                <textarea asp-for="PastSurgicalHistory" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Family History</label>
+                                <textarea asp-for="FamilyHistory" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Personal History</label>
+                                <textarea asp-for="PersonalHistory" class="form-control"></textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="vitals">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <label>Blood Pressure</label>
+                                <input asp-for="BloodPressure" class="form-control" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Pulse Rate</label>
+                                <input asp-for="PulseRate" class="form-control" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Temperature (°C)</label>
+                                <input asp-for="Temperature" class="form-control" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Respiratory Rate</label>
+                                <input asp-for="RespiratoryRate" class="form-control" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>SpO₂</label>
+                                <input asp-for="SpO2" class="form-control" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Weight (kg)</label>
+                                <input asp-for="Weight" class="form-control" id="Weight" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Height (cm)</label>
+                                <input asp-for="Height" class="form-control" id="Height" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>BMI</label>
+                                <input asp-for="BMI" class="form-control" id="BMI" readonly />
+                            </div>
+
+                        </div>
+
+                    </div>
+                    </div>
+                    </div>
+
+
+                    <div class="tab-pane fade" id="exam">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label>General Examination</label>
+                                <textarea asp-for="GeneralExamination" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>CVS Examination</label>
+                                <textarea asp-for="CVSExamination" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>RS Examination</label>
+                                <textarea asp-for="RSExamination" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Abdomen Examination</label>
+                                <textarea asp-for="AbdomenExamination" class="form-control"></textarea>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>CNS Examination</label>
+                                <textarea asp-for="CNSExamination" class="form-control"></textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    </div>
+                    </div>
+                    
+
+                    <!-- GENERAL -->
+                    <div class="tab-pane fade" id="general">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            Chief Complaint <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea asp-for="ChiefComplaint"
+                                                  class="form-control"
+                                                  rows="2"
+                                                  required></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Symptoms</label>
+                                        <textarea asp-for="Symptoms" class="form-control" rows="2"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Diagnosis</label>
+                                        <textarea asp-for="Diagnosis" class="form-control" rows="2"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Notes</label>
+                                        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Prescription</label>
+                                        <textarea asp-for="Prescription" class="form-control" rows="2"></textarea>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEDICATION -->
+                    <div class="tab-pane fade" id="medication">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                @await Html.PartialAsync("_MedicationPartial",
+                                new MedicationPartialVm
+                                {
+                                    Medications = vm.Medications,
+                                    MedicationMaster = vm.MedicationMaster
                                 })
-            </div>
 
-            <div class="tab-pane fade" id="appointment">
-                @await Html.PartialAsync("_AppointmentPartial", vm)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- APPOINTMENT -->
+                    <div class="tab-pane fade" id="appointment">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                @await Html.PartialAsync("_AppointmentPartial", vm)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REFERRALS -->
+                    <div class="tab-pane fade" id="referrals">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                @await Html.PartialAsync("_ReferralStatusPartial", Model.ReferralStatus)
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-            <div class="tab-pane fade" id="referrals">
-                @await Html.PartialAsync("_ReferralStatusPartial", Model.ReferralStatus)
-            </div>
-    
         </div>
 
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary px-5"><i class="fa fa-save me-2"></i> Update Case Sheet</button>
-            @if (Model.IsSentForApproval1 == false && Model.Approval1Status == false && Model.IsSentForApproval2 == false && Model.Approval2Status == false)
-            {
-                <button type="button"
-                        class="btn btn-warning ms-2"
-                        onclick="sendApproval(@Model.GMID)">
-                    Send for 1st Approval
-                </button>
-            }
+        <!-- STICKY ACTION BAR -->
+        <div class="sticky-bottom bg-white border-top p-3 shadow-sm mt-3">
 
-            @if (Model.IsSentForApproval1 == true && Model.Approval1Status == true && Model.IsSentForApproval2 == true && Model.Approval2Status == false)
-            {
-                <button type="button"
-                        class="btn btn-info ms-2"
-                        onclick="sendApproval(@Model.GMID)">
-                    Send for Final Approval
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+                <button type="submit" class="btn btn-primary px-5 rounded-pill">
+                    💾 Update Case Sheet
                 </button>
-            }
-            
-            <a asp-action="PatientSearch" class="btn btn-secondary px-4 ms-2">Cancel</a>
+
+                @if (!Model.IsSentForApproval1 && !Model.Approval1Status && !Model.IsSentForApproval2 && !Model.Approval2Status)
+                {
+                    <button type="button"
+                            class="btn btn-warning rounded-pill"
+                            onclick="sendApproval(@Model.GMID)">
+                        🚀 Send for 1st Approval
+                    </button>
+                }
+
+                @if (Model.IsSentForApproval1 && Model.Approval1Status && Model.IsSentForApproval2 && !Model.Approval2Status)
+                {
+                    <button type="button"
+                            class="btn btn-info rounded-pill"
+                            onclick="sendApproval(@Model.GMID)">
+                        🚀 Send for Final Approval
+                    </button>
+                }
+
+                <a asp-action="PatientSearch" class="btn btn-outline-secondary rounded-pill px-4">
+                    Cancel
+                </a>
+
+            </div>
         </div>
+
     </form>
 </div>
 
-@section Scripts {
+<!-- AJAX + TOASTR -->
+<script>
+    function sendApproval(gmId) {
 
-    <script>
+        if (!confirm("Send this case sheet for approval?"))
+            return;
 
-        function sendApproval(gmId){
+        $.ajax({
+            url: '@Url.Action("SendForApproval", "GeneralMedicine")',
+            type: 'POST',
+            data: { gmId: gmId },
+            success: function (res) {
 
-            if(!confirm("Send this case sheet for approval?"))
-                return;
-
-            $.ajax({
-                url: '@Url.Action("SendForApproval", "GeneralMedicine")',
-                type: 'POST',
-                data: { gmId: gmId },
-                        success: function (res) {
-                        if (res.success) {
-                           
-                            // location.reload();
-                             toastr.success(res.message);
-                        }
-                        else {
-                            toastr.warning(res.message);
-                        }
-                    },
-                error:function(){
-                    toastr.warning("Something went wrong.");
+                if (res.success) {
+                    toastr.success(res.message);
+                } else {
+                    toastr.warning(res.message);
                 }
-            });
 
+            },
+            error: function () {
+                toastr.error("Something went wrong.");
+            }
+        });
+
+    }
+</script>
+
+<style>
+    .nav-pills .nav-link {
+        font-weight: 600;
+        background: #f1f3f5;
+        color: #333;
+    }
+
+        .nav-pills .nav-link.active {
+            background: #0d6efd;
+            color: #fff;
         }
 
-    </script>
-
-}
+    textarea.form-control {
+        resize: none;
+    }
+</style>

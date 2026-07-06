@@ -1,59 +1,116 @@
 ﻿@model HMS.Models.GMCasesheetScreenVm
 
-<div class="row g-3">
-
-    <div class="col-md-4">
-        <label class="form-label fw-semibold">Next Visit Date</label>
-        <input asp-for="NextVisitDate" type="date" class="form-control" />
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom-0">
+        <h5 class="mb-0 fw-bold">📅 Schedule Next Appointment</h5>
+        <small class="text-muted">Plan the patient’s next visit details</small>
     </div>
 
-    <div class="col-md-4">
-        <label class="form-label fw-semibold">Time</label>
-        <input asp-for="NextVisitTime" type="time" class="form-control" />
-    </div>
+    <div class="card-body">
+        <div class="row g-4">
 
-    <div class="col-md-4">
-        <label class="form-label fw-semibold">Department</label>
-        <select asp-for="NextVisitDepartmentId"
-                asp-items="Model.Departments"
-                class="form-select">
-            <option value="">-- Select Department --</option>
-        </select>
-    </div>
+            <!-- Date & Time -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Next Visit Date</label>
+                <input asp-for="NextVisitDate" type="date" class="form-control form-control-lg" />
+            </div>
 
-    <div class="col-md-4">
-        <label class="form-label fw-semibold">Doctor</label>
-        <select asp-for="NextVisitDoctorId"
-                asp-items="Model.Doctors"
-                class="form-select">
-            <option value="">-- Select Doctor --</option>
-        </select>
-    </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Time</label>
+                <input asp-for="NextVisitTime" type="time" class="form-control form-control-lg" />
+            </div>
 
-    <div class="col-md-4">
-        <label class="form-label fw-semibold">Student</label>
-        <select asp-for="NextVisitStudentId"
-                asp-items="Model.Students"
-                class="form-select">
-            <option value="">-- Select Student --</option>
-        </select>
-    </div>
+            <!-- Department -->
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Department</label>
+                <select asp-for="NextVisitDepartmentId"
+                        asp-items="Model.Departments"
+                        class="form-select form-select-lg">
+                    <option value="">Select Department</option>
+                </select>
+            </div>
 
-    <div class="col-md-12">
-        <label class="form-label fw-semibold">Reason</label>
-        <textarea asp-for="NextVisitReason"
-                  rows="3"
-                  class="form-control"></textarea>
-    </div>
+            <!-- Doctor -->
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Doctor</label>
+                <select asp-for="NextVisitDoctorId"
+                        asp-items="Model.Doctors"
+                        class="form-select form-select-lg">
+                    <option value="">Select Doctor</option>
+                </select>
+            </div>
 
-    <div class="col-md-4">
-        <label class="form-label fw-semibold">Status</label>
-        <select asp-for="Status" class="form-select">
-            <option value="Yet to visit">Yet to visit</option>
-            <option value="Visited">Visited</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Ignored">Ignored</option>
-        </select>
-    </div>
+            <!-- Student -->
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Student</label>
+                <select asp-for="NextVisitStudentId"
+                        asp-items="Model.Students"
+                        class="form-select form-select-lg">
+                    <option value="">Select Student</option>
+                </select>
+            </div>
 
+            <!-- Reason -->
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Reason for Visit</label>
+                <textarea asp-for="NextVisitReason"
+                          rows="4"
+                          class="form-control"
+                          placeholder="Enter reason for next appointment..."></textarea>
+            </div>
+
+            <!-- Status Cards Style -->
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Appointment Status</label>
+                <div class="d-flex flex-wrap gap-3">
+
+                    <label class="status-card">
+                        <input type="radio" asp-for="Status" value="Yet to visit" />
+                        <span>⏳ Yet to Visit</span>
+                    </label>
+
+                    <label class="status-card">
+                        <input type="radio" asp-for="Status" value="Visited" />
+                        <span>✅ Visited</span>
+                    </label>
+
+                    <label class="status-card">
+                        <input type="radio" asp-for="Status" value="Cancelled" />
+                        <span>❌ Cancelled</span>
+                    </label>
+
+                    <label class="status-card">
+                        <input type="radio" asp-for="Status" value="Ignored" />
+                        <span>⚠ Ignored</span>
+                    </label>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
+
+<style>
+    .status-card {
+        border: 1px solid #dee2e6;
+        padding: 10px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        transition: all 0.2s ease-in-out;
+        font-weight: 500;
+    }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .status-card input {
+            accent-color: #0d6efd;
+        }
+</style>

@@ -46,11 +46,27 @@ namespace HMS.Controllers
         }
 
 
+        //[HttpPost]
+        //public async Task<IActionResult> SaveCaseSheet([FromBody] GMCasesheetSaveVm model)
+        //{
+        //    await _generalMedicineServices.SaveCaseSheet(model);
+
+        //    return Json(new
+        //    {
+        //        success = true,
+        //        message = "Saved successfully"
+        //    });
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> SaveCaseSheet(GMCasesheetSaveVm model)
+        public async Task<IActionResult> SaveCaseSheet([FromBody] GMCasesheetSaveVm model)
         {
+            if (model == null)
+                return BadRequest("Model is null");
+
             await _generalMedicineServices.SaveCaseSheet(model);
-            return RedirectToAction(nameof(PatientSearch));
+
+            return Json(new { success = true });
         }
 
         [HttpPost]
@@ -58,12 +74,12 @@ namespace HMS.Controllers
         {
             try
             {
-                await _generalMedicineServices.ProcessApprovalFlow(gmId);
+                var message = await _generalMedicineServices.ProcessApprovalFlow(gmId);
 
                 return Json(new
                 {
                     success = true,
-                    message = "Case sheet sent for approval successfully."
+                    message = message
                 });
             }
             catch (Exception ex)
