@@ -1,4 +1,5 @@
 ﻿using HMS.Entities;
+using HMS.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HMS.Services.Interfaces
@@ -12,5 +13,7 @@ namespace HMS.Services.Interfaces
         Task<List<SelectListItem>> GetDepartmentsAsync();
         Task<List<Doctor>> GetDoctorsByDepartmentAsync(int departmentId);
         Task<List<Student>> GetStudentsByDepartmentAsync(int departmentId);
+        Task<TreatmentContextVm> GetLatestTreatmentContextAsync(int DeptId, int patientId);
+        Task<GMCasesheetViewVm> GetCaseSheetPatient(int patientId);
     }
 }

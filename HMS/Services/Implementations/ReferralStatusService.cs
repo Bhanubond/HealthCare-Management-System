@@ -30,7 +30,7 @@ namespace HMS.Services.Implementations
 
                     FromDate = DateTime.Now,
                     TreatmentStatus = "Pending",
-                    AllotmentStatus = "Allotted",
+                    AllotmentStatus = "Pending",
                     CreatedDate = DateTime.Now
                 };
 

@@ -1,14 +1,12 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HMS.Models
 {
-    public class FollowUpVm
+    public class FollowUpSaveVm
     {
-        public int FollowupId { get; set; }
-
         public int PatientId { get; set; }
 
-        public DateTime FollowupDate { get; set; }
+        public DateTime? FollowupDate { get; set; }
 
         public TimeSpan? FollowupTime { get; set; }
 
@@ -21,10 +19,6 @@ namespace HMS.Models
         public int? StudentId { get; set; }
 
         public string Status { get; set; } = "Yet to visit";
-
-        public int? RevisitId { get; set; }
-
-        public string? IgnoreReason { get; set; }
 
         public int ReferredTreatmentId { get; set; }
 

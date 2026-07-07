@@ -1,0 +1,223 @@
+﻿@{
+    ViewData["Title"] = "Completed Cases";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
+
+<style>
+    .page-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,.08);
+    }
+
+    .page-header {
+        background: linear-gradient(135deg,#0d6efd,#2563eb);
+        color: #fff;
+        padding: 16px 20px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    table.dataTable td {
+        vertical-align: middle;
+    }
+
+    .dt-buttons {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="card page-card">
+
+    <div class="page-header d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+            <i class="bi bi-search"></i>
+            Completed Cases
+        </h4>
+
+        <div style="width:280px">
+            <input type="text"
+                   id="CaseDateRange"
+                   class="form-control"
+                   placeholder="Select Date Range" />
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table id="tblCompletedCases"
+                   class="table table-bordered table-hover align-middle"
+                   style="width:100%">
+
+                <thead class="table-primary">
+                    <tr>
+                        <th>OP No</th>
+                        <th>Patient Name</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Age</th>
+                        <th>Doctor</th>
+                        <th>Student</th>
+                        <th>Case Date</th>
+                        <th width="100">Action</th>
+                    </tr>
+                </thead>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+@section Scripts {
+
+    <script>
+
+        $(function () {
+
+            loadCompletedCases();
+
+            var start = moment();
+            var end = moment();
+
+            $('#CaseDateRange').daterangepicker({
+
+                startDate: start,
+                endDate: end,
+
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1,'days'), moment().subtract(1,'days')],
+                    'Last 7 Days': [moment().subtract(6,'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29,'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1,'month').startOf('month'),
+                                   moment().subtract(1,'month').endOf('month')]
+                }
+
+            });
+
+            $('#CaseDateRange').on('apply.daterangepicker', function (ev, picker) {
+
+                loadCompletedCases(
+                    picker.startDate,
+                    picker.endDate
+                );
+
+            });
+
+        });
+
+        function loadCompletedCases(fromDate,toDate){
+
+            var from = fromDate
+                ? fromDate.format('YYYY-MM-DD')
+                : moment().format('YYYY-MM-DD');
+
+            var to = toDate
+                ? toDate.format('YYYY-MM-DD')
+                : moment().format('YYYY-MM-DD');
+
+            $.ajax({
+
+                url:'/Emergency/GetCompletedCases',
+
+                type:'GET',
+
+                data:{
+                    fromDate:from,
+                    toDate:to
+                },
+
+                success:function(data){
+
+                    if($.fn.DataTable.isDataTable('#tblCompletedCases')){
+                        $('#tblCompletedCases').DataTable().destroy();
+                    }
+
+                    $('#tblCompletedCases').DataTable({
+
+                        data:data,
+
+                        responsive:true,
+
+                        dom:'Bfrtip',
+
+                        buttons:[
+                            'excelHtml5',
+                            'pdfHtml5',
+                            'print'
+                        ],
+
+                        columns:[
+
+                            {data:'opNo'},
+
+                            {data:'patientName'},
+
+                            {data:'phone'},
+
+                            {data:'gender'},
+
+                            {data:'age'},
+
+                            {data:'doctorName'},
+
+                            {data:'studentName'},
+
+                            {
+                                data:'caseDate',
+                                render:function(d){
+                                    return moment(d).format('DD/MM/YYYY');
+                                }
+                            },
+
+                                    {
+                                    data:'link',
+                                    orderable:false,
+                                    searchable:false,
+                                    render:function(link){
+
+                                        return `<a href="${link}"
+                                                class="btn btn-primary btn-sm">
+                                                <i class="bi bi-pencil-square"></i> Edit
+                                                </a>`;
+                                    }
+                                }
+
+                        ]
+
+                    });
+
+                },
+
+                error:function(){
+
+                    toastr.error("Unable to load completed cases.");
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+}

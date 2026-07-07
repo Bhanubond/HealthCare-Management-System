@@ -49,7 +49,9 @@ namespace HMS.Controllers
 
             var viewName = deptId switch
             {
-                (int)Department.GEN => "~/Views/Treatment/GeneralMedicine/TreatmentDetails.cshtml",               
+                (int)Department.GEN => "~/Views/Treatment/GeneralMedicine/TreatmentDetails.cshtml", 
+                (int)Department.EMR => "~/Views/Treatment/Emergency/TreatmentDetails.cshtml", 
+                
                 _ => "~/Views/Treatment/Default/TreatmentDetails.cshtml"
             };
 

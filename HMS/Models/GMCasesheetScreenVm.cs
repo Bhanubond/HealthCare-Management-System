@@ -72,5 +72,6 @@ namespace HMS.Models
         public List<SelectListItem> Departments { get; set; } = new();
 
         public ReferralStatusVm ReferralStatus { get; set; } = new();
+        public FollowUpSaveVm FollowUpSaveVm { get; set; } = new();
     }
 }

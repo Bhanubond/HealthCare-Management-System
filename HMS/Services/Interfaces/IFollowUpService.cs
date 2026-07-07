@@ -9,6 +9,6 @@ namespace HMS.Services.Interfaces
 
         Task<int?> GetCurrentDepartmentIdAsync(int patientId);
 
-        Task SaveOrUpdateFollowUpAsync(GMCasesheetSaveVm model);
+        Task SaveOrUpdateFollowUpAsync(FollowUpSaveVm model);
     }
 }

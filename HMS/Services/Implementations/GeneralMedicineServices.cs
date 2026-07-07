@@ -34,25 +34,11 @@ namespace HMS.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<GMCasesheetViewVm> GetCaseSheetPatient(int patientId)
+        public async Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int DeptId, int patientId)
         {
-            var param = new SqlParameter("@PatientId", patientId);
-
-            var data = await _db.Set<GMCasesheetViewVm>()
-                .FromSqlRaw("EXEC SP_GetPatientDetailsById @PatientId", param)
-                .AsNoTracking()
-                .ToListAsync();
-
-            var model = data.FirstOrDefault() ?? new GMCasesheetViewVm();
-            model.PatientId = patientId;
-            return model;
-        }
-
-        public async Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int patientId)
-        {
-            var patient = await GetCaseSheetPatient(patientId);
+            var patient = await _lookupService.GetCaseSheetPatient(patientId);
             var medications = await _medicationService.GetActiveMedications();
-            var context = await GetLatestTreatmentContextAsync(patientId);
+            var context = await _lookupService.GetLatestTreatmentContextAsync(DeptId, patientId);
             var currentDept = await _followUpService.GetCurrentDepartmentIdAsync(patientId);
             return new GMCasesheetScreenVm
             {
@@ -101,6 +87,8 @@ namespace HMS.Services.Implementations
 
             var departments = await _lookupService.GetDepartmentsAsync();
             var referrals = await _referralService.GetReferralsByPatientAsync(model.PatientId);
+            var doctors = await _lookupService.GetDoctorsAsync();
+            var students = await _lookupService.GetStudentsAsync();
 
             return new GMCasesheetScreenVm
             {
@@ -122,18 +110,11 @@ namespace HMS.Services.Implementations
                 Prescription = model.Prescription ?? string.Empty,
                 Notes = model.Notes ?? string.Empty,
 
-                // =========================
-                // 🧍 HISTORY
-                // =========================
                 HistoryOfPresentIllness = model.HistoryOfPresentIllness ?? string.Empty,
                 PastMedicalHistory = model.PastMedicalHistory ?? string.Empty,
                 PastSurgicalHistory = model.PastSurgicalHistory ?? string.Empty,
                 FamilyHistory = model.FamilyHistory ?? string.Empty,
                 PersonalHistory = model.PersonalHistory ?? string.Empty,
-
-                // =========================
-                // 📊 VITALS
-                // =========================
                 BloodPressure = model.BloodPressure ?? string.Empty,
                 PulseRate = model.PulseRate,
                 Temperature = model.Temperature,
@@ -142,10 +123,6 @@ namespace HMS.Services.Implementations
                 Weight = model.Weight,
                 Height = model.Height,
                 BMI = model.BMI,
-
-                // =========================
-                // 🩻 EXAMINATION
-                // =========================
                 GeneralExamination = model.GeneralExamination ?? string.Empty,
                 CVSExamination = model.CVSExamination ?? string.Empty,
                 RSExamination = model.RSExamination ?? string.Empty,
@@ -159,6 +136,8 @@ namespace HMS.Services.Implementations
                 Approval2Status = model.Approval2Status,
                 MedicationMaster = medications,
                 Medications = existingMeds.Any() ? existingMeds : new List<PatientMedicationVm> { new() },
+
+
                 NextVisitDate = followUp?.FollowupDate,
                 NextVisitTime = followUp?.FollowupTime,
                 NextVisitDepartmentId = (followUp?.DeptId ?? 0) > 0 ? followUp?.DeptId : currentDeptId,
@@ -166,9 +145,44 @@ namespace HMS.Services.Implementations
                 NextVisitStudentId = followUp?.StudentId,
                 NextVisitReason = followUp?.FollowupReason,
                 Status = followUp?.Status ?? "Yet to visit",
-                Doctors = await _lookupService.GetDoctorsAsync(),
-                Students = await _lookupService.GetStudentsAsync(),
-                Departments = await _lookupService.GetDepartmentsAsync(),
+                Doctors = doctors,
+                Students = students,
+                Departments = departments,
+
+
+                FollowUpSaveVm = new FollowUpSaveVm
+                {
+                    PatientId = model.PatientId,
+
+                    FollowupDate = followUp?.FollowupDate,
+                    FollowupTime = followUp?.FollowupTime,
+
+                    DeptId = followUp?.DeptId ?? 0,
+
+                    DoctorId = followUp?.DoctorId,
+                    StudentId = followUp?.StudentId,
+
+                    Status = followUp?.Status ?? "Yet to visit",
+
+                    ReferredTreatmentId = model.ReferredId ?? 0,
+
+                    NextVisitDate = followUp?.FollowupDate,
+                    NextVisitTime = followUp?.FollowupTime,
+
+                    NextVisitDepartmentId = followUp?.DeptId,
+                    NextVisitDoctorId = followUp?.DoctorId,
+                    NextVisitStudentId = followUp?.StudentId,
+
+                    NextVisitReason = followUp?.FollowupReason,
+
+                    Doctors = doctors,
+                    Students = students,
+                    Departments = departments
+                },
+
+                //Doctors = await _lookupService.GetDoctorsAsync(),
+                //Students = await _lookupService.GetStudentsAsync(),
+                //Departments = await _lookupService.GetDepartmentsAsync(),
                 ReferralStatus = new ReferralStatusVm
                 {
                     PatientId = model.PatientId,
@@ -240,9 +254,6 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 2: Entity created/loaded");
 
-                // =========================
-                // SAFE VITALS (IMPORTANT FIX)
-                // =========================
                 decimal? SafeDecimal(decimal? val, decimal min, decimal max, string field)
                 {
                     if (!val.HasValue) return null;
@@ -269,9 +280,6 @@ namespace HMS.Services.Implementations
                     return val;
                 }
 
-                // =========================
-                // BASIC INFO
-                // =========================
                 entity.PatientId = model.PatientId;
                 entity.DoctorId = model.DoctorId;
                 entity.StudentId = model.StudentId;
@@ -282,9 +290,6 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 3: Basic info mapped");
 
-                // =========================
-                // HISTORY
-                // =========================
                 entity.HistoryOfPresentIllness = model.HistoryOfPresentIllness;
                 entity.PastMedicalHistory = model.PastMedicalHistory;
                 entity.PastSurgicalHistory = model.PastSurgicalHistory;
@@ -293,9 +298,6 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 4: History mapped");
 
-                // =========================
-                // VITALS (SAFE MAPPING)
-                // =========================
                 entity.BloodPressure = model.BloodPressure;
                 entity.PulseRate = SafeInt(model.PulseRate, 0, 250, "PulseRate");
                 entity.RespiratoryRate = SafeInt(model.RespiratoryRate, 0, 80, "RR");
@@ -304,26 +306,11 @@ namespace HMS.Services.Implementations
                 entity.Temperature = SafeDecimal(model.Temperature, 20, 60, "Temperature");
                 entity.Weight = SafeDecimal(model.Weight, 0, 300, "Weight");
                 entity.Height = SafeDecimal(model.Height, 0, 250, "Height");
-                //entity.BMI = SafeDecimal(model.BMI, 5, 60, "BMI");
-                //if (model.Weight.HasValue && model.Height.HasValue && model.Height > 0)
-                //{
-                //    double weight = (double)model.Weight.Value;
-                //    double heightCm = (double)model.Height.Value;
 
-                //    double bmi = weight / Math.Pow(heightCm / 100.0, 2);
-
-                //    entity.BMI = (decimal)Math.Round(bmi, 2);
-                //}
-                //else
-                //{
-                //    entity.BMI = null;
-                //}
 
                 Console.WriteLine("STEP 5: Vitals mapped");
 
-                // =========================
-                // EXAMINATION
-                // =========================
+
                 entity.GeneralExamination = model.GeneralExamination;
                 entity.CVSExamination = model.CVSExamination;
                 entity.RSExamination = model.RSExamination;
@@ -332,9 +319,6 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 6: Examination mapped");
 
-                // =========================
-                // CORE DATA
-                // =========================
                 entity.ChiefComplaint = model.ChiefComplaint;
                 entity.Symptoms = model.Symptoms;
                 entity.Diagnosis = model.Diagnosis;
@@ -343,9 +327,6 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 7: Core data mapped");
 
-                // =========================
-                // APPROVAL RESET
-                // =========================
                 entity.Approval1Status = false;
                 entity.Approval2Status = false;
 
@@ -358,19 +339,40 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 8: Before SaveChanges (ENTITY READY)");
 
-                // =========================
-                // SAVE 1
-                // =========================
                 await _db.SaveChangesAsync();
                 Console.WriteLine("STEP 9: Main Save SUCCESS");
-
-                // =========================
-                // CHILD TABLES
-                // =========================
                 await _medicationService.SavePatientMedications(model.PatientId, model.Medications);
                 Console.WriteLine("STEP 10: Medications saved");
 
-                await _followUpService.SaveOrUpdateFollowUpAsync(model);
+                //await _followUpService.SaveOrUpdateFollowUpAsync(model);
+
+                var followUpModel = new FollowUpSaveVm
+                {
+                    PatientId = model.PatientId,
+
+                    FollowupDate = model.NextVisitDate,
+
+                    FollowupTime = model.NextVisitTime,
+
+                    DeptId = model.NextVisitDepartmentId ?? 0,
+
+                    FollowupReason = model.NextVisitReason ?? model.FollowUpNotes,
+
+                    DoctorId = model.NextVisitDoctorId ?? model.DoctorId,
+
+                    StudentId = model.NextVisitStudentId ?? model.StudentId,
+
+                    Status = model.Status ?? "Yet to visit",
+
+                    ReferredTreatmentId = model.ReferredId ?? 0
+                };
+
+
+                await _followUpService.SaveOrUpdateFollowUpAsync(followUpModel);
+
+                Console.WriteLine("STEP 11: FollowUp saved");
+
+
                 Console.WriteLine("STEP 11: FollowUp saved");
 
                 await UpdateAllotmentAndReferralAsync(model, entity.GMID);
@@ -389,73 +391,12 @@ namespace HMS.Services.Implementations
 
                 await tx.RollbackAsync();
 
-                throw; // IMPORTANT: sends real error to controller
+                throw; 
             }
         }
-
-        //private async Task SaveOrUpdateCaseSheetAsync(GMCasesheetSaveVm model, bool isUpdate)
-        //{
-        //    await using var tx = await _db.Database.BeginTransactionAsync();
-        //    var now = DateTime.Now;
-
-        //    GMCasesheet? entity;
-        //    if (isUpdate)
-        //    {
-        //        entity = await _db.GMCasesheets.FirstOrDefaultAsync(x => x.GMID == model.GMID);
-        //        if (entity == null)
-        //        {
-        //            return;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        entity = new GMCasesheet
-        //        {
-        //            CreatedDate = now,
-        //            CreatedBy = 1,
-        //            CreatedSystem = Environment.MachineName
-        //        };
-        //        _db.GMCasesheets.Add(entity);
-        //    }
-
-        //    entity.PatientId = model.PatientId;
-        //    entity.DoctorId = model.DoctorId;
-        //    entity.StudentId = model.StudentId;
-        //    entity.AllotId = model.AllotId;
-        //    entity.ReferredId = model.ReferredId;
-        //    entity.OpNo = model.OpNo;
-        //    entity.CaseDate = isUpdate ? entity.CaseDate : now;
-        //    entity.ChiefComplaint = model.ChiefComplaint;
-        //    entity.Symptoms = model.Symptoms;
-        //    entity.Diagnosis = model.Diagnosis;
-        //    entity.Prescription = model.Prescription;
-        //    entity.Notes = model.Notes;
-        //    entity.Approval1Status = false;
-        //    entity.Approval2Status = false;
-
-
-        //    if (isUpdate)
-        //    {
-        //        entity.ModifiedDate = now;
-        //        entity.ModifiedBy = 1;
-        //        entity.ModifiedSystem = Environment.MachineName;
-        //    }
-
-        //    await _db.SaveChangesAsync();
-
-        //    await _medicationService.SavePatientMedications(model.PatientId, model.Medications);
-
-        //    await _followUpService.SaveOrUpdateFollowUpAsync(model);
-        //    await UpdateAllotmentAndReferralAsync(model, entity.GMID);
-
-        //    await _db.SaveChangesAsync();
-        //    await tx.CommitAsync();
-        //}
-
-
+     
         private async Task UpdateAllotmentAndReferralAsync(GMCasesheetSaveVm model, int gmId)
         {
-            // 1. Update allotment
             if (model.AllotId.HasValue)
             {
                 var allotment = await _db.StudentAllotments
@@ -467,13 +408,11 @@ namespace HMS.Services.Implementations
                 }
             }
 
-            // 2. Complete the referral that brought the patient here
             if (model.ReferredId.HasValue)
             {
                 await _referralService.CompleteReferralAsync(model.ReferredId.Value);
             }
 
-            // 3. Create new referrals only if any departments were selected
             if (model.SelectedToDeptIds != null && model.SelectedToDeptIds.Any())
             {
                 var fromDeptId = await _followUpService.GetCurrentDepartmentIdAsync(model.PatientId);
@@ -488,60 +427,13 @@ namespace HMS.Services.Implementations
                 }
             }
         }
-
-        private async Task<TreatmentContextVm> GetLatestTreatmentContextAsync(int patientId)
-        {
-            var allotment = await _db.StudentAllotments
-                .AsNoTracking()
-                .Where(x => x.PatientId == patientId)
-                .OrderByDescending(x => x.AllotId)
-                .FirstOrDefaultAsync();
-
-            var referral = await _db.ReferralStatuses
-                .AsNoTracking()
-                .Where(x => x.PatientId == patientId)
-                .OrderByDescending(x => x.ReferredId)
-                .FirstOrDefaultAsync();
-
-            var doctorName = string.Empty;
-            if (allotment?.DoctorId.HasValue == true)
-            {
-                doctorName = await _db.Doctors
-                    .AsNoTracking()
-                    .Where(x => x.DoctorId == allotment.DoctorId.Value)
-                    .Select(x => x.DoctorName)
-                    .FirstOrDefaultAsync() ?? string.Empty;
-            }
-
-            var studentName = string.Empty;
-            if (allotment?.StudentId.HasValue == true)
-            {
-                studentName = await _db.Students
-                    .AsNoTracking()
-                    .Where(x => x.StudentId == allotment.StudentId.Value)
-                    .Select(x => x.StudentName)
-                    .FirstOrDefaultAsync() ?? string.Empty;
-            }
-
-            return new TreatmentContextVm
-            {
-                AllotId = allotment?.AllotId,
-                ReferredId = referral?.ReferredId,
-                DeptId = allotment?.DeptId,
-                DoctorId = allotment?.DoctorId ?? 0,
-                DoctorName = doctorName,
-                StudentId = allotment?.StudentId ?? 0,
-                StudentName = studentName
-            };
-        }
-
+     
         public async Task<string> ProcessApprovalFlow(int gmId)
         {
             var gm = await _db.GMCasesheets
                 .FirstOrDefaultAsync(x => x.GMID == gmId);
 
-            if (gm == null)
-                return "Case sheet not found.";
+            if (gm == null) return "Case sheet not found.";
 
             if (gm.IsSentForApproval1 != true)
             {
@@ -552,9 +444,7 @@ namespace HMS.Services.Implementations
                 return "Case sheet sent for Approval 1 successfully.";
             }
 
-            if (gm.IsSentForApproval1 == true
-                && gm.Approval1Status != true
-                && gm.IsSentForApproval2 != true)
+            if (gm.IsSentForApproval1 == true && gm.Approval1Status != true && gm.IsSentForApproval2 != true)
             {
                 gm.Approval1Status = true;
                 gm.ModifiedDate = DateTime.Now;
@@ -563,9 +453,7 @@ namespace HMS.Services.Implementations
                 return "Approval 1 completed successfully.";
             }
 
-            if (gm.IsSentForApproval1 == true
-                && gm.Approval1Status == true
-                && gm.IsSentForApproval2 != true)
+            if (gm.IsSentForApproval1 == true && gm.Approval1Status == true && gm.IsSentForApproval2 != true)
             {
                 gm.IsSentForApproval2 = true;
                 gm.ModifiedDate = DateTime.Now;
@@ -574,10 +462,7 @@ namespace HMS.Services.Implementations
                 return "Case sheet sent for Approval 2 successfully.";
             }
 
-            if (gm.IsSentForApproval1 == true
-                && gm.Approval1Status == true
-                && gm.IsSentForApproval2 == true
-                && gm.Approval2Status != true)
+            if (gm.IsSentForApproval1 == true && gm.Approval1Status == true && gm.IsSentForApproval2 == true && gm.Approval2Status != true)
             {
                 gm.Approval2Status = true;
                 gm.ModifiedDate = DateTime.Now;
@@ -599,20 +484,7 @@ namespace HMS.Services.Implementations
                 new SqlParameter("@ToDate", toDate)
             };
 
-            return await _db.Set<GMApprovalQueueVm>()
-                .FromSqlRaw("EXEC usp_GetGMApprovalQueue @FromDate,@ToDate", parameters)
-                .AsNoTracking()
-                .ToListAsync();
-        }
-        private sealed class TreatmentContextVm
-        {
-            public int? AllotId { get; set; }
-            public int? ReferredId { get; set; }
-            public int? DeptId { get; set; }
-            public int DoctorId { get; set; }
-            public string DoctorName { get; set; } = string.Empty;
-            public int StudentId { get; set; }
-            public string StudentName { get; set; } = string.Empty;
-        }
+            return await _db.Set<GMApprovalQueueVm>().FromSqlRaw("EXEC usp_GetGMApprovalQueue @FromDate,@ToDate", parameters).AsNoTracking().ToListAsync();
+        }      
     }
 }

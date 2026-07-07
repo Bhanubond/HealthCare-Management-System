@@ -4,7 +4,7 @@
     {
         OPD = 1,
         GEN = 2,
-        SUR = 3,
+        EMR = 3,
         PED = 4,
         ORT = 5,
         ADM = 6,

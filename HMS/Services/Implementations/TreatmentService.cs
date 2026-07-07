@@ -11,11 +11,13 @@ namespace HMS.Services.Implementations
     {
         private readonly HmsDbContext _db;
         private readonly IGeneralMedicineServices _gmService;
+        private readonly IEmergencyService _emrservice;
 
-        public TreatmentService(HmsDbContext db, IGeneralMedicineServices gmService)
+        public TreatmentService(HmsDbContext db, IGeneralMedicineServices gmService, IEmergencyService emrservice)
         {
             _db = db;
             _gmService = gmService;
+            _emrservice = emrservice;
         }
 
         public async Task<List<TreatmentQueueVm>> GetTreatmentQueue(int deptId, DateTime fromDate, DateTime toDate)
@@ -41,8 +43,8 @@ namespace HMS.Services.Implementations
 
             return dept switch
             {
-                Department.GEN => await _gmService.GetTreatmentScreenAsync(patientId),
-                //Department.SUR => await _surgeryService.GetTreatmentScreenAsync(patientId),
+                Department.GEN => await _gmService.GetTreatmentScreenAsync(deptId, patientId),
+                Department.EMR => await _emrservice.GetTreatmentScreenAsync(deptId, patientId),
                 //Department.PED => await _pediatricsService.GetTreatmentScreenAsync(patientId),
                 //Department.ORT => await _orthoService.GetTreatmentScreenAsync(patientId),
 

@@ -1,7 +1,7 @@
-﻿@model HMS.Models.GMCasesheetScreenVm
+﻿@model HMS.Models.EMRCasesheetScreenVm
 
 @{
-    var vm = Model ?? new HMS.Models.GMCasesheetScreenVm();
+    var vm = Model ?? new HMS.Models.EMRCasesheetScreenVm();
 }
 
 <div class="container-fluid py-3">
@@ -34,7 +34,7 @@
 
     <form asp-action="EditCaseSheet" method="post">
 
-        <input type="hidden" asp-for="GMID" />
+        <input type="hidden" asp-for="EMRId" />
         <input type="hidden" asp-for="PatientId" />
         <input type="hidden" asp-for="DoctorId" />
         <input type="hidden" asp-for="StudentId" />
@@ -50,31 +50,56 @@
                 <ul class="nav nav-pills nav-fill p-2 gap-2">
 
                     <li class="nav-item">
-                        <button type="button"  class="nav-link active rounded-pill"
+                        <button class="nav-link active rounded-pill"
                                 data-bs-toggle="tab"
-                                data-bs-target="#history">
-                            🧾 History
+                                data-bs-target="#arrival"
+                                type="button">
+                            🚑 Arrival & Triage
                         </button>
                     </li>
+
                     <li class="nav-item">
-                        <button type="button"  class="nav-link rounded-pill"
+                        <button class="nav-link rounded-pill"
                                 data-bs-toggle="tab"
-                                data-bs-target="#vitals">
-                            🧾 Vitals
+                                data-bs-target="#history"
+                                type="button">
+                            📋 History
                         </button>
                     </li>
+
                     <li class="nav-item">
-                        <button type="button" class="nav-link rounded-pill"
+                        <button class="nav-link rounded-pill"
                                 data-bs-toggle="tab"
-                                data-bs-target="#exam">
-                            🧾 Examination
+                                data-bs-target="#vitals"
+                                type="button">
+                            ❤️ Vitals
                         </button>
                     </li>
+
                     <li class="nav-item">
-                        <button type="button"  class="nav-link rounded-pill"
+                        <button class="nav-link rounded-pill"
                                 data-bs-toggle="tab"
-                                data-bs-target="#general">
-                            🧾 General
+                                data-bs-target="#exam"
+                                type="button">
+                            🔍 Examination
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#treatment"
+                                type="button">
+                            💉 Treatment
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link rounded-pill"
+                                data-bs-toggle="tab"
+                                data-bs-target="#disposition"
+                                type="button">
+                            🏥 Disposition
                         </button>
                     </li>
 
@@ -87,7 +112,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <button type="button"  class="nav-link rounded-pill"
+                        <button type="button" class="nav-link rounded-pill"
                                 data-bs-toggle="tab"
                                 data-bs-target="#appointment">
                             📅 Appointment
@@ -109,176 +134,218 @@
             <div class="card-body bg-light">
 
                 <div class="tab-content">
-                    <div class="tab-pane fade show active" id="history">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
+
+                    <!-- ARRIVAL -->
+                    <!-- ARRIVAL -->
+                    <div class="tab-pane fade show active" id="arrival">
 
                         <div class="row g-3">
 
-                            <div class="col-md-6">
-                                <label>HOPI</label>
-                                <textarea asp-for="HistoryOfPresentIllness" class="form-control"></textarea>
+                            <div class="col-md-4">
+                                <label class="fw-bold">Arrival Mode</label>
+                                <input class="form-control" asp-for="ArrivalMode" />
                             </div>
 
-                            <div class="col-md-6">
-                                <label>Past Medical</label>
-                                <textarea asp-for="PastMedicalHistory" class="form-control"></textarea>
+                            <div class="col-md-4">
+                                <label class="fw-bold">Arrival Time</label>
+                                <input class="form-control" asp-for="ArrivalTime" type="datetime-local" />
                             </div>
 
-                            <div class="col-md-6">
-                                <label>Past Surgical</label>
-                                <textarea asp-for="PastSurgicalHistory" class="form-control"></textarea>
+                            <div class="col-md-4">
+                                <label class="fw-bold">Brought By</label>
+                                <input class="form-control" asp-for="BroughtBy" />
                             </div>
 
-                            <div class="col-md-6">
-                                <label>Family History</label>
-                                <textarea asp-for="FamilyHistory" class="form-control"></textarea>
+                            <div class="col-md-4">
+                                <label class="fw-bold">Triage Category</label>
+                                <input class="form-control" asp-for="TriageCategory" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="fw-bold">Triage Time</label>
+                                <input class="form-control" asp-for="TriageTime" type="datetime-local" />
                             </div>
 
                             <div class="col-md-12">
-                                <label>Personal History</label>
-                                <textarea asp-for="PersonalHistory" class="form-control"></textarea>
+                                <label class="fw-bold">Triage Notes</label>
+                                <textarea class="form-control" asp-for="TriageNotes" rows="3"></textarea>
                             </div>
 
                         </div>
 
                     </div>
-                    </div>
-                    </div>
 
-                    <div class="tab-pane fade" id="vitals">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
+
+                    <!-- HISTORY -->
+                    <div class="tab-pane fade" id="history">
 
                         <div class="row g-3">
 
-                            <div class="col-md-3">
-                                <label>Blood Pressure</label>
-                                <input asp-for="BloodPressure" class="form-control" />
+                            <div class="col-md-6">
+                                <label class="fw-bold">Chief Complaint</label>
+                                <textarea class="form-control" asp-for="ChiefComplaint"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">History Of Present Illness</label>
+                                <textarea class="form-control" asp-for="HistoryOfPresentIllness"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Past Medical History</label>
+                                <textarea class="form-control" asp-for="PastMedicalHistory"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Past Surgical History</label>
+                                <textarea class="form-control" asp-for="PastSurgicalHistory"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Family History</label>
+                                <textarea class="form-control" asp-for="FamilyHistory"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Personal History</label>
+                                <textarea class="form-control" asp-for="PersonalHistory"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Drug History</label>
+                                <textarea class="form-control" asp-for="DrugHistory"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Allergy History</label>
+                                <textarea class="form-control" asp-for="AllergyHistory"></textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- VITALS -->
+                    <div class="tab-pane fade" id="vitals">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-2">
+                                <label>BP</label>
+                                <input class="form-control" asp-for="BloodPressure" />
                             </div>
 
                             <div class="col-md-2">
-                                <label>Pulse Rate</label>
-                                <input asp-for="PulseRate" class="form-control" />
+                                <label>Pulse</label>
+                                <input class="form-control" asp-for="PulseRate" />
                             </div>
 
                             <div class="col-md-2">
-                                <label>Temperature (°C)</label>
-                                <input asp-for="Temperature" class="form-control" />
+                                <label>Temperature</label>
+                                <input class="form-control" asp-for="Temperature" />
                             </div>
 
                             <div class="col-md-2">
                                 <label>Respiratory Rate</label>
-                                <input asp-for="RespiratoryRate" class="form-control" />
+                                <input class="form-control" asp-for="RespiratoryRate" />
                             </div>
 
                             <div class="col-md-2">
                                 <label>SpO₂</label>
-                                <input asp-for="SpO2" class="form-control" />
+                                <input class="form-control" asp-for="SpO2" />
                             </div>
 
                             <div class="col-md-2">
-                                <label>Weight (kg)</label>
-                                <input asp-for="Weight" class="form-control" id="Weight" />
+                                <label>Weight</label>
+                                <input class="form-control" asp-for="Weight" />
                             </div>
 
                             <div class="col-md-2">
-                                <label>Height (cm)</label>
-                                <input asp-for="Height" class="form-control" id="Height" />
+                                <label>Height</label>
+                                <input class="form-control" asp-for="Height" />
                             </div>
 
                             <div class="col-md-2">
                                 <label>BMI</label>
-                                <input asp-for="BMI" class="form-control" id="BMI" readonly />
+                                <input class="form-control" asp-for="BMI" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>GRBS</label>
+                                <input class="form-control" asp-for="GRBS" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Pain Score</label>
+                                <input class="form-control" asp-for="PainScore" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>GCS</label>
+                                <input class="form-control" asp-for="GCSScore" />
+                            </div>
+
+                            <div class="col-md-12">
+                                <label>Pupils</label>
+                                <textarea class="form-control" asp-for="Pupils"></textarea>
                             </div>
 
                         </div>
 
                     </div>
-                    </div>
-                    </div>
 
 
+                    <!-- EXAMINATION -->
                     <div class="tab-pane fade" id="exam">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
 
                         <div class="row g-3">
 
+                            @foreach (var field in new[] {
+                                                        "GeneralExamination",
+                                                        "CVSExamination",
+                                                        "RSExamination",
+                                                        "AbdomenExamination",
+                                                        "CNSExamination",
+                                                        "LocalExamination"
+                                                        })
+                            {
+                            }
+
                             <div class="col-md-6">
                                 <label>General Examination</label>
-                                <textarea asp-for="GeneralExamination" class="form-control"></textarea>
+                                <textarea class="form-control" asp-for="GeneralExamination"></textarea>
                             </div>
 
                             <div class="col-md-6">
                                 <label>CVS Examination</label>
-                                <textarea asp-for="CVSExamination" class="form-control"></textarea>
+                                <textarea class="form-control" asp-for="CVSExamination"></textarea>
                             </div>
 
                             <div class="col-md-6">
                                 <label>RS Examination</label>
-                                <textarea asp-for="RSExamination" class="form-control"></textarea>
+                                <textarea class="form-control" asp-for="RSExamination"></textarea>
                             </div>
 
                             <div class="col-md-6">
                                 <label>Abdomen Examination</label>
-                                <textarea asp-for="AbdomenExamination" class="form-control"></textarea>
+                                <textarea class="form-control" asp-for="AbdomenExamination"></textarea>
                             </div>
 
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label>CNS Examination</label>
-                                <textarea asp-for="CNSExamination" class="form-control"></textarea>
+                                <textarea class="form-control" asp-for="CNSExamination"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>Local Examination</label>
+                                <textarea class="form-control" asp-for="LocalExamination"></textarea>
                             </div>
 
                         </div>
 
                     </div>
-                    </div>
-                    </div>
-                    
 
-                    <!-- GENERAL -->
-                    <div class="tab-pane fade" id="general">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
-
-                                <div class="row g-3">
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">
-                                            Chief Complaint <span class="text-danger">*</span>
-                                        </label>
-                                        <textarea asp-for="ChiefComplaint"
-                                                  class="form-control"
-                                                  rows="2"
-                                                  required></textarea>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Symptoms</label>
-                                        <textarea asp-for="Symptoms" class="form-control" rows="2"></textarea>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Diagnosis</label>
-                                        <textarea asp-for="Diagnosis" class="form-control" rows="2"></textarea>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Notes</label>
-                                        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Prescription</label>
-                                        <textarea asp-for="Prescription" class="form-control" rows="2"></textarea>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- MEDICATION -->
                     <div class="tab-pane fade" id="medication">
@@ -332,7 +399,7 @@
                 {
                     <button type="button"
                             class="btn btn-warning rounded-pill"
-                            onclick="sendApproval(@Model.GMID)">
+                            onclick="sendApproval(@Model.EMRId)">
                         🚀 Send for 1st Approval
                     </button>
                 }
@@ -341,7 +408,7 @@
                 {
                     <button type="button"
                             class="btn btn-info rounded-pill"
-                            onclick="sendApproval(@Model.GMID)">
+                            onclick="sendApproval(@Model.EMRId)">
                         🚀 Send for Final Approval
                     </button>
                 }
@@ -358,15 +425,15 @@
 
 <!-- AJAX + TOASTR -->
 <script>
-    function sendApproval(gmId) {
+    function sendApproval(emrid) {
 
         if (!confirm("Send this case sheet for approval?"))
             return;
 
         $.ajax({
-            url: '@Url.Action("SendForApproval", "GeneralMedicine")',
+            url: '@Url.Action("SendForApproval", "Emergency")',
             type: 'POST',
-            data: { gmId: gmId },
+            data: { emrid: emrid },
             success: function (res) {
 
                 if (res.success) {

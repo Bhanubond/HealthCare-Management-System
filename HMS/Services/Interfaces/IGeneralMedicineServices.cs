@@ -6,19 +6,12 @@ namespace HMS.Services.Interfaces
     public interface IGeneralMedicineServices
     {
         Task<List<TreatmentPatientVm>> GetPendingTreatmentPatients();
-        Task<GMCasesheetViewVm> GetCaseSheetPatient(int patientId);
-        //Task<List<MASMedication>> GetActiveMedications();
-        Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int patientId);
+        Task<GMCasesheetScreenVm> GetTreatmentScreenAsync(int DeptId, int patientId);
         Task SaveCaseSheet(GMCasesheetSaveVm model);
-        //Task<List<GMCasesheetSearchVm>> GetCompletedCases();
-
         Task<List<GMCasesheetSearchVm>> GetCompletedCases(DateTime from, DateTime to);
         Task<GMCasesheetScreenVm> GetCaseSheetById(int gmId);
         Task UpdateCaseSheet(GMCasesheetSaveVm model);
-        //Task ProcessApprovalFlow(int gmId);
-
         Task<string> ProcessApprovalFlow(int gmId);
-
         Task<List<GMApprovalQueueVm>> GetApprovalQueue(DateTime fromDate, DateTime toDate);
     }
 }

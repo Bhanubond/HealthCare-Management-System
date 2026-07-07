@@ -46,18 +46,6 @@ namespace HMS.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> SaveCaseSheet([FromBody] GMCasesheetSaveVm model)
-        //{
-        //    await _generalMedicineServices.SaveCaseSheet(model);
-
-        //    return Json(new
-        //    {
-        //        success = true,
-        //        message = "Saved successfully"
-        //    });
-        //}
-
         [HttpPost]
         public async Task<IActionResult> SaveCaseSheet([FromBody] GMCasesheetSaveVm model)
         {
