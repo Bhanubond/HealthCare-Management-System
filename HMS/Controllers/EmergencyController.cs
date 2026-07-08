@@ -53,13 +53,49 @@ namespace HMS.Controllers
             return model.EMRId == 0 ? NotFound() : View(model);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> EditCaseSheet(GMCasesheetSaveVm model)
-        //{
-        //    await _emergencyServices.UpdateCaseSheet(model);
-        //    return RedirectToAction(nameof(PatientSearch));
-        //}
+        [HttpPost]
+        public async Task<IActionResult> EditCaseSheet(EMRCasesheetScreenVm model)
+        {
+            await _emergencyServices.UpdateCaseSheet(model);
+            return RedirectToAction(nameof(PatientSearch));
+        }
 
+        public IActionResult Approvals() => View();
+
+        [HttpGet]
+        public async Task<IActionResult> GetApprovalQueue(DateTime? fromDate, DateTime? toDate)
+        {
+            fromDate ??= DateTime.Now.AddMonths(-1);
+            toDate ??= DateTime.Now;
+
+            var data = await _emergencyServices.GetApprovalQueue(fromDate.Value, toDate.Value);
+
+            return Json(data);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SendForApproval(int EMRId)
+        {
+            try
+            {
+                var message = await _emergencyServices.ProcessApprovalFlow(EMRId);
+
+                return Json(new
+                {
+                    success = true,
+                    message = message
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
     }
 
 }

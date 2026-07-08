@@ -58,6 +58,10 @@ namespace HMS.Services.Implementations
         {
             await SaveOrUpdateCaseSheetAsync(model, isUpdate: false);
         }
+        public async Task UpdateCaseSheet(EMRCasesheetScreenVm model)
+        {
+            await SaveOrUpdateCaseSheetAsync(model, isUpdate: true);
+        }
 
         private async Task SaveOrUpdateCaseSheetAsync(EMRCasesheetScreenVm model, bool isUpdate)
         {
@@ -477,6 +481,62 @@ namespace HMS.Services.Implementations
             };
         }
 
+        public async Task<List<EMRApprovalQueueVm>> GetApprovalQueue(DateTime fromDate, DateTime toDate)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@FromDate", fromDate),
+                new SqlParameter("@ToDate", toDate)
+            };
+
+            return await _db.Set<EMRApprovalQueueVm>().FromSqlRaw("EXEC [usp_GetEMRApprovalQueue] @FromDate,@ToDate", parameters).AsNoTracking().ToListAsync();
+        }
+
+        public async Task<string> ProcessApprovalFlow(int EMRId)
+        {
+            var emr = await _db.EMRCasesheets
+                .FirstOrDefaultAsync(x => x.EMRId == EMRId);
+
+            if (emr == null) return "Case sheet not found.";
+
+            if (emr.IsSentForApproval1 != true)
+            {
+                emr.IsSentForApproval1 = true;
+                emr.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Case sheet sent for Approval 1 successfully.";
+            }
+
+            if (emr.IsSentForApproval1 == true && emr.Approval1Status != true && emr.IsSentForApproval2 != true)
+            {
+                emr.Approval1Status = true;
+                emr.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Approval 1 completed successfully.";
+            }
+
+            if (emr.IsSentForApproval1 == true && emr.Approval1Status == true && emr.IsSentForApproval2 != true)
+            {
+                emr.IsSentForApproval2 = true;
+                emr.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Case sheet sent for Approval 2 successfully.";
+            }
+
+            if (emr.IsSentForApproval1 == true && emr.Approval1Status == true && emr.IsSentForApproval2 == true && emr.Approval2Status != true)
+            {
+                emr.Approval2Status = true;
+                emr.ModifiedDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return "Approval 2 completed successfully.";
+            }
+
+            return "No action performed.";
+        }
 
     }
 }

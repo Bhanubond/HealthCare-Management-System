@@ -50,81 +50,39 @@
                 <ul class="nav nav-pills nav-fill p-2 gap-2">
 
                     <li class="nav-item">
-                        <button class="nav-link active rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#arrival"
-                                type="button">
-                            🚑 Arrival & Triage
-                        </button>
+                        <button class="nav-link active rounded-pill" data-bs-toggle="tab" data-bs-target="#arrival" type="button"> 🚑 Arrival & Triage </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#history"
-                                type="button">
-                            📋 History
-                        </button>
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#history" type="button"> 📋 History </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#vitals"
-                                type="button">
-                            ❤️ Vitals
-                        </button>
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#vitals" type="button"> ❤️ Vitals </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#exam"
-                                type="button">
-                            🔍 Examination
-                        </button>
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#exam" type="button">  🔍 Examination </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#treatment"
-                                type="button">
-                            💉 Treatment
-                        </button>
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#treatment" type="button"> 💉 Treatment </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#disposition"
-                                type="button">
-                            🏥 Disposition
-                        </button>
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab"  data-bs-target="#disposition"  type="button"> 🏥 Disposition </button>
                     </li>
 
                     <li class="nav-item">
-                        <button type="button" class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#medication">
-                            💊 Medication
-                        </button>
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#medication"> 💊 Medication </button>
                     </li>
 
                     <li class="nav-item">
-                        <button type="button" class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#appointment">
-                            📅 Appointment
-                        </button>
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#appointment">  📅 Appointment </button>
                     </li>
 
                     <li class="nav-item">
-                        <button type="button" class="nav-link rounded-pill"
-                                data-bs-toggle="tab"
-                                data-bs-target="#referrals">
-                            🔁 Referrals
-                        </button>
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#referrals"> 🔁 Referrals </button>
                     </li>
 
                 </ul>
@@ -136,14 +94,20 @@
                 <div class="tab-content">
 
                     <!-- ARRIVAL -->
-                    <!-- ARRIVAL -->
                     <div class="tab-pane fade show active" id="arrival">
 
                         <div class="row g-3">
 
                             <div class="col-md-4">
                                 <label class="fw-bold">Arrival Mode</label>
-                                <input class="form-control" asp-for="ArrivalMode" />
+                               @*  <input class="form-control" asp-for="ArrivalMode" /> *@
+                                <select asp-for="ArrivalMode" class="form-select">
+                                    <option value="">Select</option>
+                                    <option>Walk-in</option>
+                                    <option>Ambulance</option>
+                                    <option>Referral</option>
+                                    <option>Police</option>
+                                </select>
                             </div>
 
                             <div class="col-md-4">
@@ -346,6 +310,136 @@
 
                     </div>
 
+                    <!-- Treatment Tab -->
+                    <div class="tab-pane fade" id="treatment">
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label>Provisional Diagnosis</label>
+                                        <textarea id="ProvisionalDiagnosis"
+                                                  name="ProvisionalDiagnosis"
+                                                  class="form-control">@Model.ProvisionalDiagnosis</textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Investigations Ordered</label>
+                                        <textarea id="InvestigationsOrdered"
+                                                  name="InvestigationsOrdered"
+                                                  class="form-control">@Model.InvestigationsOrdered</textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Investigation Results</label>
+                                        <textarea id="InvestigationResults"
+                                                  name="InvestigationResults"
+                                                  class="form-control">@Model.InvestigationResults</textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Procedures Performed</label>
+                                        <textarea id="ProceduresPerformed"
+                                                  name="ProceduresPerformed"
+                                                  class="form-control">@Model.ProceduresPerformed</textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Emergency Treatment</label>
+                                        <textarea id="EmergencyTreatment"
+                                                  name="EmergencyTreatment"
+                                                  class="form-control">@Model.EmergencyTreatment</textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Medications Administered</label>
+                                        <textarea id="MedicationsAdministered"
+                                                  name="MedicationsAdministered"
+                                                  class="form-control">@Model.MedicationsAdministered</textarea>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label>IV Fluids</label>
+                                        <textarea id="IVFluids"
+                                                  name="IVFluids"
+                                                  class="form-control">@Model.IVFluids</textarea>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Disposition Tab -->
+                    <div class="tab-pane fade" id="disposition">
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label>Final Diagnosis</label>
+                                        <textarea id="FinalDiagnosis"
+                                                  name="FinalDiagnosis"
+                                                  class="form-control">@Model.FinalDiagnosis</textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Disposition</label>
+
+                                                            <select asp-for="Disposition" class="form-select">
+                                                                <option value="">Select</option>
+                                                                <option value="Discharge">Discharge</option>
+                                                                <option value="Admission">Admission</option>
+                                                                <option value="ICU">ICU</option>
+                                                                <option value="Operation Theatre">Operation Theatre</option>
+                                                                <option value="Referral">Referral</option>
+                                                                <option value="Death">Death</option>
+                                                            </select>
+
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Admitted Ward</label>
+                                        <input id="AdmittedWard"
+                                               name="AdmittedWard"
+                                               class="form-control"
+                                               value="@Model.AdmittedWard" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Referred Hospital</label>
+                                        <input id="ReferredHospital"
+                                               name="ReferredHospital"
+                                               class="form-control"
+                                               value="@Model.ReferredHospital" />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label>Discharge Advice</label>
+                                        <textarea id="DischargeAdvice"
+                                                  name="DischargeAdvice"
+                                                  class="form-control">@Model.DischargeAdvice</textarea>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label>Follow Up Advice</label>
+                                        <textarea id="FollowUpAdvice"
+                                                  name="FollowUpAdvice"
+                                                  class="form-control">@Model.FollowUpAdvice</textarea>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
 
                     <!-- MEDICATION -->
                     <div class="tab-pane fade" id="medication">

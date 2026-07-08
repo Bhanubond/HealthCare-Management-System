@@ -57,6 +57,20 @@ namespace HMS.Controllers
             return Json(new { success = true });
         }
 
+        
+        public IActionResult Approvals() => View();
+
+        [HttpGet]
+        public async Task<IActionResult> GetApprovalQueue(DateTime? fromDate, DateTime? toDate)
+        {
+            fromDate ??= DateTime.Now.AddMonths(-1);
+            toDate ??= DateTime.Now;
+
+            var data = await _generalMedicineServices.GetApprovalQueue(fromDate.Value, toDate.Value);
+
+            return Json(data);
+        }
+
         [HttpPost]
         public async Task<IActionResult> SendForApproval(int gmId)
         {
@@ -78,18 +92,6 @@ namespace HMS.Controllers
                     message = ex.Message
                 });
             }
-        }
-        public IActionResult Approvals() => View();
-
-        [HttpGet]
-        public async Task<IActionResult> GetApprovalQueue(DateTime? fromDate, DateTime? toDate)
-        {
-            fromDate ??= DateTime.Now.AddMonths(-1);
-            toDate ??= DateTime.Now;
-
-            var data = await _generalMedicineServices.GetApprovalQueue(fromDate.Value, toDate.Value);
-
-            return Json(data);
         }
     }
 }

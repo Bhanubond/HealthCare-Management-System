@@ -51,6 +51,7 @@ namespace HMS.Data
             modelBuilder.Entity<GMCasesheetEditVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<TreatmentQueueVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<GMApprovalQueueVm>().HasNoKey().ToView(null);
+            modelBuilder.Entity<EMRApprovalQueueVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<OPDSearchResultVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<EMRCompletedCaseVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<EMRCasesheetDbVm>().HasNoKey().ToView(null);
