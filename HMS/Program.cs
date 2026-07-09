@@ -38,6 +38,7 @@ builder.Services.AddScoped<IFollowUpService, FollowUpService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<IReferralStatusService, ReferralStatusService>();
 builder.Services.AddScoped<IEmergencyService, EmergencyService>();
+builder.Services.AddScoped<IPediatricsServices, PediatricsServices>();
 
 
 // REQUIRED for Session

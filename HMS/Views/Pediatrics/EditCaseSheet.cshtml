@@ -1,0 +1,331 @@
+﻿@model HMS.Models.PedoCasesheetScreenVm
+
+@{
+    var vm = Model ?? new HMS.Models.PedoCasesheetScreenVm();
+}
+
+<div class="container-fluid py-3">
+
+    <!-- PATIENT HEADER (EMR STYLE) -->
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+
+                <div>
+                    <h4 class="fw-bold mb-1">🩺 Edit Case Sheet</h4>
+                    <div class="text-muted small">OP No: @vm.OpNo</div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+
+                    <span class="badge bg-light text-dark border px-3 py-2">👤 @vm.PatientName</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">🎂 @vm.Age yrs</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">⚧ @vm.Gender</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">👨‍⚕️ @vm.DoctorName</span>
+                    <span class="badge bg-light text-dark border px-3 py-2">🎓 @vm.StudentName</span>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <form asp-action="EditCaseSheet" method="post">
+
+        <input type="hidden" asp-for="PedoID" />
+        <input type="hidden" asp-for="PatientId" />
+        <input type="hidden" asp-for="DoctorId" />
+        <input type="hidden" asp-for="StudentId" />
+        <input type="hidden" asp-for="AllotId" />
+        <input type="hidden" asp-for="ReferredId" />
+        <input type="hidden" asp-for="OpNo" />
+
+        <!-- MODERN NAV TABS -->
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white border-bottom p-0">
+
+                <ul class="nav nav-pills nav-fill p-2 gap-2">
+                    <li class="nav-item">
+                        <button class="nav-link active rounded-pill" data-bs-toggle="tab" data-bs-target="#history" type="button"> 📋 History </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#vitals" type="button"> ❤️ Vitals </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#exam" type="button">  🔍 Examination </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#treatment" type="button"> 💉 Treatment </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#medication"> 💊 Medication </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#appointment">  📅 Appointment </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#referrals"> 🔁 Referrals </button>
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="card-body bg-light">
+
+                <div class="tab-content">
+
+                    <div class="tab-pane fade show active" id="history">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Chief Complaint</label>
+                                <textarea class="form-control" asp-for="ChiefComplaint"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">History Of Present Illness</label>
+                                <textarea class="form-control" asp-for="HistoryOfPresentIllness"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Past Medical History</label>
+                                <textarea class="form-control" asp-for="PastMedicalHistory"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold">Family History</label>
+                                <textarea class="form-control" asp-for="FamilyHistory"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold">Birth History</label>
+                                <textarea class="form-control" asp-for="BirthHistory"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold">Birth Weight</label>
+                                <input class="form-control" asp-for="BirthWeight" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold">Immunization Status</label>
+                                <textarea class="form-control" asp-for="ImmunizationStatus"></textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- VITALS -->
+                    <div class="tab-pane fade" id="vitals">
+
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label>Pulse</label>
+                                <input class="form-control" asp-for="PulseRate" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Temperature</label>
+                                <input class="form-control" asp-for="Temperature" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Respiratory Rate</label>
+                                <input class="form-control" asp-for="RespiratoryRate" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>SpO₂</label>
+                                <input class="form-control" asp-for="SpO2" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Weight</label>
+                                <input class="form-control" asp-for="Weight" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Height</label>
+                                <input class="form-control" asp-for="Height" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Growth Status</label>
+                                <input class="form-control" asp-for="GrowthStatus" />
+                            </div>
+                          
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade" id="exam">
+                        <div class="row g-3">                       
+                            <div class="col-md-6">
+                                <label>General Examination</label>
+                                <textarea class="form-control" asp-for="GeneralExamination"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Systemic Examination</label>
+                                <textarea class="form-control" asp-for="SystemicExamination"></textarea>
+                            </div>              
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="treatment">
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label>Diagnosis</label>
+                                        <textarea id="Diagnosis" name="Diagnosis" class="form-control">@Model.Diagnosis</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Prescription</label>
+                                        <textarea id="Prescription" name="Prescription" class="form-control">@Model.Prescription</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Advice</label>
+                                        <textarea id="Advice" name="Advice" class="form-control">@Model.Advice</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Notes</label>
+                                        <textarea id="Notes" name="Notes" class="form-control">@Model.Notes</textarea>
+                                    </div>
+                                  
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEDICATION -->
+                    <div class="tab-pane fade" id="medication">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+
+                                @await Html.PartialAsync("_MedicationPartial",
+                                new MedicationPartialVm
+                                {
+                                    Medications = vm.Medications,
+                                    MedicationMaster = vm.MedicationMaster
+                                })
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- APPOINTMENT -->
+                    <div class="tab-pane fade" id="appointment">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                @await Html.PartialAsync("_AppointmentPartial", vm.FollowUpSaveVm)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REFERRALS -->
+                    <div class="tab-pane fade" id="referrals">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                @await Html.PartialAsync("_ReferralStatusPartial", Model.ReferralStatus)
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STICKY ACTION BAR -->
+        <div class="sticky-bottom bg-white border-top p-3 shadow-sm mt-3">
+
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+                <button type="submit" class="btn btn-primary px-5 rounded-pill">
+                    💾 Update Case Sheet
+                </button>
+
+                @if (!Model.IsSentForApproval1 && !Model.Approval1Status && !Model.IsSentForApproval2 && !Model.Approval2Status)
+                {
+                    <button type="button"
+                            class="btn btn-warning rounded-pill"
+                            onclick="sendApproval(@Model.PedoID)">
+                        🚀 Send for 1st Approval
+                    </button>
+                }
+
+                @if (Model.IsSentForApproval1 && Model.Approval1Status && Model.IsSentForApproval2 && !Model.Approval2Status)
+                {
+                    <button type="button"
+                            class="btn btn-info rounded-pill"
+                            onclick="sendApproval(@Model.PedoID)">
+                        🚀 Send for Final Approval
+                    </button>
+                }
+
+                <a asp-action="PatientSearch" class="btn btn-outline-secondary rounded-pill px-4">
+                    Cancel
+                </a>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<!-- AJAX + TOASTR -->
+<script>
+    function sendApproval(PedoID) {
+
+        if (!confirm("Send this case sheet for approval?"))
+            return;
+
+        $.ajax({
+            url: '@Url.Action("SendForApproval", "Pediatrics")',
+            type: 'POST',
+            data: { PedoID: PedoID },
+            success: function (res) {
+
+                if (res.success) {
+                    toastr.success(res.message);
+                } else {
+                    toastr.warning(res.message);
+                }
+
+            },
+            error: function () {
+                toastr.error("Something went wrong.");
+            }
+        });
+
+    }
+</script>
+
+<style>
+    .nav-pills .nav-link {
+        font-weight: 600;
+        background: #f1f3f5;
+        color: #333;
+    }
+
+        .nav-pills .nav-link.active {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+    textarea.form-control {
+        resize: none;
+    }
+</style>

@@ -51,6 +51,7 @@ namespace HMS.Controllers
             {
                 (int)Department.GEN => "~/Views/Treatment/GeneralMedicine/TreatmentDetails.cshtml", 
                 (int)Department.EMR => "~/Views/Treatment/Emergency/TreatmentDetails.cshtml", 
+                (int)Department.PED => "~/Views/Treatment/Pediatrics/TreatmentDetails.cshtml", 
                 
                 _ => "~/Views/Treatment/Default/TreatmentDetails.cshtml"
             };

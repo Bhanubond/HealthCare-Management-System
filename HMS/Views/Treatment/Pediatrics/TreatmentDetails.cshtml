@@ -1,0 +1,458 @@
+﻿@model HMS.Models.PedoCasesheetScreenVm
+
+@{
+    var vm = Model ?? new HMS.Models.PedoCasesheetScreenVm();
+}
+<style>
+
+    body {
+        background: #f4f6fb;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .cardx {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        border: none;
+    }
+
+    .badge-soft {
+        background: #f1f3f9;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        color: #444;
+    }
+
+
+    .nav-pills .nav-link {
+        border-radius: 50px;
+        color: #555;
+        background: #f1f3f9;
+        padding: 8px 18px;
+    }
+
+        .nav-pills .nav-link.active {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        min-height: 42px;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 .15rem rgba(13,110,253,.15);
+    }
+
+
+
+    label {
+        font-weight: 600;
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+
+    .tab-pane .card {
+        border-radius: 14px;
+    }
+
+    .sticky-bar {
+        position: sticky;
+        bottom: 0;
+        background: #ffffff;
+        padding: 15px;
+        border-top: 1px solid #eee;
+        z-index: 100;
+    }
+
+
+    #btnSave {
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(13,110,253,.25);
+    }
+
+
+    #TriageCategory option[value="Red"] {
+        color: red;
+    }
+
+
+
+    #TriageCategory option[value="Yellow"] {
+        color: #d39e00;
+    }
+
+
+
+    #TriageCategory option[value="Green"] {
+        color: green;
+    }
+
+
+
+    #TriageCategory option[value="Black"] {
+        color: black;
+    }
+
+
+    @@media(max - width:768px) {
+        .badge-soft {
+            font-size: 11px;
+        }
+
+
+        .nav-pills {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+
+
+            .nav-pills .nav-link {
+                white-space: nowrap;
+            }
+    }
+</style>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+<div class="container-fluid py-3">
+
+    <div class="cardx p-3 mb-3">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+
+            <div>
+                <h5 class="mb-0">🚑 Pediatrics Department Case Sheet</h5>
+                <small class="text-muted">OP No: @vm.OpNo</small>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="badge-soft">👤 @vm.PatientName</span>
+                <span class="badge-soft">🎂 @vm.Age yrs</span>
+                <span class="badge-soft">⚧ @vm.Gender</span>
+                <span class="badge-soft">👨‍⚕️ @vm.DoctorName</span>
+                <span class="badge-soft">🎓 @vm.StudentName</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="cardx">
+        <div class="p-3 border-bottom">
+
+            <ul class="nav nav-pills gap-2">         
+                <li class="nav-item">
+                    <button class="nav-link active rounded-pill" data-bs-toggle="tab" data-bs-target="#history" type="button">
+                        📋 History
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#vitals" type="button">
+                        ❤️ Vitals
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#exam" type="button">
+                        🔍 Examination
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#treatment" type="button">
+                        💉 Treatment
+                    </button>
+                </li>
+            </ul>
+
+        </div>
+
+        <div class="p-3 bg-light">
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="history">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label>Chief Complaint</label>
+                                    <textarea id="ChiefComplaint" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>History Of Present Illness</label>
+                                    <textarea id="HistoryOfPresentIllness" class="form-control"></textarea>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Past Medical History</label>
+                                    <textarea id="PastMedicalHistory" class="form-control"></textarea>
+                                </div>                              
+
+                                <div class="col-md-6">
+                                    <label>Family History</label>
+                                    <textarea id="FamilyHistory" class="form-control"></textarea>
+                                </div>                          
+                                <div class="col-md-6">
+                                    <label>Birth History</label>
+                                    <textarea id="BirthHistory" class="form-control"></textarea>
+                                </div>                          
+                                <div class="col-md-6">
+                                    <label>Birth Weight</label>
+                                    <textarea id="BirthWeight" class="form-control"></textarea>
+                                </div>                          
+                                <div class="col-md-6">
+                                    <label>Immunization Status</label>
+                                    <textarea id="ImmunizationStatus" class="form-control"></textarea>
+                                </div>                          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="vitals">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label"> Pulse Rate </label>
+                                    <input id="PulseRate" class="form-control" placeholder="Pulse">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label"> Temperature °C </label>
+                                    <input id="Temperature" class="form-control">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label"> Respiratory Rate </label>
+                                    <input id="RespiratoryRate" class="form-control">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label"> SpO₂ </label>
+                                    <input id="SpO2" class="form-control">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label"> Weight (Kg) </label>
+                                    <input id="Weight" class="form-control">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label"> Height (cm) </label>
+                                    <input id="Height" class="form-control">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label"> Growth Status</label>
+                                    <input id="GrowthStatus" class="form-control">
+                                </div>
+
+                            
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="tab-pane fade" id="exam">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label> General Examination </label>
+                                    <textarea id="GeneralExamination" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label> Systemic Examination </label>
+                                    <textarea id="SystemicExamination" class="form-control"></textarea>
+                                </div>                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="treatment">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label> Diagnosis </label>
+                                    <textarea id="Diagnosis" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label> Prescription </label>
+                                    <textarea id="Prescription" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label> Advice </label>
+                                    <textarea id="Advice" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label> Notes </label>
+                                    <textarea id="Notes" class="form-control"></textarea>
+                                </div>                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sticky-bar text-center">
+        <button type="button" id="btnSave" class="btn btn-primary px-5 rounded-pill">
+            💾 Save Pediatrics Case Sheet
+        </button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+   
+    function getModel() {
+
+        return {
+
+            PatientId: '@vm.PatientId',
+            DoctorId: '@vm.DoctorId',
+            StudentId: '@vm.StudentId',
+            AllotId: '@vm.AllotId',
+            ReferredId: '@vm.ReferredId',
+            OpNo: '@vm.OpNo',
+
+            ChiefComplaint: $("#ChiefComplaint").val(),
+            HistoryOfPresentIllness: $("#HistoryOfPresentIllness").val(),
+            PastMedicalHistory: $("#PastMedicalHistory").val(),
+            FamilyHistory: $("#FamilyHistory").val(),
+
+            BirthHistory: $("#BirthHistory").val(),
+            BirthWeight: +$("#BirthWeight").val() || null,
+            ImmunizationStatus: $("#ImmunizationStatus").val(),
+
+            Weight: +$("#Weight").val() || null,
+            Height: +$("#Height").val() || null,
+            GrowthStatus: $("#GrowthStatus").val(),
+
+            Temperature: +$("#Temperature").val() || null,
+            PulseRate: +$("#PulseRate").val() || null,
+            RespiratoryRate: +$("#RespiratoryRate").val() || null,
+            SpO2: +$("#SpO2").val() || null,
+
+            GeneralExamination: $("#GeneralExamination").val(),
+            SystemicExamination: $("#SystemicExamination").val(),
+
+            Diagnosis: $("#Diagnosis").val(),
+            Prescription: $("#Prescription").val(),
+            Advice: $("#Advice").val(),
+            Notes: $("#Notes").val(),          
+        };
+    }
+
+        function validate(m) {
+
+            let e = [];
+
+            if (!m.ChiefComplaint)
+                e.push("Chief Complaint is required");
+
+
+            if (m.Temperature && (m.Temperature < 30 || m.Temperature > 45))
+                e.push("Temperature should be between 30°C - 45°C");
+
+
+            if (m.SpO2 && (m.SpO2 < 50 || m.SpO2 > 100))
+                e.push("SpO₂ should be between 50 - 100");            
+
+            return e;
+        }
+
+
+        $("#btnSave").click(function () {
+
+            let model = getModel();
+            let errors = validate(model);
+
+            if (errors.length) {
+
+                errors.forEach(function (e) {
+                    toastr.error(e, "Validation Error");
+                });
+
+                return;
+            }
+
+            $.ajax({
+
+                url: '/Pediatrics/SaveCaseSheet',
+
+                type: 'POST',
+
+                contentType: 'application/json',
+
+                data: JSON.stringify(model),
+
+                beforeSend: function () {
+
+                    $("#btnSave")
+                        .prop("disabled", true)
+                        .text("Saving...");
+
+                },
+
+                success: function () {
+
+                    toastr.success(
+                        "Pediatrics Case Sheet Saved Successfully"
+                    );
+
+                    setTimeout(function () {
+
+                        location.href = '/Pediatrics/PatientSearch';
+
+                    }, 1000);
+
+                },
+
+                error: function (xhr) {
+
+                    console.log(xhr.responseText);
+
+                    toastr.error("Save Failed");
+
+                },
+
+                complete: function () {
+
+                    $("#btnSave")
+                        .prop("disabled", false)
+                        .text("💾 Save Pediatrics Case Sheet");
+
+                }
+
+            });
+
+        });
+
+    });
+</script>
