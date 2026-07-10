@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using HMS.Entities;
+﻿using HMS.Entities;
+using HMS.Entities.BillingDetails;
 using HMS.Models;
+using Microsoft.EntityFrameworkCore;
 namespace HMS.Data
 {
     public class HmsDbContext : DbContext
@@ -38,6 +39,19 @@ namespace HMS.Data
         public DbSet<FollowUp> FollowUps { get; set; }
         public DbSet<EMRCasesheet> EMRCasesheets { get; set; }
         public DbSet<PediatricsCasesheet> PediatricsCasesheets { get; set; }
+        public DbSet<TreatmentServices> TreatmentServices { get; set; }
+
+        public DbSet<PatientTreatment> PatientTreatments { get; set; }
+
+        public DbSet<BillQueueDetails> BillQueueDetails { get; set; }
+
+        public DbSet<Billing> Billings { get; set; }
+
+        public DbSet<BillingDetails> BillingDetails { get; set; }
+
+        public DbSet<PaymentDetail> PaymentDetails { get; set; }
+
+        public DbSet<BillingAuditLog> BillingAuditLogs { get; set; }
 
 
         //public DbSet<TreatmentQueueVm> TreatmentQueueVm { get; set; }
@@ -61,6 +75,61 @@ namespace HMS.Data
             modelBuilder.Entity<PedoCompletedCaseVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<EMRCasesheetDbVm>().HasNoKey().ToView(null);
             modelBuilder.Entity<PedoCasesheetDbVm>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PendingBillQueueVm>().HasNoKey().ToView(null);
+
+
+
+            modelBuilder.Entity<Billing>()
+                .HasIndex(x => x.BillNo)
+                .IsUnique();
+
+
+
+            modelBuilder.Entity<BillingDetails>()
+                .HasOne(x => x.Billing)
+                .WithMany(x => x.BillingDetails)
+                .HasForeignKey(x => x.BillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<BillingDetails>()
+                .HasOne(x => x.PatientTreatment)
+                .WithMany(x => x.BillingDetails)
+                .HasForeignKey(x => x.PatientTreatmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<PaymentDetail>()
+                .HasOne(x => x.Billing)
+                .WithMany(x => x.Payments)
+                .HasForeignKey(x => x.BillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<BillingAuditLog>()
+                .HasOne(x => x.Billing)
+                .WithMany(x => x.AuditLogs)
+                .HasForeignKey(x => x.BillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<BillQueueDetails>()
+                .HasOne(x => x.PatientTreatment)
+                .WithMany(x => x.BillQueueDetails)
+                .HasForeignKey(x => x.PatientTreatmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<BillQueueDetails>()
+                .HasOne(x => x.ProcessedBill)
+                .WithMany()
+                .HasForeignKey(x => x.ProcessedBillId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

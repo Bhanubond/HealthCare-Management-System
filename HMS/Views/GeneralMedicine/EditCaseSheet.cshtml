@@ -74,6 +74,12 @@
                     </li>
 
                     <li class="nav-item">
+                        <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#treatments">
+                            💉 Treatments
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
                         <button type="button" class="nav-link rounded-pill" data-bs-toggle="tab" data-bs-target="#medication">
                             💊 Medication
                         </button>
@@ -265,6 +271,14 @@
 
                                 </div>
 
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="treatments">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                @await Html.PartialAsync("~/Views/Shared/_AddTreatment.cshtml", Model.PatientTreatment ?? new HMS.Models.PatientTreatmentVM())
                             </div>
                         </div>
                     </div>

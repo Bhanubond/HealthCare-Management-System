@@ -73,5 +73,9 @@ namespace HMS.Models
 
         public ReferralStatusVm ReferralStatus { get; set; } = new();
         public FollowUpSaveVm FollowUpSaveVm { get; set; } = new();
+
+        public PatientTreatmentVM? PatientTreatment { get; set; }
+
+        public List<HMS.Entities.BillingDetails.PatientTreatment> ExistingTreatments { get; set; } = new();
     }
 }

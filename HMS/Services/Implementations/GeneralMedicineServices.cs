@@ -17,13 +17,15 @@ namespace HMS.Services.Implementations
         private readonly IFollowUpService _followUpService;
         private readonly ILookupService _lookupService;
         private readonly IReferralStatusService _referralService;
-        public GeneralMedicineServices(HmsDbContext db, IMedicationService medicationService, IFollowUpService followUpService, ILookupService lookupService, IReferralStatusService referralService)
+        private readonly IPatientTreatmentService _patientTreatmentService;
+        public GeneralMedicineServices(HmsDbContext db, IMedicationService medicationService, IFollowUpService followUpService, ILookupService lookupService, IReferralStatusService referralService, IPatientTreatmentService patientTreatmentService)
         {
             _db = db;
             _medicationService = medicationService;
             _followUpService = followUpService;
             _lookupService = lookupService;
             _referralService = referralService;
+            _patientTreatmentService = patientTreatmentService;
         }
 
         public async Task<List<TreatmentPatientVm>> GetPendingTreatmentPatients()
@@ -40,6 +42,7 @@ namespace HMS.Services.Implementations
             var medications = await _medicationService.GetActiveMedications();
             var context = await _lookupService.GetLatestTreatmentContextAsync(DeptId, patientId);
             var currentDept = await _followUpService.GetCurrentDepartmentIdAsync(patientId);
+            var departmentServices = await _patientTreatmentService.GetDepartmentServices(DeptId);
             return new GMCasesheetScreenVm
             {
                 PatientId = patient.PatientId,
@@ -60,7 +63,23 @@ namespace HMS.Services.Implementations
                 Medications = new List<PatientMedicationVm> { new() },
                 Doctors = await _lookupService.GetDoctorsAsync(),
                 Students = await _lookupService.GetStudentsAsync(),
-                Departments = await _lookupService.GetDepartmentsAsync()
+                Departments = await _lookupService.GetDepartmentsAsync(),
+                PatientTreatment = new PatientTreatmentVM
+                {
+                    CaseSheetId = 0,
+                    PatientId = patient.PatientId,
+                    DeptId = DeptId,
+                    DoctorId = context.DoctorId,
+                    Services = departmentServices.Select(x => new PatientServiceVM
+                    {
+                        ServiceID = x.ServiceID,
+                        ServiceName = x.ServiceName,
+                        Rate = x.Cost,
+                        Quantity = 1,
+                        DiscountPer = 0,
+                        Selected = false
+                    }).ToList()
+                }
             };
         }
 
@@ -80,10 +99,13 @@ namespace HMS.Services.Implementations
                 return new GMCasesheetScreenVm();
             }
 
+            var deptId = (int)Department.GEN;
             var medications = await _medicationService.GetActiveMedications();
             var existingMeds = await _medicationService.GetPatientMedications(model.PatientId);
             var followUp = await _followUpService.GetLatestFollowUpAsync(model.PatientId);
             var currentDeptId = await _followUpService.GetCurrentDepartmentIdAsync(model.PatientId);
+            var departmentServices = await _patientTreatmentService.GetDepartmentServices(deptId);
+            var treatments = await _patientTreatmentService.GetPatientTreatments(model.GMID);
 
             var departments = await _lookupService.GetDepartmentsAsync();
             var referrals = await _referralService.GetReferralsByPatientAsync(model.PatientId);
@@ -148,6 +170,32 @@ namespace HMS.Services.Implementations
                 Doctors = doctors,
                 Students = students,
                 Departments = departments,
+                PatientTreatment = new PatientTreatmentVM
+                {
+                    CaseSheetId = model.GMID,
+                    PatientId = model.PatientId,
+                    DeptId = deptId,
+                    DoctorId = model.DoctorId,
+                    Services = departmentServices.Select(x => new PatientServiceVM
+                    {
+                        ServiceID = x.ServiceID,
+                        ServiceName = x.ServiceName,
+                        Rate = x.Cost,
+                        Quantity = 1,
+                        DiscountPer = 0,
+                        Selected = false
+                    }).ToList(),
+                    ExistingTreatments = treatments.Select(x => new PatientTreatmentVMItem
+                    {
+                        TreatmentId = x.PatientTreatmentId,
+                        ServiceID = x.ServiceID,
+                        ServiceName = x.Service?.ServiceName ?? string.Empty,
+                        Rate = x.Rate,
+                        Quantity = x.Quantity,
+                        DiscountPer = x.DiscountPer,
+                        Amount = x.Amount
+                    }).ToList()
+                },
 
 
                 FollowUpSaveVm = new FollowUpSaveVm
@@ -189,7 +237,8 @@ namespace HMS.Services.Implementations
                     FromDeptId = (int)currentDeptId,
                     Departments = departments,
                     ExistingReferrals = referrals
-                }
+                },
+                ExistingTreatments = treatments
             };
         }
 
@@ -372,8 +421,18 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 11: FollowUp saved");
 
+                if (model.PatientTreatment != null &&
+                    (model.PatientTreatment.Services.Any(x => x.Selected) ||
+                     !string.IsNullOrWhiteSpace(model.PatientTreatment.PatientTreatmentJson)))
+                {
+                    model.PatientTreatment.CaseSheetId = entity.GMID;
+                    model.PatientTreatment.PatientId = model.PatientId;
+                    model.PatientTreatment.DeptId = (int)Department.GEN;
+                    model.PatientTreatment.DoctorId = model.DoctorId;
 
-                Console.WriteLine("STEP 11: FollowUp saved");
+                    await _patientTreatmentService.SavePatientTreatments(model.PatientTreatment);
+                    Console.WriteLine("STEP 11.1: Treatments saved");
+                }
 
                 await UpdateAllotmentAndReferralAsync(model, entity.GMID);
                 Console.WriteLine("STEP 12: Allotment updated");

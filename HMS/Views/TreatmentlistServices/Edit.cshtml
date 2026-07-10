@@ -1,0 +1,199 @@
+﻿@model HMS.Entities.TreatmentServices
+
+@{
+    ViewData["Title"] = "Edit Treatment Service";
+}
+
+
+<div class="card shadow">
+
+    <div class="card-header bg-warning text-dark">
+        <h4>Edit Treatment Service</h4>
+    </div>
+
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+            <input asp-for="ServiceID" type="hidden" />
+
+            <input asp-for="CreatedAt" type="hidden" />
+
+
+
+            <div class="row g-3">
+
+
+                <div class="col-md-3">
+
+                    <label asp-for="ServiceCode"
+                           class="form-label fw-bold">
+                        Service Code
+                    </label>
+
+
+                    <input asp-for="ServiceCode"
+                           class="form-control" />
+
+
+                    <span asp-validation-for="ServiceCode"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+
+                <div class="col-md-5">
+
+                    <label asp-for="ServiceName"
+                           class="form-label fw-bold">
+                        Service Name
+                    </label>
+
+
+                    <input asp-for="ServiceName"
+                           class="form-control" />
+
+
+                    <span asp-validation-for="ServiceName"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="DeptId"
+                           class="form-label fw-bold">
+                        Department
+                    </label>
+
+
+                    <select asp-for="DeptId"
+                            class="form-select"
+                            asp-items="ViewBag.Departments">
+
+                        <option value="">
+                            -- Select Department --
+                        </option>
+
+                    </select>
+
+
+                    <span asp-validation-for="DeptId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+
+                <div class="col-md-8">
+
+                    <label asp-for="Description"
+                           class="form-label fw-bold">
+                        Description
+                    </label>
+
+
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="3"></textarea>
+
+
+                    <span asp-validation-for="Description"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="Cost"
+                           class="form-label fw-bold">
+                        Cost
+                    </label>
+
+
+                    <input asp-for="Cost"
+                           class="form-control"
+                           type="number"
+                           step="0.01" />
+
+
+                    <span asp-validation-for="Cost"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+
+                <div class="col-md-4 d-flex align-items-center">
+
+                    <div class="form-check mt-4">
+
+                        <input asp-for="IsActive"
+                               class="form-check-input" />
+
+
+                        <label asp-for="IsActive"
+                               class="form-check-label fw-bold">
+                            Active
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+
+            </div>
+
+
+
+            <div class="d-flex gap-2 mt-4">
+
+
+                <button type="submit"
+                        class="btn btn-warning">
+
+                    Update
+
+                </button>
+
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

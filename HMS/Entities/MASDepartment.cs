@@ -28,5 +28,6 @@ namespace HMS.Entities
         public bool IsActive { get; set; }
 
         public ICollection<MASDeptScreenMapping>? ScreenMappings { get; set; }
+        public ICollection<TreatmentServices> TreatmentServices { get; set; }
     }
 }

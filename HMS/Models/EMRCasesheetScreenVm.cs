@@ -1,4 +1,5 @@
 ﻿using HMS.Entities;
+using HMS.Entities.BillingDetails;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -191,5 +192,10 @@ namespace HMS.Models
         public Dictionary<int, string> Reasons { get; set; } = new();
 
         public FollowUpSaveVm FollowUpSaveVm { get; set; } = new();
+
+        public PatientTreatmentVM? PatientTreatment { get; set; }
+
+        public List<PatientTreatment> ExistingTreatments { get; set; }
+            = new();
     }
 }

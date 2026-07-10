@@ -124,5 +124,7 @@ namespace HMS.Models
         public Dictionary<int, string> Reasons { get; set; } = new();
 
         public FollowUpSaveVm FollowUpSaveVm { get; set; } = new();
+
+        public PatientTreatmentVM? PatientTreatment { get; set; }
     }
 }

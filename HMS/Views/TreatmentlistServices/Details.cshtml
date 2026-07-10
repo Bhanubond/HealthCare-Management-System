@@ -1,0 +1,180 @@
+﻿@model HMS.Entities.TreatmentServices
+
+@{
+    ViewData["Title"] = "Treatment Service Details";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0 fw-bold">
+            Treatment Service Details
+        </h4>
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">
+                        Service ID
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.ServiceID
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">
+                        Service Code
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.ServiceCode
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">
+                        Service Name
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.ServiceName
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">
+                        Department
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.Department?.DeptName
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">
+                        Cost
+                    </div>
+                    <div class="col-sm-8">
+                        @Model.Cost.ToString("N2")
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-sm-4 fw-bold">
+                        Status
+                    </div>
+
+                    <div class="col-sm-8">
+
+                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+
+                            @(Model.IsActive ? "Active" : "Inactive")
+
+                        </span>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <div class="col-md-12">
+
+                <div class="row">
+
+                    <div class="col-sm-2 fw-bold">
+                        Description
+                    </div>
+
+                    <div class="col-sm-10">
+                        @(string.IsNullOrEmpty(Model.Description)
+                                                ? "N/A"
+                                                : Model.Description)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="col-md-6">
+
+                <div class="row">
+
+                    <div class="col-sm-4 fw-bold">
+                        Created Date
+                    </div>
+
+                    <div class="col-sm-8">
+                        @Model.CreatedAt.ToString("dd-MM-yyyy HH:mm")
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="col-md-6">
+
+                <div class="row">
+
+                    <div class="col-sm-4 fw-bold">
+                        Updated Date
+                    </div>
+
+                    <div class="col-sm-8">
+                        @Model.UpdatedAt.ToString("dd-MM-yyyy HH:mm")
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="mt-4">
+
+            <a asp-action="Index"
+               class="btn btn-secondary fw-bold">
+
+                Back
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+</div>

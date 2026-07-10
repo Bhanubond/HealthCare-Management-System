@@ -1,4 +1,5 @@
-﻿using HMS.Data;
+﻿using HMS.Common;
+using HMS.Data;
 using HMS.Entities;
 using HMS.Models;
 using HMS.Services.Interfaces;
@@ -14,14 +15,16 @@ namespace HMS.Services.Implementations
         private readonly IMedicationService _medicationService;
         private readonly IFollowUpService _followUpService;
         private readonly IReferralStatusService _referralService;
+        private readonly IPatientTreatmentService _patientTreatmentService;
 
-        public EmergencyService(HmsDbContext db, ILookupService lookupService, IMedicationService medicationService, IReferralStatusService referralService, IFollowUpService followUpService)
+        public EmergencyService(HmsDbContext db, ILookupService lookupService, IMedicationService medicationService, IReferralStatusService referralService, IFollowUpService followUpService, IPatientTreatmentService patientTreatmentService)
         {
             _db = db;
             _lookupService = lookupService;
             _medicationService = medicationService;
             _referralService = referralService;
             _followUpService = followUpService;
+            _patientTreatmentService = patientTreatmentService;
         }
         public async Task<EMRCasesheetScreenVm> GetTreatmentScreenAsync(int DeptId, int patientId)
         {
@@ -238,6 +241,26 @@ namespace HMS.Services.Implementations
 
                 Console.WriteLine("STEP 11: FollowUp saved");
 
+                if (model.PatientTreatment != null &&
+                    (model.PatientTreatment.Services.Any(x => x.Selected) ||
+                     !string.IsNullOrWhiteSpace(model.PatientTreatment.PatientTreatmentJson)))
+                {
+                    model.PatientTreatment.CaseSheetId = entity.EMRId;
+
+                    model.PatientTreatment.PatientId = model.PatientId;
+
+                    model.PatientTreatment.DoctorId = model.DoctorId;
+
+
+                    await _patientTreatmentService.SavePatientTreatments(
+                        model.PatientTreatment
+                    );
+
+
+                    Console.WriteLine("STEP 10.1: Treatments saved");
+                }
+
+
                 await UpdateAllotmentAndReferralAsync(model, entity.EMRId);
                 Console.WriteLine("STEP 12: Allotment updated");
 
@@ -326,6 +349,71 @@ namespace HMS.Services.Implementations
 
             if (model == null)
                 return new EMRCasesheetScreenVm();
+            var DeptID = (int)Department.EMR;
+
+
+            var departmentServices =
+                await _patientTreatmentService.GetDepartmentServices(DeptID);
+
+
+            var treatments =
+                await _patientTreatmentService.GetPatientTreatments(model.EMRId);
+
+
+
+            var patientTreatmentVM = new PatientTreatmentVM
+            {
+
+                CaseSheetId = model.EMRId,
+
+                PatientId = model.PatientId,
+
+                DeptId = DeptID,
+
+                DoctorId = model.DoctorId,
+
+
+                Services = departmentServices
+                .Select(x => new PatientServiceVM
+                {
+
+                    ServiceID = x.ServiceID,
+
+                    ServiceName = x.ServiceName,
+
+                    Rate = x.Cost,
+
+                    Quantity = 1,
+
+                    DiscountPer = 0,
+
+                    Selected = false
+
+                })
+                .ToList(),
+
+
+                ExistingTreatments = treatments
+                .Select(x => new PatientTreatmentVMItem
+                {
+                    TreatmentId = x.PatientTreatmentId, 
+                    ServiceName = x.Service?.ServiceName ?? string.Empty,
+                    ServiceID = x.ServiceID,
+
+                    Rate = x.Rate,
+
+                    Quantity = x.Quantity,
+
+                    DiscountPer = x.DiscountPer,
+
+                    Amount = x.Amount
+
+                })
+                .ToList(),
+
+            };
+
+
 
             var medications = await _medicationService.GetActiveMedications();
             var existingMeds = await _medicationService.GetPatientMedications(model.PatientId);
@@ -477,7 +565,11 @@ namespace HMS.Services.Implementations
                     FromDeptId = currentDeptId ?? 0,
                     Departments = departments,
                     ExistingReferrals = referrals
-                }
+                },
+
+                PatientTreatment = patientTreatmentVM,
+
+                ExistingTreatments = treatments,
             };
         }
 

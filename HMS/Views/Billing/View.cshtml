@@ -1,0 +1,164 @@
+@model List<HMS.Models.PendingBillQueueVm>
+
+@{
+    ViewData["Title"] = "Pending Services";
+}
+
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
+
+            <div>
+                <h4 class="mb-1">Pending Services</h4>
+
+                @if (Model.Any())
+                {
+                    <div class="text-muted">
+                        Case Sheet : @Model.First().CaseSheetId
+                    </div>
+
+                    <div class="fw-semibold">
+                        Patient : @Model.First().PatientName
+                    </div>
+                }
+
+            </div>
+
+            <div>
+                <span class="badge bg-warning text-dark">
+                    Pending Billing
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">
+            Services
+        </h5>
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered align-middle">
+
+                <thead class="table-light">
+
+                    <tr>
+                        <th>Service</th>
+                        <th>Department</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.ServiceName
+                                </td>
+
+
+                                <td>
+                                    @item.DeptName
+                                </td>
+
+
+                                <td>
+                                    @item.Quantity
+                                </td>
+
+
+                                <td>
+                                    @item.Amount.ToString("0.00")
+                                </td>
+
+
+                                <td>
+
+                                    @if (item.IsProcessed)
+                                    {
+                                        <span class="badge bg-success">
+                                            Processed
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td class="text-end">
+
+                                    @if (!item.IsProcessed)
+                                    {
+                                        <form asp-action="ProcessQueueItem"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="BillQueueId"
+                                                   value="@item.BillQueueId" />
+
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-primary">
+                                                Add To Bill
+                                            </button>
+
+                                        </form>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="6"
+                                class="text-center text-muted">
+
+                                No pending services found
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,183 @@
+@model HMS.Models.PatientTreatmentVM
+
+@{
+    var vm = Model ?? new HMS.Models.PatientTreatmentVM();
+    var existingTreatmentsJson = System.Text.Json.JsonSerializer.Serialize(
+        vm.ExistingTreatments.Select(x => new
+        {
+            x.TreatmentId,
+            x.ServiceID,
+            x.ServiceName,
+            x.Rate,
+            x.Quantity,
+            x.DiscountPer,
+            x.Amount
+        }));
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <input type="hidden" id="PatientTreatmentJson" name="PatientTreatmentJson" />
+        <input type="hidden" id="PatientTreatmentJsonNested" name="PatientTreatment.PatientTreatmentJson" />
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="fw-bold">Select Service</label>
+                <select id="ServiceId" class="form-select">
+                    <option value="">-- Select Service --</option>
+                    @foreach (var item in vm.Services)
+                    {
+                        <option value="@item.ServiceID" data-rate="@item.Rate">
+                            @item.ServiceName
+                            @if (item.Rate > 0)
+                            {
+                                <text> - @item.Rate</text>
+                            }
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="fw-bold">Rate</label>
+                <input type="number" id="Rate" class="form-control" readonly />
+            </div>
+
+            <div class="col-md-2">
+                <label class="fw-bold">Quantity</label>
+                <input type="number" id="Quantity" class="form-control" value="1" min="1" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="fw-bold">Discount %</label>
+                <input type="number" id="DiscountPer" class="form-control" value="0" min="0" />
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" class="btn btn-success w-100" onclick="addService()">+</button>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="fw-bold mb-0">Added Services</h6>
+            <small class="text-muted">Existing services are shown here and new ones are queued for save.</small>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0" id="serviceTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Service</th>
+                        <th>Rate</th>
+                        <th>Qty</th>
+                        <th>Discount</th>
+                        <th>Amount</th>
+                        <th style="width:120px;"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let treatmentList = [];
+
+    function persistTreatmentJson() {
+        const json = JSON.stringify(treatmentList);
+        $("#PatientTreatmentJson").val(json);
+        $("#PatientTreatmentJsonNested").val(json);
+    }
+
+    function renderTable() {
+        let html = "";
+
+        treatmentList.forEach(function (item, index) {
+            const rate = Number(item.Rate || 0);
+            const qty = Number(item.Quantity || 0);
+            const discount = Number(item.DiscountPer || 0);
+            const amount = Number(item.Amount || 0);
+            const isPersisted = Number(item.TreatmentId || 0) > 0;
+
+            html += `
+                <tr>
+                    <td>
+                        <div class="fw-semibold">${item.ServiceName || ""}</div>
+                        ${isPersisted ? '<small class="text-muted">Saved</small>' : '<small class="text-success">New</small>'}
+                    </td>
+                    <td>${rate.toFixed(2)}</td>
+                    <td>${qty}</td>
+                    <td>${discount.toFixed(2)}</td>
+                    <td>${amount.toFixed(2)}</td>
+                    <td>
+                        ${isPersisted
+                            ? '<button type="button" class="btn btn-outline-secondary btn-sm w-100" disabled>Saved</button>'
+                            : `<button type="button" class="btn btn-danger btn-sm w-100" onclick="removeService(${index})">Remove</button>`}
+                    </td>
+                </tr>`;
+        });
+
+        $("#serviceTable tbody").html(html);
+        persistTreatmentJson();
+    }
+
+    function clearControls() {
+        $("#ServiceId").val("");
+        $("#Rate").val("");
+        $("#Quantity").val(1);
+        $("#DiscountPer").val(0);
+    }
+
+    function addService() {
+        const service = $("#ServiceId option:selected");
+
+        if (!service.val()) {
+            toastr.warning("Please select service");
+            return;
+        }
+
+        const rate = parseFloat($("#Rate").val()) || 0;
+        const qty = parseInt($("#Quantity").val(), 10) || 1;
+        const discount = parseFloat($("#DiscountPer").val()) || 0;
+        const gross = rate * qty;
+        const amount = gross - ((gross * discount) / 100);
+
+        treatmentList.push({
+            TreatmentId: 0,
+            ServiceID: parseInt(service.val(), 10),
+            ServiceName: service.text().trim(),
+            Rate: rate,
+            Quantity: qty,
+            DiscountPer: discount,
+            Amount: amount
+        });
+
+        renderTable();
+        clearControls();
+    }
+
+    function removeService(index) {
+        const item = treatmentList[index];
+        if (item && Number(item.TreatmentId || 0) > 0) {
+            toastr.info("Saved treatments cannot be removed from the queue here.");
+            return;
+        }
+
+        treatmentList.splice(index, 1);
+        renderTable();
+    }
+
+    $(document).ready(function () {
+        treatmentList = @Html.Raw(string.IsNullOrWhiteSpace(existingTreatmentsJson) ? "[]" : existingTreatmentsJson);
+
+        $("#ServiceId").on("change", function () {
+            const rate = $("#ServiceId option:selected").data("rate");
+            $("#Rate").val(rate ?? 0);
+        });
+
+        renderTable();
+    });
+</script>

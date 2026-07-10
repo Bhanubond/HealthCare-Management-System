@@ -61,5 +61,9 @@ namespace HMS.Models
         public List<int> SelectedToDeptIds { get; set; } = new();
         public Dictionary<int, string> Reasons { get; set; } = new();
         public ReferralStatusVm ReferralStatus { get; set; }
+
+        public PatientTreatmentVM? PatientTreatment { get; set; }
+
+        public List<HMS.Entities.BillingDetails.PatientTreatment> ExistingTreatments { get; set; } = new();
     }
 }
