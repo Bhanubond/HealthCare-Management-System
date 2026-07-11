@@ -35,6 +35,16 @@ namespace HMS.Services.Implementations
 
             var now = DateTime.Now;
             var treatments = new List<PatientTreatment>();
+            var serviceIds = items
+                .Where(x => x.TreatmentId == 0 && x.ServiceID > 0)
+                .Select(x => x.ServiceID)
+                .Distinct()
+                .ToList();
+
+            var services = await _context.TreatmentServices
+                .AsNoTracking()
+                .Where(x => serviceIds.Contains(x.ServiceID) && x.DeptId == model.DeptId && x.IsActive)
+                .ToDictionaryAsync(x => x.ServiceID);
 
             foreach (var item in items)
             {
@@ -44,13 +54,25 @@ namespace HMS.Services.Implementations
                 if (item.ServiceID <= 0)
                     continue;
 
+                if (!services.TryGetValue(item.ServiceID, out var service))
+                    continue;
+
+                var duplicateExists = await _context.PatientTreatments
+                    .AnyAsync(x => x.CaseSheetId == model.CaseSheetId
+                                   && x.PatientId == model.PatientId
+                                   && x.DeptId == model.DeptId
+                                   && x.ServiceID == item.ServiceID
+                                   && !x.IsCancelled
+                                   && !x.IsBilled);
+
+                if (duplicateExists)
+                    continue;
+
                 var quantity = item.Quantity <= 0 ? 1 : item.Quantity;
-                var rate = item.Rate;
-                var discountPer = item.DiscountPer;
+                var rate = service.Cost;
+                var discountPer = Math.Clamp(item.DiscountPer, 0, 100);
                 var gross = rate * quantity;
-                var amount = item.Amount > 0
-                    ? item.Amount
-                    : gross - ((gross * discountPer) / 100m);
+                var amount = gross - ((gross * discountPer) / 100m);
 
                 treatments.Add(new PatientTreatment
                 {
@@ -82,7 +104,15 @@ namespace HMS.Services.Implementations
                 _context.PatientTreatments.AddRange(treatments);
                 await _context.SaveChangesAsync();
 
-                var queues = treatments.Select(t => new BillQueueDetails
+                var treatmentIds = treatments.Select(x => x.PatientTreatmentId).ToList();
+                var queuedTreatmentIds = await _context.BillQueueDetails
+                    .Where(x => treatmentIds.Contains(x.PatientTreatmentId) && !x.IsCancelled)
+                    .Select(x => x.PatientTreatmentId)
+                    .ToListAsync();
+
+                var queues = treatments
+                    .Where(t => !queuedTreatmentIds.Contains(t.PatientTreatmentId))
+                    .Select(t => new BillQueueDetails
                 {
                     CaseSheetId = model.CaseSheetId,
                     PatientId = model.PatientId,

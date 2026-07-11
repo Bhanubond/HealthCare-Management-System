@@ -1,164 +1,211 @@
-@model List<HMS.Models.PendingBillQueueVm>
+@model HMS.Models.BillingViewVm
 
 @{
-    ViewData["Title"] = "Pending Services";
+    ViewData["Title"] = "Pending Bill";
+    var grossTotal = Model.PendingItems.Sum(x => x.Rate * x.Quantity);
+    var discountTotal = grossTotal - Model.PendingItems.Sum(x => x.Amount);
+    var netAmount = Model.PendingItems.Sum(x => x.Amount);
+    var paymentModes = new[] { "Cash", "UPI", "Credit Card", "Debit Card", "Cheque", "NEFT" };
 }
 
 <div class="card shadow-sm border-0 mb-3">
-    <div class="card-body">
-
-        <div class="d-flex justify-content-between align-items-start flex-wrap">
-
-            <div>
-                <h4 class="mb-1">Pending Services</h4>
-
-                @if (Model.Any())
-                {
-                    <div class="text-muted">
-                        Case Sheet : @Model.First().CaseSheetId
-                    </div>
-
-                    <div class="fw-semibold">
-                        Patient : @Model.First().PatientName
-                    </div>
-                }
-
-            </div>
-
-            <div>
-                <span class="badge bg-warning text-dark">
-                    Pending Billing
-                </span>
-            </div>
-
+    <div class="card-body d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <h4 class="mb-1">Pending Bill</h4>
+            <div class="text-muted">Case Sheet: @Model.CaseSheetId</div>
+            <div class="text-muted">Department: @Model.DepartmentName</div>
+            @if (Model.Patient != null)
+            {
+                <div class="fw-semibold mt-1">@Model.Patient.PatientName</div>
+                <div class="text-muted">@Model.Patient.OpNo</div>
+            }
         </div>
-
+        <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
     </div>
 </div>
 
-
-<div class="card shadow-sm border-0">
-
+<div class="card shadow-sm border-0 mb-3">
     <div class="card-header bg-white">
-        <h5 class="mb-0">
-            Services
-        </h5>
+        <h5 class="mb-0">Services</h5>
     </div>
-
-
     <div class="card-body">
-
-        <div class="table-responsive">
-
-            <table class="table table-bordered align-middle">
-
-                <thead class="table-light">
-
-                    <tr>
-                        <th>Service</th>
-                        <th>Department</th>
-                        <th>Quantity</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var item in Model)
+        @if (Model.PendingItems.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Service</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Discount</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PendingItems)
                         {
                             <tr>
-
-                                <td>
-                                    @item.ServiceName
-                                </td>
-
-
-                                <td>
-                                    @item.DeptName
-                                </td>
-
-
-                                <td>
-                                    @item.Quantity
-                                </td>
-
-
-                                <td>
-                                    @item.Amount.ToString("0.00")
-                                </td>
-
-
-                                <td>
-
-                                    @if (item.IsProcessed)
-                                    {
-                                        <span class="badge bg-success">
-                                            Processed
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning text-dark">
-                                            Pending
-                                        </span>
-                                    }
-
-                                </td>
-
-
-                                <td class="text-end">
-
-                                    @if (!item.IsProcessed)
-                                    {
-                                        <form asp-action="ProcessQueueItem"
-                                              method="post">
-
-                                            @Html.AntiForgeryToken()
-
-                                            <input type="hidden"
-                                                   name="BillQueueId"
-                                                   value="@item.BillQueueId" />
-
-
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-primary">
-                                                Add To Bill
-                                            </button>
-
-                                        </form>
-                                    }
-
-                                </td>
-
+                                <td>@item.ServiceName</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Rate.ToString("0.00")</td>
+                                <td>@item.DiscountPer.ToString("0.00")</td>
+                                <td>@item.Amount.ToString("0.00")</td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
+                    </tbody>
+                </table>
+            </div>
 
-                            <td colspan="6"
-                                class="text-center text-muted">
-
-                                No pending services found
-
-                            </td>
-
-                        </tr>
-                    }
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+            <div class="row justify-content-end">
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between">
+                        <span>Gross Total</span>
+                        <strong>@grossTotal.ToString("0.00")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Discount</span>
+                        <strong>@discountTotal.ToString("0.00")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between fs-5 border-top mt-2 pt-2">
+                        <span>Net Amount</span>
+                        <strong>@netAmount.ToString("0.00")</strong>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">No pending services found.</div>
+        }
     </div>
-
 </div>
+
+@if (Model.PendingItems.Any())
+{
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Payment</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="PayBill" method="post" id="paymentForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="PatientId" value="@Model.PatientId" />
+                <input type="hidden" name="CaseSheetId" value="@Model.CaseSheetId" />
+                <input type="hidden" name="DeptId" value="@Model.DeptId" />
+
+                <div id="paymentRows">
+                    <div class="row g-2 align-items-end payment-row mb-2">
+                        <div class="col-md-3">
+                            <label class="form-label">Mode</label>
+                            <select name="Payments[0].PaymentMode" class="form-select payment-mode" required>
+                                @foreach (var mode in paymentModes)
+                                {
+                                    <option value="@mode">@mode</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Amount</label>
+                            <input name="Payments[0].Amount" class="form-control payment-amount" type="number" step="0.01" min="0.01" value="@netAmount.ToString("0.00")" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Transaction No</label>
+                            <input name="Payments[0].TransactionNo" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Remarks</label>
+                            <input name="Payments[0].Remarks" class="form-control" />
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <button type="button" class="btn btn-outline-danger remove-payment" disabled>Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+                    <button type="button" class="btn btn-outline-primary" id="addPayment">Add Payment Mode</button>
+                    <div class="text-end">
+                        <div class="text-muted">Payment Total: <strong id="paymentTotal">@netAmount.ToString("0.00")</strong></div>
+                        <button type="submit" class="btn btn-success mt-2">Pay</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        const netAmount = @netAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        const paymentModes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(paymentModes));
+
+        function renumberPaymentRows() {
+            $("#paymentRows .payment-row").each(function (index) {
+                $(this).find("select, input").each(function () {
+                    const name = $(this).attr("name");
+                    if (name) {
+                        $(this).attr("name", name.replace(/Payments\[\d+\]/, `Payments[${index}]`));
+                    }
+                });
+            });
+
+            $(".remove-payment").prop("disabled", $("#paymentRows .payment-row").length === 1);
+        }
+
+        function updatePaymentTotal() {
+            let total = 0;
+            $(".payment-amount").each(function () {
+                total += parseFloat($(this).val()) || 0;
+            });
+
+            $("#paymentTotal").text(total.toFixed(2));
+        }
+
+        $("#addPayment").on("click", function () {
+            const index = $("#paymentRows .payment-row").length;
+            const options = paymentModes.map(mode => `<option value="${mode}">${mode}</option>`).join("");
+
+            $("#paymentRows").append(`
+                <div class="row g-2 align-items-end payment-row mb-2">
+                    <div class="col-md-3">
+                        <select name="Payments[${index}].PaymentMode" class="form-select payment-mode" required>${options}</select>
+                    </div>
+                    <div class="col-md-2">
+                        <input name="Payments[${index}].Amount" class="form-control payment-amount" type="number" step="0.01" min="0.01" required />
+                    </div>
+                    <div class="col-md-3">
+                        <input name="Payments[${index}].TransactionNo" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <input name="Payments[${index}].Remarks" class="form-control" />
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button" class="btn btn-outline-danger remove-payment">Remove</button>
+                    </div>
+                </div>`);
+
+            renumberPaymentRows();
+        });
+
+        $(document).on("click", ".remove-payment", function () {
+            $(this).closest(".payment-row").remove();
+            renumberPaymentRows();
+            updatePaymentTotal();
+        });
+
+        $(document).on("input", ".payment-amount", updatePaymentTotal);
+
+        $("#paymentForm").on("submit", function (event) {
+            let total = 0;
+            $(".payment-amount").each(function () {
+                total += parseFloat($(this).val()) || 0;
+            });
+
+            if (Math.abs(total - netAmount) > 0.01) {
+                event.preventDefault();
+                alert("Payment total must match net amount.");
+            }
+        });
+    </script>
+}

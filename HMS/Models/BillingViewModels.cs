@@ -8,7 +8,11 @@ namespace HMS.Models
         public string BillNo { get; set; } = string.Empty;
         public int CaseSheetId { get; set; }
         public int PatientId { get; set; }
+        public int DeptId { get; set; }
         public string PatientName { get; set; } = string.Empty;
+        public string OpNo { get; set; } = string.Empty;
+        public string DeptName { get; set; } = string.Empty;
+        public int PendingServiceCount { get; set; }
         public decimal GrossAmount { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal NetAmount { get; set; }
@@ -38,6 +42,18 @@ namespace HMS.Models
     public class BillingPaymentVm
     {
         public int BillId { get; set; }
+        public int PatientId { get; set; }
+        public int CaseSheetId { get; set; }
+        public int DeptId { get; set; }
+        public string PaymentMode { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string? TransactionNo { get; set; }
+        public string? Remarks { get; set; }
+        public List<BillingPaymentLineVm> Payments { get; set; } = new();
+    }
+
+    public class BillingPaymentLineVm
+    {
         public string PaymentMode { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string? TransactionNo { get; set; }
@@ -65,5 +81,8 @@ namespace HMS.Models
         public List<BillingDetails> BillingDetails { get; set; } = new();
         public List<PaymentDetail> Payments { get; set; } = new();
         public int CaseSheetId { get; set; }
+        public int PatientId { get; set; }
+        public int DeptId { get; set; }
+        public string DepartmentName { get; set; } = string.Empty;
     }
 }

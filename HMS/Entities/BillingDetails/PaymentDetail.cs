@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HMS.Entities.BillingDetails
 {
-    [Table("PaymentDetail")]
+    [Table("PaymentDetails")]
     public class PaymentDetail
     {
         [Key]

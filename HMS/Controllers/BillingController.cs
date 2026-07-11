@@ -21,42 +21,36 @@ namespace HMS.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> PaidBills()
+        public async Task<IActionResult> PaidBills(int? department, string? patient, string? billNo, DateTime? billDate)
         {
-            var bills = await _billingService.GetPaidBills();
+            var bills = await _billingService.GetPaidBills(department, patient, billNo, billDate);
+            ViewBag.Department = department;
+            ViewBag.Patient = patient;
+            ViewBag.BillNo = billNo;
+            ViewBag.BillDate = billDate?.ToString("yyyy-MM-dd");
             return View(bills);
         }
 
         [HttpGet]
         public async Task<IActionResult> ViewBill(int id)
         {
-            var model = await _billingService.GetBillDetailsByCaseSheetId(id);
+            var model = await _billingService.GetBillDetails(id);
             return View(model);
         }
 
         [HttpGet]
-        public async Task<IActionResult> View(int patientId)
+        public async Task<IActionResult> View(int? id, int patientId = 0, int caseSheetId = 0, int deptId = 0)
         {
-            var pendingItems = await _billingService.GetPendingBillQueueByPatientId(patientId);
-
-            return View(pendingItems);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBill(int caseSheetId)
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            var billId = await _billingService.CreateBill(caseSheetId, userId);
-
-            if (billId == 0)
+            if ((id ?? 0) > 0 && patientId == 0 && caseSheetId == 0 && deptId == 0)
             {
-                TempData["ErrorMessage"] = "No pending services were found for billing.";
-                return RedirectToAction(nameof(ViewBill), new { id = caseSheetId });
+                return await ViewBill(id!.Value);
             }
 
-            TempData["SuccessMessage"] = "Bill generated successfully.";
-            return RedirectToAction(nameof(View), new { id = billId });
+            if (patientId <= 0 || caseSheetId <= 0 || deptId <= 0)
+                return BadRequest("Invalid pending bill request.");
+
+            var model = await _billingService.GetPendingBillDetails(patientId, caseSheetId, deptId);
+            return View(model);
         }
 
         [HttpPost]
@@ -64,10 +58,10 @@ namespace HMS.Controllers
         public async Task<IActionResult> PayBill(BillingPaymentVm model)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
-            await _billingService.SavePayment(model, userId);
+            var billId = await _billingService.SavePayment(model, userId);
 
             TempData["SuccessMessage"] = "Payment saved successfully.";
-            return RedirectToAction(nameof(View), new { id = model.BillId });
+            return RedirectToAction(nameof(ViewBill), new { id = billId });
         }
 
         [HttpPost]
@@ -78,7 +72,7 @@ namespace HMS.Controllers
             await _billingService.CancelBill(model, userId);
 
             TempData["SuccessMessage"] = "Bill cancelled successfully.";
-            return RedirectToAction(nameof(View), new { id = model.BillId });
+            return RedirectToAction(nameof(PaidBills));
         }
 
         [HttpPost]
@@ -89,7 +83,7 @@ namespace HMS.Controllers
             await _billingService.CancelService(model, userId);
 
             TempData["SuccessMessage"] = "Service cancelled successfully.";
-            return RedirectToAction(nameof(View), new { id = model.BillId });
+            return RedirectToAction(nameof(ViewBill), new { id = model.BillId });
         }
     }
 }

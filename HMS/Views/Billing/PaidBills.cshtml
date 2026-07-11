@@ -13,11 +13,34 @@
         <a class="btn btn-outline-primary" asp-action="Index">Unpaid Bills</a>
     </div>
     <div class="card-body">
+        <form method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-md-2">
+                <label class="form-label">Department</label>
+                <input name="department" value="@ViewBag.Department" class="form-control" type="number" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Patient</label>
+                <input name="patient" value="@ViewBag.Patient" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Bill No</label>
+                <input name="billNo" value="@ViewBag.BillNo" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Bill Date</label>
+                <input name="billDate" value="@ViewBag.BillDate" class="form-control" type="date" />
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a class="btn btn-outline-secondary" asp-action="PaidBills">Clear</a>
+            </div>
+        </form>
         <div class="table-responsive">
             <table class="table table-striped align-middle">
                 <thead>
                     <tr>
                         <th>Patient</th>
+                        <th>OP/IP No</th>
                         <th>Bill No</th>
                         <th>Case Sheet</th>
                         <th>Net Amount</th>
@@ -32,6 +55,7 @@
                     {
                         <tr>
                             <td>@bill.PatientName</td>
+                            <td>@bill.OpNo</td>
                             <td>@bill.BillNo</td>
                             <td>@bill.CaseSheetId</td>
                             <td>@bill.NetAmount.ToString("0.00")</td>
@@ -39,7 +63,7 @@
                             <td>@bill.BalanceAmount.ToString("0.00")</td>
                             <td>@bill.BillDate.ToString("dd-MMM-yyyy HH:mm")</td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary" asp-action="View" asp-route-id="@bill.BillId">View</a>
+                                <a class="btn btn-sm btn-outline-primary" asp-action="ViewBill" asp-route-id="@bill.BillId">View</a>
                             </td>
                         </tr>
                     }
